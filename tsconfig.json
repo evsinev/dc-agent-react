@@ -1,0 +1,30 @@
+{
+  "compilerOptions": {
+    "target": "ESNext",
+    "module": "ESNext",
+    "lib": ["DOM", "DOM.Iterable", "ESNext"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": true,
+    "forceConsistentCasingInFileNames": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "importHelpers": true,
+    "jsx": "preserve",
+    "incremental": true,
+    "useDefineForClassFields": true,
+    "noFallthroughCasesInSwitch": true,
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "moduleResolution": "Node",
+    "baseUrl": "./",
+    "paths": {
+      "@/*": ["src/*"],
+    }
+  },
+  "include": [
+    "src",
+    "rsbuild.config.ts",
+    "tailwind.config",
+  ]
+}

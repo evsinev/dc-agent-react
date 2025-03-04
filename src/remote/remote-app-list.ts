@@ -8,7 +8,7 @@ export type AppListItem = {
 };
 
 type AppListResponse = {
-  apps : AppListItem[];
+  apps: AppListItem[];
 };
 
 export async function remoteAppList() : Promise<AppListResponse> {

@@ -1,13 +1,11 @@
-import * as process from 'process';
-
-import { BrowserRouter, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Route, Routes } from 'react-router';
 import Home from '@/pages/home';
-import Example from '@/pages/example';
 import AppList from '@/pages/app-list';
 import AppView from '@/pages/app-view';
 import ServiceList from '@/pages/service-list';
 import ServiceView from '@/pages/service-view';
 import GitRepositoryPage from '@/pages/git-repository-page';
+import LogsPage from '@/pages/logs';
 
 export default function Router() {
   return (
@@ -25,6 +23,7 @@ export default function Router() {
         <Route path="/git">
           <Route path="" Component={GitRepositoryPage} />
         </Route>
+        <Route path="/logs" Component={LogsPage} />
         <Route path="*" Component={Home} />
       </Routes>
     </BrowserRouter>

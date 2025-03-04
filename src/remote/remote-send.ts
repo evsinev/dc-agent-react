@@ -49,6 +49,6 @@ export async function remoteSend<T>(props: RemoteSendProps): Promise<T> {
         throw new ProblemError(`Unknown error ${response.status}`);
     }
   } catch (e) {
-    throw new ProblemError('Cannot fetch', e);
+    throw new ProblemError('Cannot fetch', e as Error);
   }
 }

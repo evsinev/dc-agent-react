@@ -25,6 +25,5 @@
   "include": [
     "src",
     "rsbuild.config.ts",
-    "tailwind.config",
   ]
 }

@@ -20,7 +20,7 @@ const areEqual = (prevProps: LogRowProps, nextProps: LogRowProps) => (
 
 export default memo(({ log, index }: LogRowProps) => (
   <Wrapper>
-    <div>{index}</div>
+    {index}
     <div>{log}</div>
   </Wrapper>
 ), areEqual);

@@ -11,6 +11,8 @@ const LOCALE = 'en';
 const queryClient = new QueryClient();
 
 export default function App() {
+  const basePath = process.env.PUBLIC_BASE_PATH || '';
+
   return (
     <QueryClientProvider client={queryClient}>
       <I18nProvider locale={LOCALE} messages={[messages]}>
@@ -20,11 +22,11 @@ export default function App() {
               items={[
                 {
                   text: 'Home',
-                  href: process.env.PUBLIC_BASE_PATH,
+                  href: `${basePath}/`,
                 },
                 {
                   text: 'Apps',
-                  href: process.env.PUBLIC_BASE_PATH,
+                  href: `${basePath}/`,
                 },
               ]}
             />
@@ -32,24 +34,29 @@ export default function App() {
           navigation={(
             <SideNavigation
               header={{
-                href: process.env.PUBLIC_BASE_PATH,
+                href: basePath,
                 text: 'dc-operator',
               }}
               items={[
                 {
                   type: 'link',
                   text: 'App list',
-                  href: process.env.PUBLIC_BASE_PATH,
+                  href: basePath,
                 },
                 {
                   type: 'link',
                   text: 'Service list',
-                  href: `${process.env.PUBLIC_BASE_PATH}/services`,
+                  href: `${basePath}/services`,
                 },
                 {
                   type: 'link',
                   text: 'Git repo',
-                  href: `${process.env.PUBLIC_BASE_PATH}/git`,
+                  href: `${basePath}/git`,
+                },
+                {
+                  type: 'link',
+                  text: 'Logs',
+                  href: `${basePath}/logs`,
                 },
               ]}
             />

@@ -1,14 +1,10 @@
-import { useLogsList } from '@/pages/logs/api/logs-list';
+import { Spinner } from '@cloudscape-design/components';
 
 export default function LogsAreaLoader() {
-  // TODO: заменить hostname и service
-  const { data } = useLogsList({
-    hostname: 'some-host',
-    service: 'some-service',
-    linesCount: 10,
-  });
-
   return (
-    <div>Loading</div>
+    <div>
+      Loading
+      <Spinner />
+    </div>
   );
 }

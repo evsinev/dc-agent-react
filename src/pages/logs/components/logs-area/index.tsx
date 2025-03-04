@@ -14,13 +14,9 @@ export default function LogsArea() {
 
   const logs = useLogs((state) => state.logs);
 
-  // Suspense не подходит, т.к. у нас все в одном bundle
-  if (isLoading) {
-    return <LogsAreaLoader />;
-  }
-
   return (
     <Area>
+      {isLoading && <LogsAreaLoader />}
       {logs.map((log, index) => (
         <LogRow
           key={`${log}${index}`}

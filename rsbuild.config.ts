@@ -15,13 +15,11 @@ export default defineConfig({
     },
     legalComments: 'none',
   },
-  source: {
+  resolve: {
     alias: {
       '@': './src',
+      '@routing': './src/app/router/config.ts',
     },
-    // include: [
-    //   /[\\/]node_modules[\\/]@cloudscape-design[\\/]/,
-    // ],
   },
   performance: {
     chunkSplit: {

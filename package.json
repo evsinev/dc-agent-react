@@ -1,5 +1,6 @@
 {
   "name": "rsbuild-spa-template",
+  "description": "Dc-operator control plane ui",
   "private": true,
   "version": "1.0.0",
   "repository": "https://github.com/evsinev/dc-agent-react",

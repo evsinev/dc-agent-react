@@ -13,7 +13,14 @@ const useLogs = create<State>((set, getState) => ({
   setLogToken: (logToken: string) => set({ logToken }),
 
   logs: [],
-  setLogs: (logs: string[]) => set({ logs: [...getState().logs, ...logs] }),
+  setLogs: (logs: string[]) => {
+    const newLogs = [...getState().logs, ...logs];
+    if (newLogs.length > 10000) {
+      newLogs.splice(10);
+    }
+
+    set({ logs: newLogs });
+  },
 }));
 
 export default useLogs;

@@ -13,6 +13,10 @@ const Wrapper = styled.div`
   margin-bottom: 4px;
 `;
 
+const Number = styled.div`
+  user-select: none;
+`;
+
 const areEqual = (prevProps: LogRowProps, nextProps: LogRowProps) => (
   prevProps.index === nextProps.index
   && prevProps.log === nextProps.log
@@ -20,7 +24,7 @@ const areEqual = (prevProps: LogRowProps, nextProps: LogRowProps) => (
 
 export default memo(({ log, index }: LogRowProps) => (
   <Wrapper>
-    {index}
+    <Number>{index}</Number>
     <div>{log}</div>
   </Wrapper>
 ), areEqual);

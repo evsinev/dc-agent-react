@@ -46,5 +46,21 @@
     "eslint-plugin-react-hooks": "4.6.0",
     "typescript": "5.5.4"
   },
+  "dependenciesJustification": {
+    "@cloudscape-design/code-view": "A component for displaying code snippets with syntax highlighting and formatting, improving readability and presentation of code in applications.",
+    "@cloudscape-design/collection-hooks": "A set of hooks for managing collections of items in a React application efficiently, providing utility functions to simplify interactions with data.",
+    "@cloudscape-design/components": "A library of pre-built UI components following Cloudscape design principles, enabling rapid development of consistent and visually appealing user interfaces.",
+    "@cloudscape-design/global-styles": "A package that provides base styles for Cloudscape components, ensuring consistent styling across all components and reducing the need for custom CSS.",
+    "@emotion/react": "A library for writing CSS styles with JavaScript, allowing for dynamic styling and theming in React applications.",
+    "@emotion/styled": "A library that enables you to create styled components using a concise syntax, enhancing the organization and reusability of styles.",
+    "@tanstack/react-query": "A powerful data-fetching and state management library for React applications, helping to manage server state, caching, and background data synchronization easily.",
+    "pino": "A fast and low-overhead logging library for Node.js applications, providing efficient logging capabilities while minimizing performance impact.",
+    "react": "The core library for building user interfaces in a declarative manner, allowing developers to create re-usable and composable UI components.",
+    "react-dom": "An essential library for rendering React applications in the browser, providing functionalities for interacting with the DOM.",
+    "react-router": "A library for routing in React applications, enabling navigation between different views, and helping manage browser history and URL changes.",
+    "swr": "A React Hooks library for data fetching that provides features like caching, revalidation, and request deduplication, ensuring a smooth user experience.",
+    "uuid": "A utility for generating unique identifiers, useful for ensuring distinct keys for items in lists or for other identification purposes.",
+    "zustand": "A small and fast state management library for React, offering a simple API for managing application state without the need for complex setups."
+  },
   "packageManager": "yarn@4.7.0"
 }

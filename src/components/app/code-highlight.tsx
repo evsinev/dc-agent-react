@@ -9,11 +9,11 @@ function detectColor(line: string) {
 }
 
 function CodeHighlight({ code }: { code: string | undefined | null }) {
-  const lines : string[] = code?.split(/\r\n|\r|\n/).map((line) => line.trim());
+  const lines = code?.split(/\r\n|\r|\n/).map((line) => line.trim());
 
   return (
     <pre>
-      {lines.map((line, index) => (
+      {lines?.map((line, index) => (
         <span key={index} style={{ color: detectColor(line) }}>{line}<br /></span>
       ))}
     </pre>

@@ -12,7 +12,7 @@ export default function GitRepositoryPage() {
     isSuccess,
     isFetching,
     isError,
-    refetch
+    refetch,
   } = useQuery({
     queryKey: ['/git/status'],
     queryFn: () => remoteGitLog(),
@@ -65,7 +65,6 @@ export default function GitRepositoryPage() {
         <GitCommitsTable commits={isSuccess ? data.commits : []} isLoading={isPending} />
 
       </SpaceBetween>
-
 
     </ContentLayout>
   );

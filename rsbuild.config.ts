@@ -15,6 +15,11 @@ export default defineConfig({
     },
     legalComments: 'none',
   },
+  source: {
+    entry: {
+      index: './src/app/index.tsx',
+    },
+  },
   resolve: {
     alias: {
       '@': './src',

@@ -1,7 +1,8 @@
-import * as React from 'react';
 import Table from '@cloudscape-design/components/table';
 import Link from '@cloudscape-design/components/link';
 import { useCollection } from '@cloudscape-design/collection-hooks';
+import AppDetail from './app-detail';
+import { useSplitPanel } from '@/hooks/use-split-panel';
 import { AppListItem } from '@/remote/remote-app-list';
 
 type AppListTableProps = {
@@ -9,14 +10,39 @@ type AppListTableProps = {
   isLoading: boolean
 };
 
-function AppListTable(props: AppListTableProps) {
-  console.log('apps', props.apps?.length > 0, props.apps);
-  const { items, collectionProps } = useCollection(
-    props.apps,
-    {
-      sorting: {},
-    },
+const defaultSorting = { sorting: {} };
+
+const columns = [
+  {
+    id: 'appName',
+    visible: true,
+  },
+  {
+    id: 'taskHost',
+    visible: true,
+  },
+  {
+    id: 'taskName',
+    visible: true,
+  },
+  {
+    id: 'taskType',
+    visible: true,
+  },
+];
+
+export default function AppListTable(props: AppListTableProps) {
+  const { items, collectionProps } = useCollection(props.apps, defaultSorting);
+  const { show } = useSplitPanel();
+
+  const itemCell = (item: AppListItem) => (
+    <Link
+      onClick={() => show({ content: <AppDetail appName={item.appName} />, title: item.appName })}
+    >
+      {item.appName}
+    </Link>
   );
+
   return (
     <Table
       {...collectionProps}
@@ -24,51 +50,30 @@ function AppListTable(props: AppListTableProps) {
         {
           id: 'appName',
           header: 'App',
-          // eslint-disable-next-line
-          cell: (item) => <Link href={`/dc-operator/apps/${item.appName}`}>{item.appName}</Link>,
+          cell: itemCell,
           sortingField: 'appName',
           isRowHeader: true,
         },
         {
           id: 'taskHost',
           header: 'Host',
-          // eslint-disable-next-line
-          cell: item => item.taskHost,
+          cell: (item) => item.taskHost,
           sortingField: 'taskHost',
         },
         {
           id: 'taskName',
           header: 'Task Name',
-          // eslint-disable-next-line
-          cell: item => item.taskName,
+          cell: (item) => item.taskName,
           sortingField: 'taskName',
         },
         {
           id: 'taskType',
           header: 'Task Type',
-          // eslint-disable-next-line
-          cell: item => item.taskType,
+          cell: (item) => item.taskType,
           sortingField: 'taskType',
         },
       ]}
-      columnDisplay={[
-        {
-          id: 'appName',
-          visible: true,
-        },
-        {
-          id: 'taskHost',
-          visible: true,
-        },
-        {
-          id: 'taskName',
-          visible: true,
-        },
-        {
-          id: 'taskType',
-          visible: true,
-        },
-      ]}
+      columnDisplay={columns}
       items={items}
       loadingText="Loading resources"
       trackBy="appName"
@@ -76,5 +81,3 @@ function AppListTable(props: AppListTableProps) {
     />
   );
 }
-
-export default AppListTable;

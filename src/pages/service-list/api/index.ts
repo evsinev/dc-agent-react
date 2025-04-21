@@ -1,16 +1,6 @@
-import { remoteSend } from '@/remote/remote-send';
+import { clientPost } from '@/libs/client-post';
 import { StatusIndicatorProps } from '@cloudscape-design/components/status-indicator/internal';
-
-export type ServiceListItem = {
-  fqsn: string;
-  host: string;
-  serviceName: string;
-  serviceStatus: ServiceStatus;
-  statusIndicator: StatusIndicatorProps.Type;
-  statusName: string;
-  ageFormatted: string;
-  whenFormatted: string;
-};
+import useSWR from 'swr';
 
 export type ServiceStateType =
   | 'UP'
@@ -30,10 +20,21 @@ export type ServiceStatus = {
   errorMessage?: string;
 };
 
+export type ServiceListItem = {
+  fqsn: string;
+  host: string;
+  serviceName: string;
+  serviceStatus: ServiceStatus;
+  statusIndicator: StatusIndicatorProps.Type;
+  statusName: string;
+  ageFormatted: string;
+  whenFormatted: string;
+};
+
 type ServiceListResponse = {
   services: ServiceListItem[];
 };
 
-export async function remoteServiceList(): Promise<ServiceListResponse> {
-  return remoteSend({ path: '/service/list' });
+export function useServiceList() {
+  return useSWR('/service/list', (url) => clientPost<ServiceListResponse>({ url }));
 }

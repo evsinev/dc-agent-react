@@ -1,15 +1,15 @@
-import Table from '@cloudscape-design/components/table';
-import Link from '@cloudscape-design/components/link';
+import { ServiceListItem } from '@/remote/remote-service-list';
 import { useCollection } from '@cloudscape-design/collection-hooks';
 import { StatusIndicator } from '@cloudscape-design/components';
-import { ServiceListItem } from '@/remote/remote-service-list';
+import Link from '@cloudscape-design/components/link';
+import Table from '@cloudscape-design/components/table';
 
-type ServiceListTableProps = {
+type Props = {
   services: ServiceListItem[];
   isLoading: boolean;
 };
 
-export default function ServiceListTable(props: ServiceListTableProps) {
+export default function ServiceListTable(props: Props) {
   const { items, collectionProps } = useCollection(props.services, {
     sorting: {},
   });

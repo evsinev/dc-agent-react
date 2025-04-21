@@ -1,7 +1,8 @@
 import { useCollection } from '@cloudscape-design/collection-hooks';
 import { StatusIndicator } from '@cloudscape-design/components';
-import Link from '@cloudscape-design/components/link';
 import Table from '@cloudscape-design/components/table';
+import routing from '@routing';
+import { Link } from 'react-router';
 import { ServiceListItem } from '../api/service-list';
 
 type Props = {
@@ -9,17 +10,18 @@ type Props = {
   isLoading: boolean;
 };
 
+const serviceNameLink = (item: ServiceListItem) => (
+  <Link to={routing.service.replace(':host/:serviceName', item.fqsn)}>{item.serviceName}</Link>
+);
+
+const statusNameLink = (item: ServiceListItem) => (
+  <StatusIndicator type={item.statusIndicator}>{item.statusName}</StatusIndicator>
+);
+
 export default function ServiceListTable(props: Props) {
   const { items, collectionProps } = useCollection(props.services, {
     sorting: {},
   });
-
-  const serviceNameLink = (item: ServiceListItem) => (
-    <Link href={`/dc-operator/services/${item.fqsn}`}>{item.serviceName}</Link>
-  );
-  const statusNameLink = (item: ServiceListItem) => (
-    <StatusIndicator type={item.statusIndicator}>{item.statusName}</StatusIndicator>
-  );
 
   return (
     <Table

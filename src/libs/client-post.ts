@@ -14,7 +14,7 @@ const getFetchData = async <T>(response: Response): Promise<T> => {
   if (!text) {
     throw new RequestError({
       title: 'Empty response',
-      errorMessage: 'Request error',
+      type: 'Request error',
       status: response.status,
       detail: {
         path: response.url,
@@ -43,10 +43,12 @@ export async function clientPost<T>(props: ClientPostProps): Promise<T> {
   if (!response.ok) {
     const errorMessage = await getFetchData<RequestErrorModel>(response);
     throw new RequestError({
-      errorCorrelationId: errorMessage.errorCorrelationId,
+      // biome-ignore lint/suspicious/noExplicitAny: <explanation> TODO: привести ошибки на бэкенде к общему формату
+      errorId: errorMessage.errorId || (errorMessage as any).errorCorrelationId,
       title: 'Request Error',
       status: response.status,
-      errorMessage: errorMessage.errorMessage,
+      // biome-ignore lint/suspicious/noExplicitAny: <explanation> TODO: привести ошибки на бэкенде к общему формату
+      type: errorMessage.type || (errorMessage as any).errorMessage,
       detail: {
         path: props.url,
         params: props.params,

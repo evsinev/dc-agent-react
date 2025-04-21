@@ -6,9 +6,9 @@ export class RequestError extends Error {
   constructor(props: RequestErrorModel) {
     super(props.title);
 
-    this.errorCorrelationId = props.errorCorrelationId || v4();
+    this.errorCorrelationId = props.errorId || v4();
     this.title = props.title;
-    this.errorMessage = props.type || 'Request Error';
+    this.type = props.type || 'Request Error';
     this.status = props.status;
     this.detail = props.detail;
 
@@ -19,7 +19,7 @@ export class RequestError extends Error {
 
   title?: string;
 
-  errorMessage: string;
+  type: string;
 
   status?: number;
 

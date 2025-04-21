@@ -1,4 +1,5 @@
-import { remoteSend } from '@/remote/remote-send';
+import { clientPost } from '@/libs/client-post';
+import useSWR from 'swr';
 
 export type GitLogItem = {
   dateFormatted: string;
@@ -9,11 +10,12 @@ export type GitLogItem = {
   ageFormatted: string;
 };
 
-export type GitStatusResponse = {
+export type GitLog = {
   currentBranch: string;
   lastCommit: GitLogItem;
+  commits: GitLogItem[];
 };
 
-export async function remoteGitStatus(): Promise<GitStatusResponse> {
-  return remoteSend({ path: '/git/status' });
+export function useGitLog() {
+  return useSWR('/git/log', (url) => clientPost<GitLog>({ url }));
 }

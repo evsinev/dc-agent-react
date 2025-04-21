@@ -1,7 +1,7 @@
-import { useServiceList } from '@/pages/service-list/api';
 import { StatusIndicator } from '@cloudscape-design/components';
 import Header from '@cloudscape-design/components/header';
 import SpaceBetween from '@cloudscape-design/components/space-between';
+import { useServiceList } from './api/service-list';
 import ServiceListTable from './components/service-list-table';
 
 export default function ServiceList() {

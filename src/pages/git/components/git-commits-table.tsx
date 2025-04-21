@@ -1,16 +1,17 @@
-import { GitLogItem } from '@/remote/remote-git-status';
 import { useCollection } from '@cloudscape-design/collection-hooks';
 import Table from '@cloudscape-design/components/table';
+import { GitLogItem } from '../api/git-log';
 
 type GitCommitsTableProps = {
   commits: GitLogItem[];
   isLoading: boolean;
 };
 
-function GitCommitsTable(props: GitCommitsTableProps) {
+export default function GitCommitsTable(props: GitCommitsTableProps) {
   const { items, collectionProps } = useCollection(props.commits, {
     sorting: {},
   });
+
   return (
     <Table
       {...collectionProps}
@@ -42,5 +43,3 @@ function GitCommitsTable(props: GitCommitsTableProps) {
     />
   );
 }
-
-export default GitCommitsTable;

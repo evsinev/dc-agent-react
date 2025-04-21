@@ -1,8 +1,8 @@
-import { ServiceListItem } from '@/remote/remote-service-list';
 import { useCollection } from '@cloudscape-design/collection-hooks';
 import { StatusIndicator } from '@cloudscape-design/components';
 import Link from '@cloudscape-design/components/link';
 import Table from '@cloudscape-design/components/table';
+import { ServiceListItem } from '../api/service-list';
 
 type Props = {
   services: ServiceListItem[];

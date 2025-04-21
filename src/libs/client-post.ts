@@ -14,7 +14,7 @@ const getFetchData = async <T>(response: Response): Promise<T> => {
   if (!text) {
     throw new RequestError({
       title: 'Empty response',
-      type: 'Request error',
+      errorMessage: 'Request error',
       status: response.status,
       detail: {
         path: response.url,
@@ -42,7 +42,17 @@ export async function clientPost<T>(props: ClientPostProps): Promise<T> {
 
   if (!response.ok) {
     const errorMessage = await getFetchData<RequestErrorModel>(response);
-    throw new RequestError(errorMessage);
+    throw new RequestError({
+      errorCorrelationId: errorMessage.errorCorrelationId,
+      title: 'Request Error',
+      status: response.status,
+      errorMessage: errorMessage.errorMessage,
+      detail: {
+        path: props.url,
+        params: props.params,
+        method: 'POST',
+      },
+    });
   }
 
   return getFetchData<T>(response);

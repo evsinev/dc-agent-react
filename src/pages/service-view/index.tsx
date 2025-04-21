@@ -1,4 +1,4 @@
-import { useServiceView } from '@/pages/service-view/api';
+import { useServiceView } from '@/pages/service-view/api/service-view';
 import ServiceHeader from '@/pages/service-view/components/header';
 import Status from '@/pages/service-view/components/status';
 import { CodeView } from '@cloudscape-design/code-view';

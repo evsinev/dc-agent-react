@@ -1,5 +1,5 @@
 import AppList from '@/pages/app-list';
-import GitRepositoryPage from '@/pages/git-repository-page';
+import Git from '@/pages/git';
 import LogsPage from '@/pages/logs';
 import NotFound from '@/pages/not-found';
 import ServiceList from '@/pages/service-list';
@@ -24,7 +24,7 @@ export default function Router() {
       />
       <Route
         path={routing.git}
-        Component={GitRepositoryPage}
+        Component={Git}
       />
       <Route
         path={routing.logs}

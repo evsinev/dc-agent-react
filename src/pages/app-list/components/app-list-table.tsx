@@ -1,5 +1,5 @@
 import { useSplitPanel } from '@/hooks/use-split-panel';
-import { AppListItem } from '@/pages/app-list/api';
+import { AppListItem } from '@/pages/app-list/api/app-list';
 import { useCollection } from '@cloudscape-design/collection-hooks';
 import Link from '@cloudscape-design/components/link';
 import Table from '@cloudscape-design/components/table';

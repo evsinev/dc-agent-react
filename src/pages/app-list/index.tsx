@@ -1,4 +1,4 @@
-import { useAppList } from '@/pages/app-list/api';
+import { useAppList } from '@/pages/app-list/api/app-list';
 import { StatusIndicator } from '@cloudscape-design/components';
 import Header from '@cloudscape-design/components/header';
 import SpaceBetween from '@cloudscape-design/components/space-between';

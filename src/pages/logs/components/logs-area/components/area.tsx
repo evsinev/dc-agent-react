@@ -1,7 +1,7 @@
 import { Button, TextContent } from '@cloudscape-design/components';
-import { ReactNode, UIEventHandler, useEffect, useRef, useState } from 'react';
 import styled from '@emotion/styled';
-import useLogs from '@/pages/logs/hooks/use-logs';
+import { ReactNode, UIEventHandler, useEffect, useRef, useState } from 'react';
+import useLogs from '../../../hooks/use-logs';
 
 const Container = styled.div`
   position: relative;

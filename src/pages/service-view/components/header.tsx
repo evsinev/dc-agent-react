@@ -1,5 +1,6 @@
-import { ServiceActionType, ServiceView, useServiceAction } from '@/pages/service-view/api';
 import { Button, Header, SpaceBetween, StatusIndicator } from '@cloudscape-design/components';
+import { ServiceActionType, useServiceAction } from '../api/service-action';
+import { ServiceView } from '../api/service-view';
 
 type Props = {
   isLoading?: boolean;

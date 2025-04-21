@@ -3,17 +3,6 @@ import { clientPost } from '@/libs/client-post';
 import useSWRImmutable from 'swr/immutable';
 import useSWRMutation from 'swr/mutation';
 
-export type AppListItem = {
-  appName: string;
-  taskName: string;
-  taskHost: string;
-  taskType: string;
-};
-
-type AppListResponse = {
-  apps: AppListItem[];
-};
-
 type AppViewParams = {
   appName: string;
 };
@@ -29,10 +18,6 @@ type AppViewResponse = {
   consumerKey: string;
   agentUrl: string;
 };
-
-export function useAppList() {
-  return useSWRImmutable('/app/list', (url) => clientPost<AppListResponse>({ url }));
-}
 
 export function useAppView(params: AppViewParams) {
   return useSWRImmutable(['/app/view', params], ([url, swrParams]) =>

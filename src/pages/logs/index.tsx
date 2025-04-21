@@ -1,5 +1,5 @@
 import Header from '@cloudscape-design/components/header';
-import LogsArea from '@/pages/logs/components/logs-area';
+import LogsArea from './components/logs-area';
 
 export default function Logs() {
   return (

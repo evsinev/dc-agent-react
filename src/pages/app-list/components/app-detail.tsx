@@ -1,5 +1,3 @@
-import { useAppPush, useAppView } from '@/pages/app-list/api';
-import CodeHighlight from '@/pages/app-list/components/code-highlight';
 import {
   Box,
   Button,
@@ -10,6 +8,8 @@ import {
   StatusIndicator,
 } from '@cloudscape-design/components';
 import { ReactNode } from 'react';
+import { useAppPush, useAppView } from '../api/app-view';
+import CodeHighlight from '../components/code-highlight';
 
 function ValueWithLabel({ label, children }: { label: string; children: ReactNode }) {
   return (

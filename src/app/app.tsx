@@ -5,6 +5,7 @@ import { AppLayout } from '@cloudscape-design/components';
 import { I18nProvider } from '@cloudscape-design/components/i18n';
 import messages from '@cloudscape-design/components/i18n/messages/all.en';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { BrowserRouter } from 'react-router';
 import Breadcrumbs from './components/breadcrumbs';
 import Navigation from './components/navigation';
 import SplitPanelWrapper from './components/split-panel';
@@ -24,14 +25,16 @@ export default function App() {
           locale={LOCALE}
           messages={[messages]}
         >
-          <AppLayout
-            breadcrumbs={<Breadcrumbs />}
-            navigation={<Navigation />}
-            content={<Router />}
-            splitPanel={<SplitPanelWrapper />}
-            splitPanelOpen
-            onSplitPanelToggle={hide}
-          />
+          <BrowserRouter basename={process.env.PUBLIC_BASE_PATH}>
+            <AppLayout
+              breadcrumbs={<Breadcrumbs />}
+              navigation={<Navigation />}
+              content={<Router />}
+              splitPanel={<SplitPanelWrapper />}
+              splitPanelOpen
+              onSplitPanelToggle={hide}
+            />
+          </BrowserRouter>
         </I18nProvider>
       </QueryClientProvider>
     </ErrorProvider>

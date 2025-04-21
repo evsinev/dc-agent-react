@@ -36,7 +36,9 @@ export function useLogsList(params: LogsListParams) {
   const setLogToken = useLogs((state) => state.setLogToken);
   const setLogs = useLogs((state) => state.setLogs);
 
-  const refreshInterval = process.env.PUBLIC_LOGS_REFRESH_INTERVAL ? Number(process.env.PUBLIC_LOGS_REFRESH_INTERVAL) : 5000;
+  const refreshInterval = process.env.PUBLIC_LOGS_REFRESH_INTERVAL
+    ? Number(process.env.PUBLIC_LOGS_REFRESH_INTERVAL)
+    : 5000;
 
   const response = useSWR<LogsListResponse>('/logs/get-list', () => getLogsMoq({ ...params, logToken }), {
     refreshInterval,

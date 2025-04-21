@@ -14,8 +14,12 @@ export default function ServiceListTable(props: ServiceListTableProps) {
     sorting: {},
   });
 
-  const serviceNameLink = (item: ServiceListItem) => <Link href={`/dc-operator/services/${item.fqsn}`}>{item.serviceName}</Link>;
-  const statusNameLink = (item: ServiceListItem) => <StatusIndicator type={item.statusIndicator}>{item.statusName}</StatusIndicator>;
+  const serviceNameLink = (item: ServiceListItem) => (
+    <Link href={`/dc-operator/services/${item.fqsn}`}>{item.serviceName}</Link>
+  );
+  const statusNameLink = (item: ServiceListItem) => (
+    <StatusIndicator type={item.statusIndicator}>{item.statusName}</StatusIndicator>
+  );
 
   return (
     <Table

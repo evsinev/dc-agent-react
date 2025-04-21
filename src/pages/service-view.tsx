@@ -3,7 +3,16 @@ import { remoteServiceView } from '@/remote/remote-service-view';
 import { CodeView } from '@cloudscape-design/code-view';
 // @ts-ignore Неверный импорт в типах библиотеки
 import shHighlight from '@cloudscape-design/code-view/highlight/sh';
-import { Alert, Box, Button, ColumnLayout, Container, Header, SpaceBetween, StatusIndicator } from '@cloudscape-design/components';
+import {
+  Alert,
+  Box,
+  Button,
+  ColumnLayout,
+  Container,
+  Header,
+  SpaceBetween,
+  StatusIndicator,
+} from '@cloudscape-design/components';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { ReactNode } from 'react';
 import { useParams } from 'react-router';

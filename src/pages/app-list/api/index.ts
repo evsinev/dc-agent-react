@@ -1,6 +1,6 @@
 import { RequestError } from '@/components/error/models/error-model';
 import { clientPost } from '@/libs/client-post';
-import useSWR from 'swr';
+import useSWRImmutable from 'swr/immutable';
 import useSWRMutation from 'swr/mutation';
 
 export type AppListItem = {
@@ -31,11 +31,13 @@ type AppViewResponse = {
 };
 
 export function useAppList() {
-  return useSWR('/app/list', (url) => clientPost<AppListResponse>({ url }));
+  return useSWRImmutable('/app/list', (url) => clientPost<AppListResponse>({ url }));
 }
 
 export function useAppView(params: AppViewParams) {
-  return useSWR(['/app/view', params], ([url, swrParams]) => clientPost<AppViewResponse>({ url, params: swrParams }));
+  return useSWRImmutable(['/app/view', params], ([url, swrParams]) =>
+    clientPost<AppViewResponse>({ url, params: swrParams }),
+  );
 }
 
 export function useAppPush() {

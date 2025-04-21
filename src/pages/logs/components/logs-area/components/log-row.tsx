@@ -17,7 +17,8 @@ const SNumber = styled.div`
   user-select: none;
 `;
 
-const areEqual = (prevProps: LogRowProps, nextProps: LogRowProps) => prevProps.index === nextProps.index && prevProps.log === nextProps.log;
+const areEqual = (prevProps: LogRowProps, nextProps: LogRowProps) =>
+  prevProps.index === nextProps.index && prevProps.log === nextProps.log;
 
 export default memo(
   ({ log, index }: LogRowProps) => (

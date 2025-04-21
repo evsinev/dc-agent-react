@@ -1,34 +1,39 @@
 import { SideNavigation } from '@cloudscape-design/components';
+import { useNavigate } from 'react-router';
 
 export default function Navigation() {
-  const basePath = process.env.PUBLIC_BASE_PATH || '';
+  const navigate = useNavigate();
 
   return (
     <SideNavigation
       header={{
-        href: basePath,
+        href: '/',
         text: 'dc-operator',
+      }}
+      onFollow={(event) => {
+        event.preventDefault();
+        navigate(event.detail.href);
       }}
       items={[
         {
           type: 'link',
           text: 'App list',
-          href: basePath,
+          href: '/',
         },
         {
           type: 'link',
           text: 'Service list',
-          href: `${basePath}/services`,
+          href: '/services',
         },
         {
           type: 'link',
           text: 'Git repo',
-          href: `${basePath}/git`,
+          href: '/git',
         },
         {
           type: 'link',
           text: 'Logs',
-          href: `${basePath}/logs`,
+          href: '/logs',
         },
       ]}
     />

@@ -12,7 +12,15 @@ export type ServiceListItem = {
   whenFormatted: string;
 };
 
-export type ServiceStateType = 'UP' | 'DOWN' | 'UP_NORMALLY_DOWN' | 'UP_PAUSED' | 'UP_WANT_DOWN' | 'DOWN_NORMALLY_UP' | 'DOWN_WANT_UP' | 'ERROR';
+export type ServiceStateType =
+  | 'UP'
+  | 'DOWN'
+  | 'UP_NORMALLY_DOWN'
+  | 'UP_PAUSED'
+  | 'UP_WANT_DOWN'
+  | 'DOWN_NORMALLY_UP'
+  | 'DOWN_WANT_UP'
+  | 'ERROR';
 
 export type ServiceStatus = {
   state: ServiceStateType;

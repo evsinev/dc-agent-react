@@ -66,7 +66,9 @@ export default function Area(props: { children: ReactNode }) {
           />
         </ButtonWrapper>
       </Container>
-      <Button onClick={() => setIsAutoScroll(!isAutoScroll)}>{isAutoScroll ? 'Stop autoscroll' : 'Start autoscroll'}</Button>
+      <Button onClick={() => setIsAutoScroll(!isAutoScroll)}>
+        {isAutoScroll ? 'Stop autoscroll' : 'Start autoscroll'}
+      </Button>
     </>
   );
 }

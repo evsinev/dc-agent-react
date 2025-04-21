@@ -1,12 +1,13 @@
-import { useSplitPanel } from '@/hooks/use-split-panel';
 import { AppListItem } from '@/pages/app-list/api/app-list';
-import AppDetail from '@/pages/app-view';
 import { useCollection } from '@cloudscape-design/collection-hooks';
-import Link from '@cloudscape-design/components/link';
 import Table from '@cloudscape-design/components/table';
+import routing from '@routing';
+import { Link } from 'react-router';
 
 type AppListTableProps = {
   apps: AppListItem[];
+  selected: AppListItem[];
+  setSelected: (app: AppListItem[]) => void;
   isLoading: boolean;
 };
 
@@ -31,19 +32,17 @@ const columns = [
   },
 ];
 
+const itemCell = (item: AppListItem) => <Link to={routing.app.replace(':appName', item.appName)}>{item.appName}</Link>;
+
 export default function AppListTable(props: AppListTableProps) {
   const { items, collectionProps } = useCollection(props.apps, defaultSorting);
-  const { show } = useSplitPanel();
-
-  const itemCell = (item: AppListItem) => (
-    <Link onClick={() => show({ content: <AppDetail appName={item.appName} />, title: item.appName })}>
-      {item.appName}
-    </Link>
-  );
 
   return (
     <Table
       {...collectionProps}
+      selectionType="multi"
+      onSelectionChange={(e) => props.setSelected(e.detail.selectedItems)}
+      selectedItems={props.selected}
       columnDefinitions={[
         {
           id: 'appName',

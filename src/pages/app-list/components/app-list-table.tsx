@@ -1,9 +1,9 @@
-import Table from '@cloudscape-design/components/table';
-import Link from '@cloudscape-design/components/link';
-import { useCollection } from '@cloudscape-design/collection-hooks';
-import AppDetail from './app-detail';
 import { useSplitPanel } from '@/hooks/use-split-panel';
-import { AppListItem } from '@/remote/remote-app-list';
+import { AppListItem } from '@/pages/app-list/api';
+import { useCollection } from '@cloudscape-design/collection-hooks';
+import Link from '@cloudscape-design/components/link';
+import Table from '@cloudscape-design/components/table';
+import AppDetail from './app-detail';
 
 type AppListTableProps = {
   apps: AppListItem[];
@@ -35,7 +35,11 @@ export default function AppListTable(props: AppListTableProps) {
   const { items, collectionProps } = useCollection(props.apps, defaultSorting);
   const { show } = useSplitPanel();
 
-  const itemCell = (item: AppListItem) => <Link onClick={() => show({ content: <AppDetail appName={item.appName} />, title: item.appName })}>{item.appName}</Link>;
+  const itemCell = (item: AppListItem) => (
+    <Link onClick={() => show({ content: <AppDetail appName={item.appName} />, title: item.appName })}>
+      {item.appName}
+    </Link>
+  );
 
   return (
     <Table

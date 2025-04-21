@@ -1,8 +1,8 @@
+import { RequestErrorModel } from '../models/types';
 import { Flashbar } from '@cloudscape-design/components';
-import Error from './interface';
 
 interface ErrorMessageProps {
-  error: Error;
+  error: RequestErrorModel;
   onClose: () => void;
   index: number;
 }
@@ -23,7 +23,10 @@ export default function ErrorWidget(props: ErrorMessageProps) {
           content: (
             <div>
               {Object.keys(error).map((fieldName) => (
-                <div key={fieldName} data-field={fieldName}>
+                <div
+                  key={fieldName}
+                  data-field={fieldName}
+                >
                   <strong>{fieldName}:</strong> <span>{JSON.stringify(error[fieldName as keyof typeof error])}</span>
                 </div>
               ))}

@@ -37,7 +37,7 @@ export default function Area(props: { children: ReactNode }) {
   const onScroll: UIEventHandler = (event) => {
     const element = wrapperRef.current;
     if (element) {
-      const isBottom = (element.scrollHeight - (event.currentTarget.scrollTop + element.offsetHeight)) < 24;
+      const isBottom = element.scrollHeight - (event.currentTarget.scrollTop + element.offsetHeight) < 24;
       // устанавливаем автопрокрутку, только если курсор в нижнем положении
       setIsAutoScroll(isBottom);
     }
@@ -56,9 +56,7 @@ export default function Area(props: { children: ReactNode }) {
           ref={wrapperRef}
           onScroll={onScroll}
         >
-          <TextContent>
-            {props.children}
-          </TextContent>
+          <TextContent>{props.children}</TextContent>
         </Wrapper>
         <ButtonWrapper>
           <Button

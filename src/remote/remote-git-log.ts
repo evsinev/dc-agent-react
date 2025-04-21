@@ -7,6 +7,6 @@ export type GitLogResponse = {
   commits: GitLogItem[];
 };
 
-export async function remoteGitLog() : Promise<GitLogResponse> {
+export async function remoteGitLog(): Promise<GitLogResponse> {
   return remoteSend({ path: '/git/log' });
 }

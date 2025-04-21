@@ -14,6 +14,6 @@ export type GitStatusResponse = {
   lastCommit: GitLogItem;
 };
 
-export async function remoteGitStatus() : Promise<GitStatusResponse> {
+export async function remoteGitStatus(): Promise<GitStatusResponse> {
   return remoteSend({ path: '/git/status' });
 }

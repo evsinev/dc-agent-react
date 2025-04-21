@@ -1,5 +1,4 @@
 import { SideNavigation } from '@cloudscape-design/components';
-import React from 'react';
 
 export default function Navigation() {
   const basePath = process.env.PUBLIC_BASE_PATH || '';

@@ -15,14 +15,21 @@ export type LogsListResponse = {
 };
 
 // TODO: Удалить при интеграции
-const getLogsMoq = (params: LogsListParams): Promise<LogsListResponse> => new Promise((resolve) => {
-  setTimeout(() => {
-    resolve({
-      logToken: 'some token',
-      logs: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((log) => `some log some log somesome log some log some log some log some log some log some log some log some log some log some log some logsome log some log some log some log some log some log some log some log some log some log some log some logsome log some log some log some log some log some log some log some log some log some log some log some log log some log some log some log some log some log some log some log some log some log ${log + Math.random()}`),
-    });
-  }, 2000);
-});
+const getLogsMoq = (params: LogsListParams): Promise<LogsListResponse> =>
+  new Promise((resolve) => {
+    // biome-ignore lint/suspicious/noConsoleLog: <explanation>
+    console.log('req logs params', params);
+
+    setTimeout(() => {
+      resolve({
+        logToken: 'some token',
+        logs: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(
+          (log) =>
+            `some log some log somesome log some log some log some log some log some log some log some log some log some log some log some logsome log some log some log some log some log some log some log some log some log some log some log some logsome log some log some log some log some log some log some log some log some log some log some log some log log some log some log some log some log some log some log some log some log some log ${log + Math.random()}`,
+        ),
+      });
+    }, 2000);
+  });
 
 export function useLogsList(params: LogsListParams) {
   const logToken = useLogs((state) => state.logToken);
@@ -31,13 +38,9 @@ export function useLogsList(params: LogsListParams) {
 
   const refreshInterval = process.env.PUBLIC_LOGS_REFRESH_INTERVAL ? Number(process.env.PUBLIC_LOGS_REFRESH_INTERVAL) : 5000;
 
-  const response = useSWR<LogsListResponse>(
-    '/logs/get-list',
-    () => getLogsMoq({ ...params, logToken }),
-    {
-      refreshInterval,
-    },
-  );
+  const response = useSWR<LogsListResponse>('/logs/get-list', () => getLogsMoq({ ...params, logToken }), {
+    refreshInterval,
+  });
 
   // перезаписываем токен в хранилище, чтобы последующие запросы шли с ним
   useEffect(() => {

@@ -13,15 +13,15 @@ export default function AppList() {
 
   return (
     <SpaceBetween size="m">
-      <Header variant="h1">app list
-        {isFetching && !isPending && (
-          <StatusIndicator type="loading">
-            Fetching
-          </StatusIndicator>
-        )}
+      <Header variant="h1">
+        app list
+        {isFetching && !isPending && <StatusIndicator type="loading">Fetching</StatusIndicator>}
       </Header>
 
-      <AppListTable apps={isSuccess ? data.apps : []} isLoading={isPending} />
+      <AppListTable
+        apps={isSuccess ? data.apps : []}
+        isLoading={isPending}
+      />
     </SpaceBetween>
   );
 }

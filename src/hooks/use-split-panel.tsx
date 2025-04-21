@@ -2,7 +2,7 @@ import { ReactNode } from 'react';
 import { create } from 'zustand';
 
 type Panel = {
-  title: string
+  title: string;
   content: ReactNode;
 };
 

@@ -16,6 +16,6 @@ type ServiceViewResponse = {
   canDown: boolean;
 };
 
-export async function remoteServiceView(request: ServiceViewRequest) : Promise<ServiceViewResponse> {
+export async function remoteServiceView(request: ServiceViewRequest): Promise<ServiceViewResponse> {
   return remoteSend({ path: `/service/view/${request.fqsn}`, request });
 }

@@ -23,9 +23,9 @@ export type ServiceStatus = {
 };
 
 type ServiceListResponse = {
-  services : ServiceListItem[];
+  services: ServiceListItem[];
 };
 
-export async function remoteServiceList() : Promise<ServiceListResponse> {
+export async function remoteServiceList(): Promise<ServiceListResponse> {
   return remoteSend({ path: '/service/list' });
 }

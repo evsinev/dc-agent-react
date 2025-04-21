@@ -11,6 +11,6 @@ type AppListResponse = {
   apps: AppListItem[];
 };
 
-export async function remoteAppList() : Promise<AppListResponse> {
+export async function remoteAppList(): Promise<AppListResponse> {
   return remoteSend({ path: '/app/list' });
 }

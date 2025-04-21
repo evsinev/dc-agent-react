@@ -1,19 +1,17 @@
-import process from 'process';
-
 type RemoteSendProps = {
   path: string;
-  request?: any;
+  request?: object;
 };
 
 class ProblemError extends Error {
-  constructor(message : string, cause? : Error) {
+  constructor(message: string, cause?: Error) {
     super(message);
     this.cause = cause;
     this.name = 'ReadError';
   }
 }
 
-async function makeSuccessResponse<T>(response: Response) : Promise<T> {
+async function makeSuccessResponse<T>(response: Response): Promise<T> {
   if (!response.ok) {
     throw new ProblemError('Response is not ok');
   }
@@ -24,7 +22,6 @@ async function makeSuccessResponse<T>(response: Response) : Promise<T> {
 
 export async function remoteSend<T>(props: RemoteSendProps): Promise<T> {
   const url = process.env.PUBLIC_API_BASE_URL + props.path;
-  console.log(`Sending to ${url}`, props.request);
 
   try {
     const response = await fetch(url, {
@@ -35,8 +32,6 @@ export async function remoteSend<T>(props: RemoteSendProps): Promise<T> {
       },
       body: props.request ? JSON.stringify(props.request) : '{}',
     });
-
-    console.log(`<< ${url} ${response.status}`);
 
     switch (response.status) {
       case 200:

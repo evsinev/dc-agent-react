@@ -1,13 +1,13 @@
 import { Header, StatusIndicator } from '@cloudscape-design/components';
-import React from 'react';
+import { ReactNode } from 'react';
 
 export type LoadingHeaderParams = {
   description: string;
-  children?: React.ReactNode;
+  children?: ReactNode;
   isPending: boolean;
   isFetching: boolean;
   isError: boolean;
-  actions?: React.ReactNode;
+  actions?: ReactNode;
 };
 
 function getInfo({ isPending, isFetching, isError }: LoadingHeaderParams) {

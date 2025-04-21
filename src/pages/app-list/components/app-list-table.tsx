@@ -6,8 +6,8 @@ import { useSplitPanel } from '@/hooks/use-split-panel';
 import { AppListItem } from '@/remote/remote-app-list';
 
 type AppListTableProps = {
-  apps: AppListItem[],
-  isLoading: boolean
+  apps: AppListItem[];
+  isLoading: boolean;
 };
 
 const defaultSorting = { sorting: {} };
@@ -35,13 +35,7 @@ export default function AppListTable(props: AppListTableProps) {
   const { items, collectionProps } = useCollection(props.apps, defaultSorting);
   const { show } = useSplitPanel();
 
-  const itemCell = (item: AppListItem) => (
-    <Link
-      onClick={() => show({ content: <AppDetail appName={item.appName} />, title: item.appName })}
-    >
-      {item.appName}
-    </Link>
-  );
+  const itemCell = (item: AppListItem) => <Link onClick={() => show({ content: <AppDetail appName={item.appName} />, title: item.appName })}>{item.appName}</Link>;
 
   return (
     <Table

@@ -10,17 +10,38 @@ export default function Router() {
   return (
     <BrowserRouter basename={process.env.PUBLIC_BASE_PATH}>
       <Routes>
-        <Route path="/" Component={AppList} />
-        <Route path="/apps" Component={AppList} />
+        <Route
+          path="/"
+          Component={AppList}
+        />
+        <Route
+          path="/apps"
+          Component={AppList}
+        />
         <Route path="/services">
-          <Route path="" Component={ServiceList} />
-          <Route path=":host/:serviceName" Component={ServiceView} />
+          <Route
+            path=""
+            Component={ServiceList}
+          />
+          <Route
+            path=":host/:serviceName"
+            Component={ServiceView}
+          />
         </Route>
         <Route path="/git">
-          <Route path="" Component={GitRepositoryPage} />
+          <Route
+            path=""
+            Component={GitRepositoryPage}
+          />
         </Route>
-        <Route path="/logs" Component={LogsPage} />
-        <Route path="*" Component={Home} />
+        <Route
+          path="/logs"
+          Component={LogsPage}
+        />
+        <Route
+          path="*"
+          Component={Home}
+        />
       </Routes>
     </BrowserRouter>
   );

@@ -1,62 +1,49 @@
-import * as process from 'process';
-
-import createError from '@/components/error/create-error';
-import Error from '@/components/error/interface';
-
-export interface PostResponse<T> {
-  data?: T;
-  status?: number;
-  error?: Error;
-}
+import { RequestError } from '@/components/error/models/error-model';
+import { RequestErrorModel } from '@/components/error/models/types';
 
 interface ClientPostProps {
   url: string;
-  params?: any;
+  params?: object;
+  options?: {
+    proxy: boolean;
+  };
 }
 
-const getFetchData = async <T>(response: Response) => {
+const getFetchData = async <T>(response: Response): Promise<T> => {
   const text = await response.text();
   if (!text) {
-    return undefined;
+    throw new RequestError({
+      title: 'Empty response',
+      type: 'Request error',
+      status: response.status,
+      detail: {
+        path: response.url,
+      },
+    });
   }
   try {
-    const stringify = response.ok ? text : undefined;
-    if (stringify) {
-      return JSON.parse(stringify) as T;
-    }
-    return undefined;
-  } catch (e) {
+    return JSON.parse(text) as T;
+  } catch (_e) {
     return text as T;
   }
 };
 
-export async function clientPost<T>(props: ClientPostProps): Promise<PostResponse<T>> {
-  const baseUrl = (window as any).API_BASE_URL ? (window as any).API_BASE_URL : process.env.PUBLIC_API_BASE_URL;
-  const response = await fetch(baseUrl + props.url, {
-    cache: 'no-store',
+export async function clientPost<T>(props: ClientPostProps): Promise<T | undefined> {
+  const url = process.env.NEXT_PUBLIC_BASE_PATH + props.url;
+
+  const response = await fetch(url, {
     method: 'POST',
+    cache: 'no-store',
     headers: {
-      'Content-Type': 'application/json',
+      'content-type': 'application/json',
     },
     body: props.params ? JSON.stringify(props.params) : '{}',
   });
 
-  if (response.status === 403) {
-    return { data: undefined, error: undefined, status: response?.status };
+  if (!response.ok) {
+    const errorMessage = await getFetchData<RequestErrorModel>(response);
+    throw new RequestError(errorMessage);
   }
 
-  return {
-    data: await getFetchData<T>(response),
-    status: response.status,
-    error: response.ok ? undefined : createError({
-      title: `${props.url} request error`,
-      type: 'Request error',
-      status: response.status,
-      detail: {
-        path: props.url,
-        params: props.params,
-        method: 'POST',
-      },
-    }),
-  };
+  return getFetchData<T>(response);
 }

@@ -1,7 +1,7 @@
-import LogRow from '@/pages/logs/components/logs-area/components/log-row';
-import Area from './components/area';
-import useLogs from '../../hooks/use-logs';
 import { useLogsList } from '../../api/logs-list';
+import useLogs from '../../hooks/use-logs';
+import Area from './components/area';
+import LogRow from './components/log-row';
 import LogsAreaLoader from './loader';
 
 export default function LogsArea() {
@@ -19,7 +19,7 @@ export default function LogsArea() {
       {isLoading && <LogsAreaLoader />}
       {logs.map((log, index) => (
         <LogRow
-          key={`${log}${index}`}
+          key={`${log}-${index}`}
           index={index}
           log={log}
         />

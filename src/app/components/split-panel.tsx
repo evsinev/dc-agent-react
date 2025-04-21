@@ -1,5 +1,4 @@
 import { SplitPanel } from '@cloudscape-design/components';
-import React from 'react';
 import { useSplitPanel } from '@/hooks/use-split-panel';
 
 export default function SplitPanelWrapper() {

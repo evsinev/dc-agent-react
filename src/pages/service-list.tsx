@@ -13,15 +13,15 @@ export default function ServiceList() {
 
   return (
     <SpaceBetween size="m">
-      <Header variant="h1">Service List
-        {isFetching && !isPending && (
-          <StatusIndicator type="loading">
-            Fetching
-          </StatusIndicator>
-        )}
+      <Header variant="h1">
+        Service List
+        {isFetching && !isPending && <StatusIndicator type="loading">Fetching</StatusIndicator>}
       </Header>
 
-      <ServiceListTable services={isSuccess ? data.services : []} isLoading={isPending} />
+      <ServiceListTable
+        services={isSuccess ? data.services : []}
+        isLoading={isPending}
+      />
     </SpaceBetween>
   );
 }

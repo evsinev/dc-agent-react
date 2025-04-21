@@ -8,15 +8,20 @@ function detectColor(line: string) {
   return '';
 }
 
-function CodeHighlight({ code }: { code: string | undefined | null }) {
+export default function CodeHighlight({ code }: { code?: string | null }) {
   const lines = code?.split(/\r\n|\r|\n/).map((line) => line.trim());
 
   return (
     <pre>
       {lines?.map((line, index) => (
-        <span key={index} style={{ color: detectColor(line) }}>{line}<br /></span>
+        <span
+          key={index}
+          style={{ color: detectColor(line) }}
+        >
+          {line}
+          <br />
+        </span>
       ))}
     </pre>
   );
 }
-export default CodeHighlight;

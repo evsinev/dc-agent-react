@@ -1,9 +1,5 @@
 {
-  "extends": [
-    "airbnb",
-    "airbnb-typescript",
-    "airbnb/hooks"
-  ],
+  "extends": ["airbnb", "airbnb-typescript", "airbnb/hooks"],
   "rules": {
     "react/no-array-index-key": "off",
     "react/react-in-jsx-scope": "off",
@@ -27,9 +23,12 @@
     "no-nested-ternary": "off",
     "eqeqeq": "off",
     "no-plusplus": "off",
-    "max-len": ["error", {
-      "code": 180
-    }]
+    "max-len": [
+      "error",
+      {
+        "code": 180
+      }
+    ]
   },
   "parserOptions": {
     "project": "./tsconfig.json"

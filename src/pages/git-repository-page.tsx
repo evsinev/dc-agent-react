@@ -1,36 +1,28 @@
-import { Button, Container, ContentLayout, KeyValuePairs, SpaceBetween } from '@cloudscape-design/components';
-import { useQuery, useMutation } from '@tanstack/react-query';
 import { LoadingHeader } from '@/components/common/loading-header';
-import { remoteGitLog } from '@/remote/remote-git-log';
 import GitCommitsTable from '@/components/git/git-commits-table';
-import { GitPullRequest, GitPullResponse, remoteGitPull } from '@/remote/remote-git-pull';
+import { remoteGitLog } from '@/remote/remote-git-log';
+import { GitPullResponse, remoteGitPull } from '@/remote/remote-git-pull';
+import { Button, Container, ContentLayout, KeyValuePairs, SpaceBetween } from '@cloudscape-design/components';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
 export default function GitRepositoryPage() {
-  const {
-    isPending,
-    data,
-    isSuccess,
-    isFetching,
-    isError,
-    refetch,
-  } = useQuery({
+  const { isPending, data, isSuccess, isFetching, isError, refetch } = useQuery({
     queryKey: ['/git/status'],
     queryFn: () => remoteGitLog(),
   });
 
   const mutation = useMutation<GitPullResponse>({
-    mutationFn: (request : GitPullRequest) => remoteGitPull(request),
+    mutationFn: () => remoteGitPull(),
   });
 
   async function makeGitPull() {
-    const request : GitPullRequest = {};
-    const response : GitPullResponse = await mutation.mutateAsync(request);
+    await mutation.mutateAsync();
     await refetch();
   }
 
   return (
     <ContentLayout
-      header={(
+      header={
         <LoadingHeader
           isPending={isPending || mutation.isPending}
           isFetching={isFetching}
@@ -40,10 +32,9 @@ export default function GitRepositoryPage() {
         >
           Git Repo
         </LoadingHeader>
-      )}
+      }
     >
       <SpaceBetween size="xl">
-
         <Container>
           <KeyValuePairs
             columns={3}
@@ -57,15 +48,15 @@ export default function GitRepositoryPage() {
                 label: 'Updated',
                 value: data?.lastCommit.ageFormatted,
               },
-
             ]}
           />
         </Container>
 
-        <GitCommitsTable commits={isSuccess ? data.commits : []} isLoading={isPending} />
-
+        <GitCommitsTable
+          commits={isSuccess ? data.commits : []}
+          isLoading={isPending}
+        />
       </SpaceBetween>
-
     </ContentLayout>
   );
 }

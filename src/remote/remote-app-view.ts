@@ -16,10 +16,10 @@ type AppViewResponse = {
   agentUrl: string;
 };
 
-export async function remoteAppView(request: AppViewRequest) : Promise<AppViewResponse> {
+export async function remoteAppView(request: AppViewRequest): Promise<AppViewResponse> {
   return remoteSend({ path: '/app/view', request });
 }
 
-export async function remoteAppPush(request: AppViewRequest) : Promise<AppViewResponse> {
+export async function remoteAppPush(request: AppViewRequest): Promise<AppViewResponse> {
   return remoteSend({ path: '/app/push', request });
 }

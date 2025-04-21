@@ -5,17 +5,14 @@ import { StatusIndicator } from '@cloudscape-design/components';
 import { ServiceListItem } from '@/remote/remote-service-list';
 
 type ServiceListTableProps = {
-  services: ServiceListItem[],
-  isLoading: boolean
+  services: ServiceListItem[];
+  isLoading: boolean;
 };
 
 export default function ServiceListTable(props: ServiceListTableProps) {
-  const { items, collectionProps } = useCollection(
-    props.services,
-    {
-      sorting: {},
-    },
-  );
+  const { items, collectionProps } = useCollection(props.services, {
+    sorting: {},
+  });
 
   const serviceNameLink = (item: ServiceListItem) => <Link href={`/dc-operator/services/${item.fqsn}`}>{item.serviceName}</Link>;
   const statusNameLink = (item: ServiceListItem) => <StatusIndicator type={item.statusIndicator}>{item.statusName}</StatusIndicator>;

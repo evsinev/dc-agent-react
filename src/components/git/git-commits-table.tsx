@@ -1,6 +1,6 @@
-import Table from '@cloudscape-design/components/table';
-import { useCollection } from '@cloudscape-design/collection-hooks';
 import { GitLogItem } from '@/remote/remote-git-status';
+import { useCollection } from '@cloudscape-design/collection-hooks';
+import Table from '@cloudscape-design/components/table';
 
 type GitCommitsTableProps = {
   commits: GitLogItem[];
@@ -18,7 +18,6 @@ function GitCommitsTable(props: GitCommitsTableProps) {
         {
           id: 'dateFormatted',
           header: 'Date',
-          // eslint-disable-next-line
           cell: (item) => item.dateFormatted,
           sortingField: 'dateFormatted',
           isRowHeader: true,
@@ -26,14 +25,12 @@ function GitCommitsTable(props: GitCommitsTableProps) {
         {
           id: 'author',
           header: 'Author',
-          // eslint-disable-next-line
           cell: (item) => item.author,
           sortingField: 'author',
         },
         {
           id: 'shortMessage',
           header: 'Message',
-          // eslint-disable-next-line
           cell: (item) => item.shortMessage,
           sortingField: 'shortMessage',
         },

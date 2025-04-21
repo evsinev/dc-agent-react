@@ -1,45 +1,38 @@
 import AppList from '@/pages/app-list';
 import GitRepositoryPage from '@/pages/git-repository-page';
-import Home from '@/pages/home';
 import LogsPage from '@/pages/logs';
+import NotFound from '@/pages/not-found';
 import ServiceList from '@/pages/service-list';
 import ServiceView from '@/pages/service-view';
+import routing from '@routing';
 import { Route, Routes } from 'react-router';
 
 export default function Router() {
   return (
     <Routes>
       <Route
-        path="/"
+        path={routing.apps}
         Component={AppList}
       />
       <Route
-        path="/apps"
-        Component={AppList}
+        path={routing.services}
+        Component={ServiceList}
       />
-      <Route path="/services">
-        <Route
-          path=""
-          Component={ServiceList}
-        />
-        <Route
-          path=":host/:serviceName"
-          Component={ServiceView}
-        />
-      </Route>
-      <Route path="/git">
-        <Route
-          path=""
-          Component={GitRepositoryPage}
-        />
-      </Route>
       <Route
-        path="/logs"
+        path={routing.service}
+        Component={ServiceView}
+      />
+      <Route
+        path={routing.git}
+        Component={GitRepositoryPage}
+      />
+      <Route
+        path={routing.logs}
         Component={LogsPage}
       />
       <Route
         path="*"
-        Component={Home}
+        Component={NotFound}
       />
     </Routes>
   );

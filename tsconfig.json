@@ -19,7 +19,8 @@
     "moduleResolution": "Node",
     "baseUrl": "./",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@routing": ["src/app/router/routing"]
     }
   },
   "include": ["src", "rsbuild.config.ts"]

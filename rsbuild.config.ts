@@ -32,7 +32,7 @@ export default defineConfig({
     },
   },
   html: {
-    template: './static/index.html',
+    template: './src/app/static/index.html',
   },
   server: {
     proxy: {

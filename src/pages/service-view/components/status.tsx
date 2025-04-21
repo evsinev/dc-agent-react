@@ -1,6 +1,6 @@
+import Label from '@/components/label';
 import { ServiceView } from '@/pages/service-view/api/service-view';
 import { ColumnLayout, Container, Header, SpaceBetween, StatusIndicator } from '@cloudscape-design/components';
-import Label from './label';
 
 export default function Status(props: ServiceView) {
   return (

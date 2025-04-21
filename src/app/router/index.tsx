@@ -1,4 +1,5 @@
 import AppList from '@/pages/app-list';
+import AppView from '@/pages/app-view';
 import Git from '@/pages/git';
 import LogsPage from '@/pages/logs';
 import NotFound from '@/pages/not-found';
@@ -13,6 +14,10 @@ export default function Router() {
       <Route
         path={routing.apps}
         Component={AppList}
+      />
+      <Route
+        path={routing.app}
+        Component={AppView}
       />
       <Route
         path={routing.services}

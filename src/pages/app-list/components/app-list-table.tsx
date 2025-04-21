@@ -1,9 +1,9 @@
 import { useSplitPanel } from '@/hooks/use-split-panel';
 import { AppListItem } from '@/pages/app-list/api/app-list';
+import AppDetail from '@/pages/app-view';
 import { useCollection } from '@cloudscape-design/collection-hooks';
 import Link from '@cloudscape-design/components/link';
 import Table from '@cloudscape-design/components/table';
-import AppDetail from './app-detail';
 
 type AppListTableProps = {
   apps: AppListItem[];

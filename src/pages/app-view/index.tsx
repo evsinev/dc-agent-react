@@ -1,26 +1,17 @@
-import {
-  Box,
-  Button,
-  ColumnLayout,
-  Container,
-  Header,
-  SpaceBetween,
-  StatusIndicator,
-} from '@cloudscape-design/components';
-import { ReactNode } from 'react';
-import { useAppPush, useAppView } from '../api/app-view';
-import CodeHighlight from '../components/code-highlight';
+import Label from '@/components/label';
+import { Button, ColumnLayout, Container, Header, SpaceBetween, StatusIndicator } from '@cloudscape-design/components';
+import { useParams } from 'react-router';
+import { useAppPush, useAppView } from './api/app-view';
+import CodeHighlight from './components/code-highlight';
 
-function ValueWithLabel({ label, children }: { label: string; children: ReactNode }) {
-  return (
-    <div>
-      <Box variant="awsui-key-label">{label}</Box>
-      <div>{children}</div>
-    </div>
-  );
+interface Props {
+  appName?: string;
 }
 
-export default function AppDetail({ appName }: { appName: string }) {
+export default function AppView(props: Props) {
+  const params = useParams();
+  const appName = params.appName || (props.appName as string);
+
   const { data: appView, isLoading, mutate: resetApp } = useAppView({ appName });
   const { isMutating, trigger, data: mutatingData } = useAppPush();
 
@@ -42,25 +33,25 @@ export default function AppDetail({ appName }: { appName: string }) {
         >
           <Container header={<Header headingTagOverride="h3">App and Agent</Header>}>
             <SpaceBetween size="l">
-              <ValueWithLabel label="App name">
+              <Label label="App name">
                 <StatusIndicator type="loading" />
-              </ValueWithLabel>
-              <ValueWithLabel label="Agent url">
+              </Label>
+              <Label label="Agent url">
                 <StatusIndicator type="loading" />
-              </ValueWithLabel>
+              </Label>
             </SpaceBetween>
           </Container>
           <Container header={<Header headingTagOverride="h3">Task</Header>}>
             <SpaceBetween size="l">
-              <ValueWithLabel label="Task name">
+              <Label label="Task name">
                 <StatusIndicator type="loading" />
-              </ValueWithLabel>
-              <ValueWithLabel label="Task type">
+              </Label>
+              <Label label="Task type">
                 <StatusIndicator type="loading" />
-              </ValueWithLabel>
-              <ValueWithLabel label="Task host">
+              </Label>
+              <Label label="Task host">
                 <StatusIndicator type="loading" />
-              </ValueWithLabel>
+              </Label>
             </SpaceBetween>
           </Container>
         </ColumnLayout>
@@ -73,15 +64,15 @@ export default function AppDetail({ appName }: { appName: string }) {
         >
           <Container header={<Header headingTagOverride="h3">App and Agent</Header>}>
             <SpaceBetween size="l">
-              <ValueWithLabel label="App name">{appView.appName}</ValueWithLabel>
-              <ValueWithLabel label="Agent url">{appView.agentUrl}</ValueWithLabel>
+              <Label label="App name">{appView.appName}</Label>
+              <Label label="Agent url">{appView.agentUrl}</Label>
             </SpaceBetween>
           </Container>
           <Container header={<Header headingTagOverride="h3">Task</Header>}>
             <SpaceBetween size="l">
-              <ValueWithLabel label="Task name">{appView.taskName}</ValueWithLabel>
-              <ValueWithLabel label="Task type">{appView.taskType}</ValueWithLabel>
-              <ValueWithLabel label="Task host">{appView.taskHost}</ValueWithLabel>
+              <Label label="Task name">{appView.taskName}</Label>
+              <Label label="Task type">{appView.taskType}</Label>
+              <Label label="Task host">{appView.taskHost}</Label>
             </SpaceBetween>
           </Container>
         </ColumnLayout>

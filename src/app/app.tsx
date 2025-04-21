@@ -1,4 +1,5 @@
 import '@cloudscape-design/global-styles/index.css';
+import GlobalStyles from '@/app/components/global-styles';
 import ErrorProvider from '@/components/error';
 import { useSplitPanel } from '@/hooks/use-split-panel';
 import { AppLayout } from '@cloudscape-design/components';
@@ -17,6 +18,7 @@ export default function App() {
 
   return (
     <ErrorProvider>
+      <GlobalStyles />
       <I18nProvider
         locale={LOCALE}
         messages={[messages]}

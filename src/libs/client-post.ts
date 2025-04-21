@@ -28,8 +28,8 @@ const getFetchData = async <T>(response: Response): Promise<T> => {
   }
 };
 
-export async function clientPost<T>(props: ClientPostProps): Promise<T | undefined> {
-  const url = process.env.NEXT_PUBLIC_BASE_PATH + props.url;
+export async function clientPost<T>(props: ClientPostProps): Promise<T> {
+  const url = process.env.PUBLIC_API_BASE_URL + props.url;
 
   const response = await fetch(url, {
     method: 'POST',

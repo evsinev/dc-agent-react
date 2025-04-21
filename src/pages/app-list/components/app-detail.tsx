@@ -1,7 +1,14 @@
+import { useAppPush, useAppView } from '@/pages/app-list/api';
 import CodeHighlight from '@/pages/app-list/components/code-highlight';
-import { remoteAppPush, remoteAppView } from '@/remote/remote-app-view';
-import { Alert, Box, Button, ColumnLayout, Container, Header, SpaceBetween, StatusIndicator } from '@cloudscape-design/components';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import {
+  Box,
+  Button,
+  ColumnLayout,
+  Container,
+  Header,
+  SpaceBetween,
+  StatusIndicator,
+} from '@cloudscape-design/components';
 import { ReactNode } from 'react';
 
 function ValueWithLabel({ label, children }: { label: string; children: ReactNode }) {
@@ -14,26 +21,21 @@ function ValueWithLabel({ label, children }: { label: string; children: ReactNod
 }
 
 export default function AppDetail({ appName }: { appName: string }) {
-  const { isPending, data, isSuccess, isFetching } = useQuery({
-    queryKey: ['app', appName],
-    queryFn: () => remoteAppView({ appName }),
-  });
+  const { data: appView, isLoading, mutate: resetApp } = useAppView({ appName });
+  const { isMutating, trigger, data: mutatingData } = useAppPush();
 
-  const mutation = useMutation({
-    mutationFn: remoteAppPush,
-  });
-
-  function makePush() {
-    mutation.mutate({ appName });
+  async function makePush() {
+    await trigger({ appName });
+    await resetApp();
   }
 
   return (
     <SpaceBetween size="m">
       <Header variant="h1">
-        App {appName} {isFetching && !isPending && <StatusIndicator type="loading">Fetching</StatusIndicator>}
+        App {appName} {isLoading && <StatusIndicator type="loading">Fetching</StatusIndicator>}
       </Header>
 
-      {isPending && (
+      {isLoading && (
         <ColumnLayout
           columns={3}
           variant="text-grid"
@@ -64,37 +66,40 @@ export default function AppDetail({ appName }: { appName: string }) {
         </ColumnLayout>
       )}
 
-      {isSuccess && (
+      {appView && (
         <ColumnLayout
           columns={3}
           variant="text-grid"
         >
           <Container header={<Header headingTagOverride="h3">App and Agent</Header>}>
             <SpaceBetween size="l">
-              <ValueWithLabel label="App name">{data.appName}</ValueWithLabel>
-              <ValueWithLabel label="Agent url">{data.agentUrl}</ValueWithLabel>
+              <ValueWithLabel label="App name">{appView.appName}</ValueWithLabel>
+              <ValueWithLabel label="Agent url">{appView.agentUrl}</ValueWithLabel>
             </SpaceBetween>
           </Container>
           <Container header={<Header headingTagOverride="h3">Task</Header>}>
             <SpaceBetween size="l">
-              <ValueWithLabel label="Task name">{data.taskName}</ValueWithLabel>
-              <ValueWithLabel label="Task type">{data.taskType}</ValueWithLabel>
-              <ValueWithLabel label="Task host">{data.taskHost}</ValueWithLabel>
+              <ValueWithLabel label="Task name">{appView.taskName}</ValueWithLabel>
+              <ValueWithLabel label="Task type">{appView.taskType}</ValueWithLabel>
+              <ValueWithLabel label="Task host">{appView.taskHost}</ValueWithLabel>
             </SpaceBetween>
           </Container>
         </ColumnLayout>
       )}
 
-      <Container header={<Header>Check</Header>}>{isSuccess && <CodeHighlight code={data.taskCheckText} />}</Container>
+      <Container header={<Header>Check</Header>}>{appView && <CodeHighlight code={appView.taskCheckText} />}</Container>
 
       <Container header={<Header variant="h3">Push</Header>}>
-        {mutation.isPending && <StatusIndicator type="loading" />}
+        {isMutating && <StatusIndicator type="loading" />}
 
-        {mutation.isSuccess && <CodeHighlight code={mutation.data.taskCheckText} />}
+        {mutatingData && <CodeHighlight code={mutatingData.taskCheckText} />}
 
-        {mutation.isIdle && <Button onClick={() => makePush()}>Push config</Button>}
-
-        {mutation.isError && <Alert header={mutation.error.name}>{mutation.error.message}</Alert>}
+        <Button
+          onClick={makePush}
+          loading={isMutating}
+        >
+          Push config
+        </Button>
       </Container>
     </SpaceBetween>
   );

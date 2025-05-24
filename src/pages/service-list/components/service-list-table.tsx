@@ -8,6 +8,8 @@ import { ServiceListItem } from '../api/service-list';
 type Props = {
   services: ServiceListItem[];
   isLoading: boolean;
+  selected: ServiceListItem[];
+  setSelected: (app: ServiceListItem[]) => void;
 };
 
 const serviceNameLink = (item: ServiceListItem) => (
@@ -56,6 +58,9 @@ export default function ServiceListTable(props: Props) {
       loadingText="Loading services ..."
       trackBy="fqsn"
       loading={props.isLoading}
+      selectionType="single"
+      onSelectionChange={(e) => props.setSelected(e.detail.selectedItems)}
+      selectedItems={props.selected}
     />
   );
 }

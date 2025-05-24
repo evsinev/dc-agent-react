@@ -40,7 +40,7 @@ export default function AppListTable(props: AppListTableProps) {
   return (
     <Table
       {...collectionProps}
-      selectionType="multi"
+      selectionType="single"
       onSelectionChange={(e) => props.setSelected(e.detail.selectedItems)}
       selectedItems={props.selected}
       columnDefinitions={[

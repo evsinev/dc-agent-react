@@ -20,7 +20,6 @@ export default function SplitPanelWrapper() {
     <SplitPanel
       header={panel.title}
       closeBehavior="collapse"
-      hidePreferencesButton
     >
       {panel.content}
     </SplitPanel>

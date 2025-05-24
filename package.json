@@ -51,6 +51,5 @@
     "swr": "A React Hooks library for data fetching that provides features like caching, revalidation, and request deduplication, ensuring a smooth user experience.",
     "uuid": "A utility for generating unique identifiers, useful for ensuring distinct keys for items in lists or for other identification purposes.",
     "zustand": "A small and fast state management library for React, offering a simple API for managing application state without the need for complex setups."
-  },
-  "packageManager": "yarn@4.7.0"
+  }
 }

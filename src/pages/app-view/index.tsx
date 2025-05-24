@@ -6,6 +6,7 @@ import CodeHighlight from './components/code-highlight';
 
 interface Props {
   appName?: string;
+  showAppInfo?: boolean;
 }
 
 export default function AppView(props: Props) {
@@ -22,11 +23,12 @@ export default function AppView(props: Props) {
 
   return (
     <SpaceBetween size="m">
-      <Header variant="h1">
-        App {appName} {isLoading && <StatusIndicator type="loading">Fetching</StatusIndicator>}
+      {props.showAppInfo && <Header variant="h1">
+          App {appName} {isLoading && <StatusIndicator type="loading">Fetching</StatusIndicator>}
       </Header>
+      }
 
-      {isLoading && (
+      {props.showAppInfo && isLoading && (
         <ColumnLayout
           columns={3}
           variant="text-grid"
@@ -57,7 +59,7 @@ export default function AppView(props: Props) {
         </ColumnLayout>
       )}
 
-      {appView && (
+      {props.showAppInfo && appView && (
         <ColumnLayout
           columns={3}
           variant="text-grid"

@@ -4,7 +4,7 @@ import Git from '@/pages/git';
 import LogsPage from '@/pages/logs';
 import NotFound from '@/pages/not-found';
 import ServiceList from '@/pages/service-list';
-import ServiceView from '@/pages/service-view';
+import ServiceViewPage from '@/pages/service-view';
 import routing from '@routing';
 import { Route, Routes } from 'react-router';
 
@@ -17,7 +17,7 @@ export default function Router() {
       />
       <Route
         path={routing.app}
-        Component={AppView}
+        element={<AppView showAppInfo={true} />}
       />
       <Route
         path={routing.services}
@@ -25,7 +25,7 @@ export default function Router() {
       />
       <Route
         path={routing.service}
-        Component={ServiceView}
+        Component={ServiceViewPage}
       />
       <Route
         path={routing.git}

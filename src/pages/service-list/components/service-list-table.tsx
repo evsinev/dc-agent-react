@@ -1,9 +1,14 @@
 import { useCollection } from '@cloudscape-design/collection-hooks';
-import { StatusIndicator } from '@cloudscape-design/components';
+import { PropertyFilter, StatusIndicator } from '@cloudscape-design/components';
 import Table from '@cloudscape-design/components/table';
 import routing from '@routing';
 import { Link } from 'react-router';
 import { ServiceListItem } from '../api/service-list';
+import { SERVICE_LIST_FILTERING_PROPERTIES } from '@/pages/service-list/components/service-list-table-filters';
+import { useQueryParams } from '@/hooks/use-query-params';
+import { parsePropertyFilterQuery } from '@/libs/parse-property-filter';
+
+const PROPERTY_FILTERS_QUERY_PARAM_KEY = 'propertyFilter';
 
 type Props = {
   services: ServiceListItem[];
@@ -21,8 +26,13 @@ const statusNameLink = (item: ServiceListItem) => (
 );
 
 export default function ServiceListTable(props: Props) {
-  const { items, collectionProps } = useCollection(props.services, {
+  const { getQueryParam, setQueryParam } = useQueryParams();
+  const { items, collectionProps, propertyFilterProps } = useCollection(props.services, {
     sorting: {},
+    propertyFiltering: {
+      filteringProperties: SERVICE_LIST_FILTERING_PROPERTIES,
+      defaultQuery: parsePropertyFilterQuery(getQueryParam(PROPERTY_FILTERS_QUERY_PARAM_KEY)),
+    },
   });
 
   return (
@@ -61,6 +71,22 @@ export default function ServiceListTable(props: Props) {
       selectionType="single"
       onSelectionChange={(e) => props.setSelected(e.detail.selectedItems)}
       selectedItems={props.selected}
+      filter={
+        <PropertyFilter
+          {...propertyFilterProps}
+          expandToViewport={true}
+          onChange={event => {
+            const query = event.detail;
+            if (!query.tokens?.length) {
+              setQueryParam(PROPERTY_FILTERS_QUERY_PARAM_KEY, null);
+            } else {
+              setQueryParam(PROPERTY_FILTERS_QUERY_PARAM_KEY, JSON.stringify(query));
+            }
+
+            propertyFilterProps.onChange(event);
+          }}
+        />
+      }
     />
   );
 }

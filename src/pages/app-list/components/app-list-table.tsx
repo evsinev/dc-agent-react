@@ -3,6 +3,12 @@ import { useCollection } from '@cloudscape-design/collection-hooks';
 import Table from '@cloudscape-design/components/table';
 import routing from '@routing';
 import { Link } from 'react-router';
+import { APP_LIST_FILTERING_PROPERTIES } from '@/pages/app-list/components/app-list-table-filters';
+import { PropertyFilter } from '@cloudscape-design/components';
+import { useQueryParams } from '@/hooks/use-query-params';
+import { parsePropertyFilterQuery } from '@/libs/parse-property-filter';
+
+const PROPERTY_FILTERS_QUERY_PARAM_KEY = 'propertyFilter';
 
 type AppListTableProps = {
   apps: AppListItem[];
@@ -35,7 +41,15 @@ const columns = [
 const itemCell = (item: AppListItem) => <Link to={routing.app.replace(':appName', item.appName)}>{item.appName}</Link>;
 
 export default function AppListTable(props: AppListTableProps) {
-  const { items, collectionProps } = useCollection(props.apps, defaultSorting);
+  const { getQueryParam, setQueryParam } = useQueryParams();
+  const { items, collectionProps, propertyFilterProps } = useCollection(props.apps,
+    {
+      sorting: defaultSorting.sorting,
+      propertyFiltering: {
+        filteringProperties: APP_LIST_FILTERING_PROPERTIES,
+        defaultQuery: parsePropertyFilterQuery(getQueryParam(PROPERTY_FILTERS_QUERY_PARAM_KEY)),
+      },
+    });
 
   return (
     <Table
@@ -75,6 +89,22 @@ export default function AppListTable(props: AppListTableProps) {
       loadingText="Loading resources"
       trackBy="appName"
       loading={props.isLoading}
+      filter={
+        <PropertyFilter
+          {...propertyFilterProps}
+          expandToViewport={true}
+          onChange={event => {
+            const query = event.detail;
+            if (!query.tokens?.length) {
+              setQueryParam(PROPERTY_FILTERS_QUERY_PARAM_KEY, null);
+            } else {
+              setQueryParam(PROPERTY_FILTERS_QUERY_PARAM_KEY, JSON.stringify(query));
+            }
+
+            propertyFilterProps.onChange(event);
+          }}
+        />
+      }
     />
   );
 }

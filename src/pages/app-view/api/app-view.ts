@@ -1,7 +1,7 @@
 import { RequestError } from '@/components/error/models/error-model';
 import { clientPost } from '@/libs/client-post';
-import useSWRImmutable from 'swr/immutable';
 import useSWRMutation from 'swr/mutation';
+import useSWR from 'swr';
 
 type AppViewParams = {
   appName: string;
@@ -20,8 +20,8 @@ type AppViewResponse = {
 };
 
 export function useAppView(params: AppViewParams) {
-  return useSWRImmutable(['/app/view', params], ([url, swrParams]) =>
-    clientPost<AppViewResponse>({ url, params: swrParams }),
+  return useSWR(`/app/view/${params.appName}`, (url) =>
+    clientPost<AppViewResponse>({ url, params }),
   );
 }
 

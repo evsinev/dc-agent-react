@@ -1,5 +1,13 @@
 import Label from '@/components/label';
-import { Button, ColumnLayout, Container, Header, SpaceBetween, StatusIndicator } from '@cloudscape-design/components';
+import {
+  Button,
+  ColumnLayout,
+  Container,
+  Header,
+  SpaceBetween,
+  Spinner,
+  StatusIndicator
+} from '@cloudscape-design/components';
 import { useParams } from 'react-router';
 import { useAppPush, useAppView } from './api/app-view';
 import CodeHighlight from './components/code-highlight';
@@ -13,7 +21,7 @@ export default function AppView(props: Props) {
   const params = useParams();
   const appName = params.appName || (props.appName as string);
 
-  const { data: appView, isLoading, mutate: resetApp } = useAppView({ appName });
+  const { data: appView, isLoading, isValidating, mutate: resetApp } = useAppView({ appName });
   const { isMutating, trigger, data: mutatingData } = useAppPush();
 
   async function makePush() {
@@ -80,9 +88,9 @@ export default function AppView(props: Props) {
         </ColumnLayout>
       )}
 
-      <Container header={<Header>Check</Header>}>{appView && <CodeHighlight code={appView.taskCheckText} />}</Container>
+      <Container header={<Header actions={isValidating && <Spinner />}>Check</Header>}>{appView && <CodeHighlight code={appView.taskCheckText} />}</Container>
 
-      <Container header={<Header variant="h3">Push</Header>}>
+      <Container header={<Header variant="h3" actions={isValidating && <StatusIndicator type="loading"/>}>Push</Header>}>
         {isMutating && <StatusIndicator type="loading" />}
 
         {mutatingData && <CodeHighlight code={mutatingData.taskCheckText} />}

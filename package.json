@@ -12,10 +12,10 @@
     "lint": "biome lint && tsc --noEmit"
   },
   "dependencies": {
-    "@cloudscape-design/code-view": "3.0.50",
-    "@cloudscape-design/collection-hooks": "1.0.44",
-    "@cloudscape-design/components": "3.0.726",
-    "@cloudscape-design/global-styles": "1.0.32",
+    "@cloudscape-design/code-view": "3.0.57",
+    "@cloudscape-design/collection-hooks": "1.0.73",
+    "@cloudscape-design/components": "3.0.979",
+    "@cloudscape-design/global-styles": "1.0.44",
     "@emotion/react": "11.14.0",
     "@emotion/styled": "11.14.0",
     "pino": "8.19.0",
@@ -52,5 +52,6 @@
     "swr": "A React Hooks library for data fetching that provides features like caching, revalidation, and request deduplication, ensuring a smooth user experience.",
     "uuid": "A utility for generating unique identifiers, useful for ensuring distinct keys for items in lists or for other identification purposes.",
     "zustand": "A small and fast state management library for React, offering a simple API for managing application state without the need for complex setups."
-  }
+  },
+  "packageManager": "yarn@1.22.22"
 }

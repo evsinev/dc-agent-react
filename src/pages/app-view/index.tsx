@@ -6,7 +6,7 @@ import {
   Header,
   SpaceBetween,
   Spinner,
-  StatusIndicator
+  StatusIndicator,
 } from '@cloudscape-design/components';
 import { useParams } from 'react-router';
 import { useAppPush, useAppView } from './api/app-view';
@@ -22,19 +22,20 @@ export default function AppView(props: Props) {
   const appName = params.appName || (props.appName as string);
 
   const { data: appView, isLoading, isValidating, mutate: resetApp } = useAppView({ appName });
-  const { isMutating, trigger, data: mutatingData } = useAppPush();
+  const { isMutating, trigger, data: mutatingData } = useAppPush({ appName });
 
   async function makePush() {
-    await trigger({ appName });
+    await trigger();
     await resetApp();
   }
 
   return (
     <SpaceBetween size="m">
-      {props.showAppInfo && <Header variant="h1">
+      {props.showAppInfo && (
+        <Header variant="h1">
           App {appName} {isLoading && <StatusIndicator type="loading">Fetching</StatusIndicator>}
-      </Header>
-      }
+        </Header>
+      )}
 
       {props.showAppInfo && isLoading && (
         <ColumnLayout
@@ -88,9 +89,20 @@ export default function AppView(props: Props) {
         </ColumnLayout>
       )}
 
-      <Container header={<Header actions={isValidating && <Spinner />}>Check</Header>}>{appView && <CodeHighlight code={appView.taskCheckText} />}</Container>
+      <Container header={<Header actions={isValidating && <Spinner />}>Check</Header>}>
+        {appView && <CodeHighlight code={appView.taskCheckText} />}
+      </Container>
 
-      <Container header={<Header variant="h3" actions={isValidating && <StatusIndicator type="loading"/>}>Push</Header>}>
+      <Container
+        header={
+          <Header
+            variant="h3"
+            actions={isValidating && <StatusIndicator type="loading" />}
+          >
+            Push
+          </Header>
+        }
+      >
         {isMutating && <StatusIndicator type="loading" />}
 
         {mutatingData && <CodeHighlight code={mutatingData.taskCheckText} />}

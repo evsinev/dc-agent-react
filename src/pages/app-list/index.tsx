@@ -27,7 +27,7 @@ export default function AppList() {
   return (
     <SpaceBetween size="m">
       <Header variant="h1">
-        app list
+        App list
         {isLoading && <StatusIndicator type="loading">Fetching</StatusIndicator>}
       </Header>
 

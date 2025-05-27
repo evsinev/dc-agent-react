@@ -1,7 +1,7 @@
-import { RequestError } from '@/components/error/models/error-model';
 import { clientPost } from '@/libs/client-post';
-import useSWRMutation from 'swr/mutation';
+import { useEffect } from 'react';
 import useSWR from 'swr';
+import useSWRMutation from 'swr/mutation';
 
 type AppViewParams = {
   appName: string;
@@ -20,13 +20,17 @@ type AppViewResponse = {
 };
 
 export function useAppView(params: AppViewParams) {
-  return useSWR(`/app/view/${params.appName}`, (url) =>
-    clientPost<AppViewResponse>({ url, params }),
-  );
+  return useSWR(`/app/view/${params.appName}`, (url) => clientPost<AppViewResponse>({ url, params }));
 }
 
-export function useAppPush() {
-  return useSWRMutation<AppViewResponse, RequestError, string, AppViewParams>('/app/push', (url, { arg: params }) =>
-    clientPost<AppViewResponse>({ url, params }),
-  );
+export function useAppPush(params: { appName: string }) {
+  const result = useSWRMutation('/app/push', (url) => clientPost<AppViewResponse>({ url, params }));
+
+  useEffect(() => {
+    if (result.data?.appName !== params.appName) {
+      result.reset();
+    }
+  }, [params.appName, result.data?.appName]);
+
+  return result;
 }

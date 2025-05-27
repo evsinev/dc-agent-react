@@ -38,18 +38,21 @@ export const parsePropertyFilterQuery = (stringifiedPropertyFilter: string): Pro
     return defaultQuery;
   }
   try {
-    const json = JSON.parse(stringifiedPropertyFilter.replace("(", "{"));
+    const json = JSON.parse(stringifiedPropertyFilter.replace('(', '{'));
     return propertyFilterQuerySchema.parse(json);
-  } catch (error) {
+  } catch (_error) {
     return defaultQuery;
   }
 };
 
-export function saveQueryFilter(event: NonCancelableCustomEvent<PropertyFilterProps.Query>, setQueryParam: (param: string, value: (string | null)) => void) {
+export function saveQueryFilter(
+  event: NonCancelableCustomEvent<PropertyFilterProps.Query>,
+  setQueryParam: (param: string, value: string | null) => void,
+) {
   const query = event.detail;
-  if (!query.tokens?.length){
+  if (!query.tokens?.length) {
     setQueryParam(PROPERTY_FILTERS_QUERY_PARAM_KEY, null);
   } else {
-    setQueryParam(PROPERTY_FILTERS_QUERY_PARAM_KEY, JSON.stringify(query).replace("{", "("));
+    setQueryParam(PROPERTY_FILTERS_QUERY_PARAM_KEY, JSON.stringify(query).replace('{', '('));
   }
 }

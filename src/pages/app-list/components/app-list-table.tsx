@@ -6,7 +6,7 @@ import { Link } from 'react-router';
 import { APP_LIST_FILTERING_PROPERTIES } from '@/pages/app-list/components/app-list-table-filters';
 import { PropertyFilter } from '@cloudscape-design/components';
 import { useQueryParams } from '@/hooks/use-query-params';
-import { parsePropertyFilterQuery } from '@/libs/parse-property-filter';
+import { parsePropertyFilterQuery, saveQueryFilter } from '@/libs/parse-property-filter';
 
 const PROPERTY_FILTERS_QUERY_PARAM_KEY = 'propertyFilter';
 
@@ -94,13 +94,7 @@ export default function AppListTable(props: AppListTableProps) {
           {...propertyFilterProps}
           expandToViewport={true}
           onChange={event => {
-            const query = event.detail;
-            if (!query.tokens?.length) {
-              setQueryParam(PROPERTY_FILTERS_QUERY_PARAM_KEY, null);
-            } else {
-              setQueryParam(PROPERTY_FILTERS_QUERY_PARAM_KEY, JSON.stringify(query));
-            }
-
+            saveQueryFilter(event, setQueryParam);
             propertyFilterProps.onChange(event);
           }}
         />

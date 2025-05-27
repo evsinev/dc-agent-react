@@ -6,9 +6,11 @@ import { Link } from 'react-router';
 import { ServiceListItem } from '../api/service-list';
 import { SERVICE_LIST_FILTERING_PROPERTIES } from '@/pages/service-list/components/service-list-table-filters';
 import { useQueryParams } from '@/hooks/use-query-params';
-import { parsePropertyFilterQuery } from '@/libs/parse-property-filter';
-
-const PROPERTY_FILTERS_QUERY_PARAM_KEY = 'propertyFilter';
+import {
+  parsePropertyFilterQuery,
+  PROPERTY_FILTERS_QUERY_PARAM_KEY,
+  saveQueryFilter
+} from '@/libs/parse-property-filter';
 
 type Props = {
   services: ServiceListItem[];
@@ -76,13 +78,7 @@ export default function ServiceListTable(props: Props) {
           {...propertyFilterProps}
           expandToViewport={true}
           onChange={event => {
-            const query = event.detail;
-            if (!query.tokens?.length) {
-              setQueryParam(PROPERTY_FILTERS_QUERY_PARAM_KEY, null);
-            } else {
-              setQueryParam(PROPERTY_FILTERS_QUERY_PARAM_KEY, JSON.stringify(query));
-            }
-
+            saveQueryFilter(event, setQueryParam);
             propertyFilterProps.onChange(event);
           }}
         />

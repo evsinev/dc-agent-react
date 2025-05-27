@@ -3,6 +3,9 @@
 import * as z from 'zod';
 
 import { PropertyFilterQuery } from '@cloudscape-design/collection-hooks';
+import { NonCancelableCustomEvent, PropertyFilterProps } from '@cloudscape-design/components';
+
+export const PROPERTY_FILTERS_QUERY_PARAM_KEY = 'propertyFilter';
 
 const PropertyFilterOperation = z.enum(['and', 'or']);
 
@@ -35,9 +38,18 @@ export const parsePropertyFilterQuery = (stringifiedPropertyFilter: string): Pro
     return defaultQuery;
   }
   try {
-    const json = JSON.parse(stringifiedPropertyFilter);
+    const json = JSON.parse(stringifiedPropertyFilter.replace("(", "{"));
     return propertyFilterQuerySchema.parse(json);
   } catch (error) {
     return defaultQuery;
   }
 };
+
+export function saveQueryFilter(event: NonCancelableCustomEvent<PropertyFilterProps.Query>, setQueryParam: (param: string, value: (string | null)) => void) {
+  const query = event.detail;
+  if (!query.tokens?.length){
+    setQueryParam(PROPERTY_FILTERS_QUERY_PARAM_KEY, null);
+  } else {
+    setQueryParam(PROPERTY_FILTERS_QUERY_PARAM_KEY, JSON.stringify(query).replace("{", "("));
+  }
+}

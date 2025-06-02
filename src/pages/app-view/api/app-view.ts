@@ -34,13 +34,3 @@ export function useAppPush(params: { appName: string }) {
 
   return result;
 }
-
-export function useAppInfo(params: { appName: string }) {
-  const mock = new Promise((resolve) => {
-    setTimeout(() => {
-      resolve('<section><h4>Mock title</h4><p>Mock description</p></section>');
-    }, 2000);
-  });
-
-  return useSWR(`/app/info/${params.appName}`, () => mock);
-}

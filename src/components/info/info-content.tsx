@@ -1,8 +1,12 @@
 import { Spinner } from '@cloudscape-design/components';
-import { useAppInfo } from '../api/app-view';
+import { useAppInfo } from './api/info';
 
-export default function Info({ appName }: { appName: string }) {
-  const { data, isLoading } = useAppInfo({ appName });
+interface Props {
+  infoKey: string;
+}
+
+export default function InfoContent({ infoKey }: Props) {
+  const { data, isLoading } = useAppInfo({ infoKey });
 
   if (isLoading) return <Spinner />;
 

@@ -1,4 +1,6 @@
 import Label from '@/components/label';
+import { useHelpPanel } from '@/hooks/use-help-panel';
+import Info from '@/pages/app-view/components/info';
 import {
   Button,
   ColumnLayout,
@@ -20,6 +22,7 @@ interface Props {
 export default function AppView(props: Props) {
   const params = useParams();
   const appName = params.appName || (props.appName as string);
+  const { show, hide, panel } = useHelpPanel();
 
   const { data: appView, isLoading, isValidating, mutate: resetApp } = useAppView({ appName });
   const { isMutating, trigger, data: mutatingData } = useAppPush({ appName });
@@ -29,10 +32,26 @@ export default function AppView(props: Props) {
     await resetApp();
   }
 
+  const showPanel = () =>
+    show({
+      content: <Info appName={appName} />,
+      title: 'Info title',
+    });
+
   return (
     <SpaceBetween size="m">
       {props.showAppInfo && (
-        <Header variant="h1">
+        <Header
+          variant="h1"
+          info={
+            <Button
+              variant="link"
+              onClick={panel ? hide : showPanel}
+            >
+              Info
+            </Button>
+          }
+        >
           App {appName} {isLoading && <StatusIndicator type="loading">Fetching</StatusIndicator>}
         </Header>
       )}

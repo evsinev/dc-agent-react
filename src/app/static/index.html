@@ -4,6 +4,31 @@
       <title>DC Operator</title>
   </head>
 
+  <script>
+    window.callbacks = {
+      'uuid1': function () {
+        console.log('syn func 1');
+        return 1;
+        },
+      'uuid2': function () {
+        console.log('syn func 2');
+        return 2;
+        },
+      'uuid3': function () {
+        const start = Date.now();
+        while (Date.now() - start < 2000) {
+          // блочим основной поток на 2 секунды для теста
+        }
+        console.log('syn func 3');
+        return 3;
+      },
+      'uuid4': function () {
+        console.log('syn func 4');
+        return 4;
+        },
+    }
+  </script>
+
   <body class="awsui-dark-mode" style="background-color: #131925">
       <div id="<%= mountId %>"></div>
   </body>

@@ -5,6 +5,7 @@ const routing = {
   service: '/services/:host/:serviceName',
   git: '/git',
   logs: '/logs',
+  test: '/test',
 };
 
 export default routing;

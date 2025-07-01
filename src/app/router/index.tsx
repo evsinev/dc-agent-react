@@ -5,6 +5,7 @@ import LogsPage from '@/pages/logs';
 import NotFound from '@/pages/not-found';
 import ServiceList from '@/pages/service-list';
 import ServiceViewPage from '@/pages/service-view';
+import TestPage from '@/pages/test';
 import routing from '@routing';
 import { Route, Routes } from 'react-router';
 
@@ -34,6 +35,10 @@ export default function Router() {
       <Route
         path={routing.logs}
         Component={LogsPage}
+      />
+      <Route
+        path={routing.test}
+        Component={TestPage}
       />
       <Route
         path="*"

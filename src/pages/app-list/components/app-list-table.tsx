@@ -7,6 +7,7 @@ import { APP_LIST_FILTERING_PROPERTIES } from '@/pages/app-list/components/app-l
 import { PropertyFilter } from '@cloudscape-design/components';
 import { useQueryParams } from '@/hooks/use-query-params';
 import { parsePropertyFilterQuery, saveQueryFilter } from '@/libs/parse-property-filter';
+import { AppStatusIndicator } from '@/pages/app-list/components/app-status-indicator';
 
 const PROPERTY_FILTERS_QUERY_PARAM_KEY = 'propertyFilter';
 
@@ -23,6 +24,11 @@ const columns = [
   {
     id: 'appName',
     visible: true,
+  },
+  {
+    id: 'appStatus',
+    visible: true,
+    sortable: false,
   },
   {
     id: 'taskHost',
@@ -62,6 +68,13 @@ export default function AppListTable(props: AppListTableProps) {
           id: 'appName',
           header: 'App',
           cell: itemCell,
+          sortingField: 'appName',
+          isRowHeader: true,
+        },
+        {
+          id: 'appStatus',
+          header: 'Status',
+          cell: (it) => <AppStatusIndicator appName={it.appName} />,
           sortingField: 'appName',
           isRowHeader: true,
         },

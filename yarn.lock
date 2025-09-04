@@ -136,21 +136,16 @@
   resolved "https://registry.yarnpkg.com/@biomejs/cli-win32-x64/-/cli-win32-x64-1.9.4.tgz#4c7afa90e3970213599b4095e62f87e5972b2340"
   integrity sha512-8Y5wMhVIPaWe6jw2H+KlEm4wP/f7EW3810ZLmDlrEEy5KvBsb9ECEfu/kMWD484ijfQ8+nIi0giMgu9g1UAuuA==
 
-"@cloudscape-design/code-view@3.0.50":
-  version "3.0.50"
-  resolved "https://registry.yarnpkg.com/@cloudscape-design/code-view/-/code-view-3.0.50.tgz#5a963cae59fb77980d1f5736f92cfaa92255da0e"
-  integrity sha512-WrsK9X0pIh1qpmq9gijKhcpDOBo46AOkq1kmWnILw2KxNomLlXQglDDCdQ8cS9dZPY+EiN/7RPeAqVMDBfuwDQ==
+"@cloudscape-design/code-view@3.0.57":
+  version "3.0.57"
+  resolved "https://registry.yarnpkg.com/@cloudscape-design/code-view/-/code-view-3.0.57.tgz#13906b87978263706b4a473f32da786b506edbf6"
+  integrity sha512-EKP2rkZYmi4j9OF4q0WUo1bNJ5TlJbi6JZQ21XkY7RFl7zQKCoex3snh+4l17d9igX8dt+kEfqgoRsVis3MvtA==
   dependencies:
     "@cloudscape-design/component-toolkit" "^1.0.0-beta"
     ace-code "^1.32.3"
     clsx "^1.2.1"
 
-"@cloudscape-design/collection-hooks@1.0.44":
-  version "1.0.44"
-  resolved "https://registry.yarnpkg.com/@cloudscape-design/collection-hooks/-/collection-hooks-1.0.44.tgz#0beea8bb07a592aa7d6e76411c688500cf5f254a"
-  integrity sha512-UM9dWGgb1fnhTiEzk8Yjr+Vo6z4g2h1zUBIKoABRjqR8KVAuj1IBVZ9rMBbpxDrfuoekzY6uY6ik+2GcZqwKsA==
-
-"@cloudscape-design/collection-hooks@^1.0.0":
+"@cloudscape-design/collection-hooks@1.0.73", "@cloudscape-design/collection-hooks@^1.0.0":
   version "1.0.73"
   resolved "https://registry.yarnpkg.com/@cloudscape-design/collection-hooks/-/collection-hooks-1.0.73.tgz#339484862efe6b0888247db63225a1565d8bbc20"
   integrity sha512-eWj+K2PR4RLSOxDl2fYNPAm+9cqvPr8va5KXthhC/K4tWDSqwFliG6x4vqgdmvifyNJIviD80p6zm8vdk5X27w==
@@ -163,10 +158,10 @@
     "@juggle/resize-observer" "^3.3.1"
     tslib "^2.3.1"
 
-"@cloudscape-design/components@3.0.726":
-  version "3.0.726"
-  resolved "https://registry.yarnpkg.com/@cloudscape-design/components/-/components-3.0.726.tgz#54372007207cab8fa6c114e07bb027d6736e9952"
-  integrity sha512-wp3pocEWamkO860YTJLeRTbs2dDU4dYOE6RQXhUQR2EMc9MuFqltTxIOIo2NLCpjkRxcWQ/fs1px2gDzAaoVyA==
+"@cloudscape-design/components@3.0.979":
+  version "3.0.979"
+  resolved "https://registry.yarnpkg.com/@cloudscape-design/components/-/components-3.0.979.tgz#9fdeb4af9059d93502fc3118b60d582154b0a732"
+  integrity sha512-j1oQNvpZmyT2oKHhZWlfWgv0+d5drC6MS+nrk0kQwQlQGqNIYUi3m5TDbUyX+E70TM6+sLee5KoQ07+sDgifEQ==
   dependencies:
     "@cloudscape-design/collection-hooks" "^1.0.0"
     "@cloudscape-design/component-toolkit" "^1.0.0-beta"
@@ -183,15 +178,15 @@
     date-fns "^2.25.0"
     intl-messageformat "^10.3.1"
     mnth "^2.0.0"
-    react-keyed-flatten-children "^1.3.0"
+    react-keyed-flatten-children "^2.2.1"
     react-transition-group "^4.4.2"
     tslib "^2.4.0"
     weekstart "^1.1.0"
 
-"@cloudscape-design/global-styles@1.0.32":
-  version "1.0.32"
-  resolved "https://registry.yarnpkg.com/@cloudscape-design/global-styles/-/global-styles-1.0.32.tgz#7ae14287f7ea6e6ebf2cdc558d4228ebd1fc5193"
-  integrity sha512-3X7YEnzB7U0HeWS2iGIXWgdUAfloWVm+skzJlFkj0MNGIZ7jpI5rH9u9jLFsS021a4WrpK12FM+cwgLjzAq03A==
+"@cloudscape-design/global-styles@1.0.44":
+  version "1.0.44"
+  resolved "https://registry.yarnpkg.com/@cloudscape-design/global-styles/-/global-styles-1.0.44.tgz#cf68c225c2a1f2c04a6e2ad9f498af78f8c0a5ac"
+  integrity sha512-cQmZ3tsbbMv4QZll0+NzmlUHjmQj0C+9s9nIf1KyV/sdVFGfeFLbV4K4cMmWeu2kOwg1fAE1QkjTI96SpUGM9w==
 
 "@cloudscape-design/test-utils-core@^1.0.0":
   version "1.0.59"
@@ -1014,17 +1009,22 @@ react-dom@19.0.0:
   dependencies:
     scheduler "^0.25.0"
 
-react-is@^16.13.1, react-is@^16.7.0, react-is@^16.8.6:
+react-is@^16.13.1, react-is@^16.7.0:
   version "16.13.1"
   resolved "https://registry.yarnpkg.com/react-is/-/react-is-16.13.1.tgz#789729a4dc36de2999dc156dd6c1d9c18cea56a4"
   integrity sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==
 
-react-keyed-flatten-children@^1.3.0:
-  version "1.3.0"
-  resolved "https://registry.yarnpkg.com/react-keyed-flatten-children/-/react-keyed-flatten-children-1.3.0.tgz#38d171582c6358909f430648a7a7d094aebae42a"
-  integrity sha512-qB7A6n+NHU0x88qTZGAJw6dsqwI941jcRPBB640c/CyWqjPQQ+YUmXOuzPziuHb7iqplM3xksWAbGYwkQT0tXA==
+react-is@^18.2.0:
+  version "18.3.1"
+  resolved "https://registry.yarnpkg.com/react-is/-/react-is-18.3.1.tgz#e83557dc12eae63a99e003a46388b1dcbb44db7e"
+  integrity sha512-/LLMVyas0ljjAtoYiPqYiL8VWXzUUdThrmU5+n20DZv+a+ClRoevUzw5JxU+Ieh5/c87ytoTBV9G1FiKfNJdmg==
+
+react-keyed-flatten-children@^2.2.1:
+  version "2.2.1"
+  resolved "https://registry.yarnpkg.com/react-keyed-flatten-children/-/react-keyed-flatten-children-2.2.1.tgz#39cbf8fede2620adc07ff5c8cdedc7548a97fbd5"
+  integrity sha512-6yBLVO6suN8c/OcJk1mzIrUHdeEzf5rtRVBhxEXAHO49D7SlJ70cG4xrSJrBIAG7MMeQ+H/T151mM2dRDNnFaA==
   dependencies:
-    react-is "^16.8.6"
+    react-is "^18.2.0"
 
 react-refresh@^0.16.0:
   version "0.16.0"

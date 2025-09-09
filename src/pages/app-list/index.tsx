@@ -1,11 +1,11 @@
 import { useSplitPanel } from '@/hooks/use-split-panel';
 import { AppListItem, useAppList } from '@/pages/app-list/api/app-list';
-import AppDetail from '@/pages/app-view';
 import { StatusIndicator } from '@cloudscape-design/components';
 import Header from '@cloudscape-design/components/header';
 import SpaceBetween from '@cloudscape-design/components/space-between';
 import { useEffect, useState } from 'react';
 import AppListTable from './components/app-list-table';
+import AppServicePanel from '@/pages/app-list/components/app-service-panel';
 
 export default function AppList() {
   const { data, isLoading } = useAppList();
@@ -18,7 +18,10 @@ export default function AppList() {
     if (selected.length > 0) {
       const last = selected[selected.length - 1];
 
-      show({ content: <AppDetail appName={last.appName} />, title: last.appName });
+      show({
+        content: <AppServicePanel appName={last.appName} serviceHost={last.taskHost} serviceName={`${last.taskName}-1`} />,
+        title: last.appName
+      });
     } else {
       hide();
     }

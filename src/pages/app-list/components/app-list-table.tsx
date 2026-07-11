@@ -48,14 +48,13 @@ const itemCell = (item: AppListItem) => <Link to={routing.app.replace(':appName'
 
 export default function AppListTable(props: AppListTableProps) {
   const { getQueryParam, setQueryParam } = useQueryParams();
-  const { items, collectionProps, propertyFilterProps } = useCollection(props.apps,
-    {
-      sorting: defaultSorting.sorting,
-      propertyFiltering: {
-        filteringProperties: APP_LIST_FILTERING_PROPERTIES,
-        defaultQuery: parsePropertyFilterQuery(getQueryParam(PROPERTY_FILTERS_QUERY_PARAM_KEY)),
-      },
-    });
+  const { items, collectionProps, propertyFilterProps } = useCollection(props.apps, {
+    sorting: defaultSorting.sorting,
+    propertyFiltering: {
+      filteringProperties: APP_LIST_FILTERING_PROPERTIES,
+      defaultQuery: parsePropertyFilterQuery(getQueryParam(PROPERTY_FILTERS_QUERY_PARAM_KEY)),
+    },
+  });
 
   return (
     <Table
@@ -106,7 +105,7 @@ export default function AppListTable(props: AppListTableProps) {
         <PropertyFilter
           {...propertyFilterProps}
           expandToViewport={true}
-          onChange={event => {
+          onChange={(event) => {
             saveQueryFilter(event, setQueryParam);
             propertyFilterProps.onChange(event);
           }}

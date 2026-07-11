@@ -9,7 +9,7 @@ import { Container, Header, SpaceBetween, StatusIndicator } from '@cloudscape-de
 type Props = {
   host: string;
   serviceName: string;
-}
+};
 export default function ServiceViewPanel({ host, serviceName }: Props) {
   const fqsn = `${host}/${serviceName}`;
 

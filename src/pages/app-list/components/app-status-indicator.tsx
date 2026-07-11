@@ -6,7 +6,7 @@ type Props = {
 };
 
 export function AppStatusIndicator({ appName }: Props) {
-  const { data, isLoading, isValidating } = useRemoteAppStatus({appName});
+  const { data, isLoading, isValidating } = useRemoteAppStatus({ appName });
 
   if (isLoading) {
     return <StatusIndicator type="loading" />;

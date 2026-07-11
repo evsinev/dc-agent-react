@@ -4,7 +4,7 @@ import routing from '@routing';
 import { useNavigate } from 'react-router';
 import { useState } from 'react';
 
-function toHref(aRouterLink : string) {
+function toHref(aRouterLink: string) {
   return process.env.PUBLIC_BASE_PATH + aRouterLink;
 }
 
@@ -48,7 +48,7 @@ export default function Navigation() {
   function onFollow(event: CustomEvent<SideNavigationProps.FollowDetail>) {
     event.preventDefault();
     const { href } = event.detail;
-    if (href.startsWith('http')){
+    if (href.startsWith('http')) {
       window.location.href = href;
     }
     setActiveHref(href);

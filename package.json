@@ -8,7 +8,8 @@
     "dev": "rsbuild dev --env-mode development",
     "build": "rsbuild build",
     "preview": "rsbuild preview",
-    "format": "biome format",
+    "format": "biome format --write",
+    "format:check": "biome format",
     "lint": "biome lint && tsc --noEmit"
   },
   "dependencies": {

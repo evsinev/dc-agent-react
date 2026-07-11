@@ -9,7 +9,7 @@ import { useQueryParams } from '@/hooks/use-query-params';
 import {
   parsePropertyFilterQuery,
   PROPERTY_FILTERS_QUERY_PARAM_KEY,
-  saveQueryFilter
+  saveQueryFilter,
 } from '@/libs/parse-property-filter';
 
 type Props = {
@@ -77,7 +77,7 @@ export default function ServiceListTable(props: Props) {
         <PropertyFilter
           {...propertyFilterProps}
           expandToViewport={true}
-          onChange={event => {
+          onChange={(event) => {
             saveQueryFilter(event, setQueryParam);
             propertyFilterProps.onChange(event);
           }}

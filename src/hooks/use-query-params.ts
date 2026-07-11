@@ -10,7 +10,7 @@ export const useQueryParams = () => {
   };
 
   const setQueryParam = (param: string, value: string | null) => {
-    setParams(currentParams => {
+    setParams((currentParams) => {
       const queryParams = { ...currentParams };
       if (value === null || value === '') {
         delete queryParams[param];

@@ -32,5 +32,9 @@ jobs:
       - name: Lint & type-check
         run: yarn lint
 
+      # Fail if any file isn't formatted (check mode, no writes).
+      - name: Format check
+        run: yarn format:check
+
       - name: Build
         run: yarn build

@@ -14,12 +14,12 @@ type AppListResponse = {
 
 type AppStatusRequest = {
   appName: string;
-}
+};
 
 type AppStatusResponse = {
   status: 'OK' | 'ERROR' | 'DRIFT';
   errorMessage: string;
-}
+};
 
 export function useAppList() {
   return useSWR('/app/list', (url) => clientPost<AppListResponse>({ url }));

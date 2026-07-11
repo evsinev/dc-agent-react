@@ -14,20 +14,35 @@ export default function AppServicePanel(props: Props) {
     <Tabs
       tabs={[
         {
-          label: "App",
-          id: "app",
-          content: <AppView appName={props.appName} showAppInfo={false} />
+          label: 'App',
+          id: 'app',
+          content: (
+            <AppView
+              appName={props.appName}
+              showAppInfo={false}
+            />
+          ),
         },
         {
-          label: "Service",
-          id: "service",
-          content: <ServiceViewPanel host={props.serviceHost} serviceName={props.serviceName} />
+          label: 'Service',
+          id: 'service',
+          content: (
+            <ServiceViewPanel
+              host={props.serviceHost}
+              serviceName={props.serviceName}
+            />
+          ),
         },
         {
-          label: "Logs",
-          id: "logs",
-          content: <ServiceLogPanel host={props.serviceHost} serviceName={props.serviceName} />
-        }
+          label: 'Logs',
+          id: 'logs',
+          content: (
+            <ServiceLogPanel
+              host={props.serviceHost}
+              serviceName={props.serviceName}
+            />
+          ),
+        },
       ]}
     />
   );

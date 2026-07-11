@@ -19,8 +19,14 @@ export default function AppList() {
       const last = selected[selected.length - 1];
 
       show({
-        content: <AppServicePanel appName={last.appName} serviceHost={last.taskHost} serviceName={`${last.taskName}-1`} />,
-        title: last.appName
+        content: (
+          <AppServicePanel
+            appName={last.appName}
+            serviceHost={last.taskHost}
+            serviceName={`${last.taskName}-1`}
+          />
+        ),
+        title: last.appName,
       });
     } else {
       hide();

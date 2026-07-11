@@ -5,7 +5,7 @@ import { Button, Container, Header } from '@cloudscape-design/components';
 type Props = {
   host: string;
   serviceName: string;
-}
+};
 export default function ServiceLogPanel({ host, serviceName }: Props) {
   const fqsn = `${host}/${serviceName}`;
 
@@ -16,19 +16,23 @@ export default function ServiceLogPanel({ host, serviceName }: Props) {
   }
 
   return (
-    <Container header={
-      <Header
-        headingTagOverride="h5"
-        actions={
-          <Button
-            onClick={refreshLogs}
-            iconName="refresh"
-            loadingText="Refreshing logs"
-            loading={isLoading}
-          />}
-      >
-        /var/log/{data?.service?.serviceName || ''}/current
-      </Header>}>
+    <Container
+      header={
+        <Header
+          headingTagOverride="h5"
+          actions={
+            <Button
+              onClick={refreshLogs}
+              iconName="refresh"
+              loadingText="Refreshing logs"
+              loading={isLoading}
+            />
+          }
+        >
+          /var/log/{data?.service?.serviceName || ''}/current
+        </Header>
+      }
+    >
       <CodeView
         lineNumbers
         content={data?.lastLogLines || 'Loading logs ...'}

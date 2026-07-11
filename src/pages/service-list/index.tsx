@@ -19,8 +19,13 @@ export default function ServiceList() {
     if (selectedService.length > 0) {
       const service = selectedService[0];
       showSplit({
-          content: <ServiceViewPanel serviceName={service.serviceName} host={service.host} />,
-          title: `${service.host} / ${service.serviceName}`,
+        content: (
+          <ServiceViewPanel
+            serviceName={service.serviceName}
+            host={service.host}
+          />
+        ),
+        title: `${service.host} / ${service.serviceName}`,
       });
     } else {
       hideSplit();

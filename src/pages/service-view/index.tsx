@@ -5,6 +5,9 @@ export default function ServiceViewPage() {
   const { host, serviceName } = useParams();
 
   return (
-    <ServiceViewPanel host={host ?? 'unknown-host'} serviceName={serviceName ?? 'unknown-service'} />
+    <ServiceViewPanel
+      host={host ?? 'unknown-host'}
+      serviceName={serviceName ?? 'unknown-service'}
+    />
   );
 }

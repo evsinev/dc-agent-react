@@ -9,7 +9,7 @@ export const enumOperators = [
   '!:',
 ] as const;
 
-export const APP_LIST_FILTERING_PROPERTIES : PropertyFilterProperty[] = [
+export const APP_LIST_FILTERING_PROPERTIES: PropertyFilterProperty[] = [
   {
     propertyLabel: 'Host',
     key: 'taskHost',

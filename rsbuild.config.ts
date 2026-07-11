@@ -1,5 +1,9 @@
 import { defineConfig } from '@rsbuild/core';
 import { pluginReact } from '@rsbuild/plugin-react';
+import { devMockMiddleware } from './mock/dev-mock-middleware';
+
+// `yarn dev:mock` sets MOCK=true to serve fixture data and run the UI without a backend.
+const useMock = process.env.MOCK === 'true' || process.env.MOCK === '1';
 
 export default defineConfig({
   plugins: [pluginReact()],
@@ -35,8 +39,19 @@ export default defineConfig({
     template: './src/app/static/index.html',
   },
   server: {
+    // Serve the dev/preview server under the router basename so http://localhost:3000/dc-operator works.
+    base: '/dc-operator',
     proxy: {
       '/dc-operator/api': 'http://localhost:8052',
     },
   },
+  dev: useMock
+    ? {
+        setupMiddlewares: [
+          (middlewares) => {
+            middlewares.unshift(devMockMiddleware);
+          },
+        ],
+      }
+    : undefined,
 });

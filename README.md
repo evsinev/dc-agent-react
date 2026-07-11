@@ -41,17 +41,27 @@ yarn install
 yarn dev
 ```
 
-The dev server proxies API calls from `/dc-operator/api` to the backend at `http://localhost:8052` (see `rsbuild.config.ts`). Start the [dc-agent](https://github.com/evsinev/dc-agent) backend on that port for the UI to work locally.
+The dev server proxies API calls from `/dc-operator/api` to the backend at `http://localhost:8052` (see `rsbuild.config.ts`). Start the [dc-agent](https://github.com/evsinev/dc-agent) backend on that port for the UI to work locally — or run `yarn dev:mock` to use built-in fixtures instead (see below).
+
+### Running without a backend (mock mode)
+
+`yarn dev:mock` starts the dev server with a mock middleware (`MOCK=true`) that answers all backend API calls with fake fixture data, so the UI runs fully offline — no dc-agent and no `:8052` needed.
+
+- The mock lives in `mock/` (middleware in `dev-mock-middleware.ts`, fixtures in `mock-data.ts`) and is wired into `dev.setupMiddlewares` in `rsbuild.config.ts`, gated on the `MOCK` env var.
+- Fixture data (apps, services, git commits) is deliberately fake and for local dev only.
+- Plain `yarn dev` is unchanged and still targets the real backend.
 
 ## Scripts
 
-| Command        | Description                                         |
-|----------------|-----------------------------------------------------|
-| `yarn dev`     | Start the Rsbuild dev server (development env mode) |
-| `yarn build`   | Production build into `dist/`                       |
-| `yarn preview` | Serve the production build locally                  |
-| `yarn lint`    | `biome lint` + `tsc --noEmit` (type check)          |
-| `yarn format`  | Report Biome formatting differences                 |
+| Command           | Description                                                     |
+|-------------------|-----------------------------------------------------------------|
+| `yarn dev`        | Start the Rsbuild dev server (proxies to the real backend)      |
+| `yarn dev:mock`   | Dev server with the offline mock middleware (`MOCK=true`)       |
+| `yarn build`      | Production build into `dist/`                                   |
+| `yarn preview`    | Serve the production build locally                              |
+| `yarn lint`       | `biome lint` + `tsc --noEmit` (type check)                      |
+| `yarn format`     | Apply Biome formatting (`--write`)                              |
+| `yarn format:check` | Check Biome formatting without writing (used in CI)           |
 
 ## Environment variables
 

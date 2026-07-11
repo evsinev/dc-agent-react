@@ -12,16 +12,20 @@ Package manager is **Yarn 1** (`packageManager: yarn@1.22.22`). Use `yarn`, not 
 
 ```bash
 yarn install          # install deps
-yarn dev              # Rsbuild dev server on :3000, base path /dc-operator
+yarn dev              # Rsbuild dev server on :3000, base path /dc-operator (proxies to real backend :8052)
+yarn dev:mock         # dev server with the offline mock middleware (MOCK=true) — no backend needed
 yarn build            # production build into dist/
 yarn preview          # serve the production build
 yarn lint             # biome lint && tsc --noEmit  (the quality gate)
-yarn format           # biome format (prints diffs; does NOT write)
+yarn format           # biome format --write (apply formatting)
+yarn format:check     # biome format (check only; used in CI)
 ```
 
 There are **no tests** in this project.
 
-Before considering a change done, run `yarn lint` — it is the enforced gate (Biome lint + full TypeScript type check). Formatting is checked separately (`yarn format`) and is **not** part of that gate.
+Before considering a change done, run `yarn lint` — it is the enforced gate (Biome lint + full TypeScript type check). Formatting is checked separately (`yarn format:check`) and is **not** part of that gate.
+
+**Offline dev / mocks:** `yarn dev:mock` runs the UI without a backend. A dev-only middleware in `mock/` (`dev-mock-middleware.ts` + fixtures in `mock-data.ts`) is wired into `dev.setupMiddlewares` in `rsbuild.config.ts`, gated on the `MOCK` env var, and answers all `clientPost` endpoints (`/app/*`, `/service/*`, `/git/*`) under the `/dc-operator/api` prefix with fake data. Note: `/logs/get-list` and `/app/info/{infoKey}` are separate client-side stubs (`logs-list.ts`, `info.ts`) that never hit the network, so they aren't in the middleware.
 
 ## Toolchain specifics
 

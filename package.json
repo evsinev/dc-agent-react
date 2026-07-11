@@ -6,6 +6,7 @@
   "repository": "https://github.com/evsinev/dc-agent-react",
   "scripts": {
     "dev": "rsbuild dev --env-mode development",
+    "dev:mock": "MOCK=true rsbuild dev --env-mode development",
     "build": "rsbuild build",
     "preview": "rsbuild preview",
     "format": "biome format --write",

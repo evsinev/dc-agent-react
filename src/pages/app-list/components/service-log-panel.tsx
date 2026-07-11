@@ -1,10 +1,6 @@
 import { useServiceView } from '@/pages/service-view/api/service-view';
-import ServiceHeader from '@/pages/service-view/components/header';
-import Status from '@/pages/service-view/components/status';
 import { CodeView } from '@cloudscape-design/code-view';
-// @ts-ignore Неверный импорт в типах библиотеки
-import shHighlight from '@cloudscape-design/code-view/highlight/sh';
-import { Button, Container, Header, SpaceBetween, StatusIndicator } from '@cloudscape-design/components';
+import { Button, Container, Header } from '@cloudscape-design/components';
 
 type Props = {
   host: string;

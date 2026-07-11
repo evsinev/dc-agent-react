@@ -1,5 +1,5 @@
 import { SideNavigation } from '@cloudscape-design/components';
-import { SideNavigationProps } from '@cloudscape-design/components/side-navigation/interfaces';
+import { SideNavigationProps } from '@cloudscape-design/components/side-navigation';
 import routing from '@routing';
 import { useNavigate } from 'react-router';
 import { useState } from 'react';
@@ -52,7 +52,7 @@ export default function Navigation() {
       window.location.href = href;
     }
     setActiveHref(href);
-    navigate(href.replace(process.env.PUBLIC_BASE_PATH!, ''));
+    navigate(href.replace(process.env.PUBLIC_BASE_PATH || '', ''));
   }
 
   return (

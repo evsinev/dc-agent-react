@@ -1,5 +1,5 @@
 import { clientPost } from '@/libs/client-post';
-import { StatusIndicatorProps } from '@cloudscape-design/components/status-indicator/internal';
+import { StatusIndicatorProps } from '@cloudscape-design/components/status-indicator';
 import useSWR from 'swr';
 
 export type ServiceStateType =

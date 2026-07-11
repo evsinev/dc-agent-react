@@ -1,3 +1,4 @@
+import { useDocumentTitle } from '@/hooks/use-document-title';
 import { Button, Container, ContentLayout, KeyValuePairs, SpaceBetween } from '@cloudscape-design/components';
 import { useGitLog } from './api/git-log';
 import { useGitPull } from './api/git-pull';
@@ -5,6 +6,7 @@ import GitCommitsTable from './components/git-commits-table';
 import Header from './components/header';
 
 export default function Git() {
+  useDocumentTitle('Git repo');
   const { data, isLoading, mutate, error } = useGitLog();
   const { isMutating, trigger } = useGitPull();
 

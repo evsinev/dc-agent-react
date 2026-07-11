@@ -4,10 +4,12 @@ import SpaceBetween from '@cloudscape-design/components/space-between';
 import { ServiceListItem, useServiceList } from './api/service-list';
 import ServiceListTable from './components/service-list-table';
 import { useEffect, useState } from 'react';
+import { useDocumentTitle } from '@/hooks/use-document-title';
 import { useSplitPanel } from '@/hooks/use-split-panel';
 import ServiceViewPanel from '@/pages/service-view/components/service-view-panel';
 
 export default function ServiceList() {
+  useDocumentTitle('Service list');
   const { data, isLoading } = useServiceList();
   const services = data?.services ?? [];
   const [selectedService, setSelectedServices] = useState<ServiceListItem[]>([]);

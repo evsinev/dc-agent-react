@@ -62,6 +62,7 @@ Environment is loaded from `.env.development` / `.env.production` (see `--env-mo
 | `PUBLIC_BASE_PATH`             | `/dc-operator`     | Router base path the app is served under |
 | `PUBLIC_API_BASE_URL`          | `/dc-operator/api` | Base URL prepended to all API requests   |
 | `PUBLIC_LOGS_REFRESH_INTERVAL` | `2000`             | Log viewer auto-refresh interval, in ms  |
+| `PUBLIC_TITLE_PREFIX`          | `"dc: "`           | Browser-tab title prefix (default `dc: `; overridable at runtime by `window.TITLE_PREFIX`) |
 
 ## Project structure
 

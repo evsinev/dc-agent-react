@@ -1,3 +1,4 @@
+import { useDocumentTitle } from '@/hooks/use-document-title';
 import { useSplitPanel } from '@/hooks/use-split-panel';
 import { AppListItem, useAppList } from '@/pages/app-list/api/app-list';
 import { StatusIndicator } from '@cloudscape-design/components';
@@ -8,6 +9,7 @@ import AppListTable from './components/app-list-table';
 import AppServicePanel from '@/pages/app-list/components/app-service-panel';
 
 export default function AppList() {
+  useDocumentTitle('App list');
   const { data, isLoading } = useAppList();
   const [selected, setSelected] = useState<AppListItem[]>([]);
 

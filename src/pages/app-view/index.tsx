@@ -1,4 +1,5 @@
 import InfoButton from '@/components/info/info-button';
+import { useDocumentTitle } from '@/hooks/use-document-title';
 import Label from '@/components/label';
 import {
   Button,
@@ -21,6 +22,10 @@ interface Props {
 export default function AppView(props: Props) {
   const params = useParams();
   const appName = params.appName || (props.appName as string);
+
+  // Only the full-page route (showAppInfo) owns the tab title; the embedded
+  // split-panel instance passes undefined so it doesn't hijack it.
+  useDocumentTitle(props.showAppInfo ? `App ${appName}` : undefined);
 
   const { data: appView, isLoading, isValidating, mutate: resetApp } = useAppView({ appName });
   const { isMutating, trigger, data: mutatingData } = useAppPush({ appName });

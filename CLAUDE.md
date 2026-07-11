@@ -61,4 +61,4 @@ Feature pages: `app-list`, `app-view`, `service-list`, `service-view`, `git`, `l
 
 ## Environment
 
-Env is loaded from `.env.development` / `.env.production` via `--env-mode`. Only variables prefixed `PUBLIC_` reach the browser: `PUBLIC_BASE_PATH`, `PUBLIC_API_BASE_URL`, `PUBLIC_LOGS_REFRESH_INTERVAL`. In dev, Rsbuild proxies `/dc-operator/api` → `http://localhost:8052` (`rsbuild.config.ts`), so the dc-agent backend must be running there for the UI to function locally.
+Env is loaded from `.env.development` / `.env.production` via `--env-mode`. Only variables prefixed `PUBLIC_` reach the browser: `PUBLIC_BASE_PATH`, `PUBLIC_API_BASE_URL`, `PUBLIC_LOGS_REFRESH_INTERVAL`, `PUBLIC_TITLE_PREFIX` (browser-tab title prefix; per-screen titles are set via the `useDocumentTitle` hook in `src/hooks/`. Prefix priority: `window.TITLE_PREFIX` runtime global > `PUBLIC_TITLE_PREFIX` build var > `'dc: '` default). In dev, Rsbuild proxies `/dc-operator/api` → `http://localhost:8052` (`rsbuild.config.ts`), so the dc-agent backend must be running there for the UI to function locally.

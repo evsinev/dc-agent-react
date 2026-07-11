@@ -19,11 +19,14 @@ yarn preview          # serve the production build
 yarn lint             # biome lint && tsc --noEmit  (the quality gate)
 yarn format           # biome format --write (apply formatting)
 yarn format:check     # biome format (check only; used in CI)
+yarn test             # Rstest unit/component tests (jsdom), run once
+yarn test:watch       # Rstest watch mode
+yarn test:e2e         # Playwright E2E (auto-boots `yarn dev:mock`)
 ```
 
-There are **no tests** in this project.
-
 Before considering a change done, run `yarn lint` — it is the enforced gate (Biome lint + full TypeScript type check). Formatting is checked separately (`yarn format:check`) and is **not** part of that gate.
+
+**Testing.** Unit/component tests run on **Rstest** (`@rstest/core`, jsdom + `@testing-library/react`) — same Rspack pipeline as the build, so no test/prod divergence (do NOT add Vitest). Config: `rstest.config.mts` (`.mts` so Node treats it as ESM — avoids the type-detection warning; JSX via SWC's automatic runtime — the app's Rsbuild-v1 `@rsbuild/plugin-react` is incompatible with the Rsbuild-v2 core Rstest bundles, so it's not reused; setup + jsdom polyfills in `tests/setup.ts`). Tests are colocated `*.test.ts[x]` (+ `mock/*.test.ts`). **E2E** = Playwright in `e2e/`; `playwright.config.ts` boots `yarn dev:mock` as its `webServer`, so E2E is offline/deterministic. Tests that touch pino import mock `@/libs/logger`.
 
 **Offline dev / mocks:** `yarn dev:mock` runs the UI without a backend. A dev-only middleware in `mock/` (`dev-mock-middleware.ts` + fixtures in `mock-data.ts`) is wired into `dev.setupMiddlewares` in `rsbuild.config.ts`, gated on the `MOCK` env var, and answers all `clientPost` endpoints (`/app/*`, `/service/*`, `/git/*`) under the `/dc-operator/api` prefix with fake data. Note: `/logs/get-list` and `/app/info/{infoKey}` are separate client-side stubs (`logs-list.ts`, `info.ts`) that never hit the network, so they aren't in the middleware.
 

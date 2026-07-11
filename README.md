@@ -53,25 +53,37 @@ The dev server proxies API calls from `/dc-operator/api` to the backend at `http
 
 ## Scripts
 
-| Command           | Description                                                     |
-|-------------------|-----------------------------------------------------------------|
-| `yarn dev`        | Start the Rsbuild dev server (proxies to the real backend)      |
-| `yarn dev:mock`   | Dev server with the offline mock middleware (`MOCK=true`)       |
-| `yarn build`      | Production build into `dist/`                                   |
-| `yarn preview`    | Serve the production build locally                              |
-| `yarn lint`       | `biome lint` + `tsc --noEmit` (type check)                      |
-| `yarn format`     | Apply Biome formatting (`--write`)                              |
-| `yarn format:check` | Check Biome formatting without writing (used in CI)           |
+| Command             | Description                                                |
+|---------------------|------------------------------------------------------------|
+| `yarn dev`          | Start the Rsbuild dev server (proxies to the real backend) |
+| `yarn dev:mock`     | Dev server with the offline mock middleware (`MOCK=true`)  |
+| `yarn build`        | Production build into `dist/`                              |
+| `yarn preview`      | Serve the production build locally                         |
+| `yarn lint`         | `biome lint` + `tsc --noEmit` (type check)                 |
+| `yarn format`       | Apply Biome formatting (`--write`)                         |
+| `yarn format:check` | Check Biome formatting without writing (used in CI)        |
+| `yarn test`         | Rstest unit/component tests (jsdom), run once              |
+| `yarn test:watch`   | Rstest in watch mode                                       |
+| `yarn test:e2e`     | Playwright E2E tests (boots `dev:mock` automatically)      |
+
+## Testing
+
+Two layers:
+
+- **Unit / component — [Rstest](https://rstest.rs/)** (`@rstest/core`, jsdom + `@testing-library/react`). Rstest runs on the same Rspack pipeline as the build, so tests and prod don't diverge. Config in `rstest.config.mts`; tests are colocated as `*.test.ts[x]` (plus `mock/*.test.ts`). Run `yarn test` / `yarn test:watch`.
+- **E2E — [Playwright](https://playwright.dev/)** in `e2e/`. `playwright.config.ts` boots `yarn dev:mock` as its `webServer`, so E2E runs offline against fixture data (no backend). First run: `yarn playwright install chromium`, then `yarn test:e2e`.
+
+Rstest browser mode is intentionally not used yet — Playwright covers real-DOM flows; add browser mode pointwise later where jsdom is insufficient. (Vitest is deliberately avoided: its Vite build would diverge from the Rspack prod build.)
 
 ## Environment variables
 
 Environment is loaded from `.env.development` / `.env.production` (see `--env-mode`). Variables that must reach the browser are prefixed with `PUBLIC_`:
 
-| Variable                       | Example            | Description                              |
-|--------------------------------|--------------------|------------------------------------------|
-| `PUBLIC_BASE_PATH`             | `/dc-operator`     | Router base path the app is served under |
-| `PUBLIC_API_BASE_URL`          | `/dc-operator/api` | Base URL prepended to all API requests   |
-| `PUBLIC_LOGS_REFRESH_INTERVAL` | `2000`             | Log viewer auto-refresh interval, in ms  |
+| Variable                       | Example            | Description                                                                                |
+|--------------------------------|--------------------|--------------------------------------------------------------------------------------------|
+| `PUBLIC_BASE_PATH`             | `/dc-operator`     | Router base path the app is served under                                                   |
+| `PUBLIC_API_BASE_URL`          | `/dc-operator/api` | Base URL prepended to all API requests                                                     |
+| `PUBLIC_LOGS_REFRESH_INTERVAL` | `2000`             | Log viewer auto-refresh interval, in ms                                                    |
 | `PUBLIC_TITLE_PREFIX`          | `"dc: "`           | Browser-tab title prefix (default `dc: `; overridable at runtime by `window.TITLE_PREFIX`) |
 
 ## Project structure

@@ -36,5 +36,32 @@ jobs:
       - name: Format check
         run: yarn format:check
 
+      # Rstest unit/component tests (jsdom) — fast, no browser.
+      - name: Test
+        run: yarn test
+
       - name: Build
         run: yarn build
+
+  e2e:
+    name: E2E (Playwright)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      - name: Install Playwright browser
+        run: yarn playwright install --with-deps chromium
+
+      # Playwright boots `yarn dev:mock` (offline mock) via the config's webServer.
+      - name: Run E2E tests
+        run: yarn test:e2e

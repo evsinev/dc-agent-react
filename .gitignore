@@ -8,6 +8,11 @@ node_modules
 dist/
 tsconfig.tsbuildinfo
 
+# Tests
+/test-results/
+/playwright-report/
+/coverage/
+
 # IDE
 .vscode/*
 !.vscode/extensions.json
@@ -22,3 +27,5 @@ package.zip
 /.pnp.cjs
 .pnp.loader.mjs
 .yarn/cache
+
+/handoffs/

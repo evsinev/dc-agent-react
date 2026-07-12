@@ -1,3 +1,4 @@
+import LoadError from '@/components/error/components/load-error';
 import { useDocumentTitle } from '@/hooks/use-document-title';
 import { useCommandList } from '@/pages/command-list/api/command-list';
 import CommandDetailsPanel from '@/pages/command-list/components/command-details-panel';
@@ -10,7 +11,7 @@ export default function CommandView() {
   const { host, name } = useParams();
   useDocumentTitle(name ? `Command: ${name}` : 'Command');
 
-  const { data, isLoading } = useCommandList();
+  const { data, isLoading, error, mutate } = useCommandList();
   const command = data?.commands.find((item) => item.host === host && item.name === name);
 
   return (
@@ -20,8 +21,15 @@ export default function CommandView() {
         {isLoading && <StatusIndicator type="loading">Fetching</StatusIndicator>}
       </Header>
 
+      {error && (
+        <LoadError
+          error={error}
+          onRetry={() => mutate()}
+          resource="commands"
+        />
+      )}
       {command && <CommandDetailsPanel command={command} />}
-      {!command && !isLoading && <Box variant="p">Command not found</Box>}
+      {!error && !command && !isLoading && <Box variant="p">Command not found</Box>}
     </SpaceBetween>
   );
 }

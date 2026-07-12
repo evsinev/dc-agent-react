@@ -1,3 +1,5 @@
+import { errorMessage } from '@/components/error/components/load-error';
+import { useNotifications } from '@/hooks/use-notifications';
 import { Button, Header, SpaceBetween, StatusIndicator } from '@cloudscape-design/components';
 import { ServiceActionType, useServiceAction } from '../api/service-action';
 import { ServiceView } from '../api/service-view';
@@ -11,12 +13,25 @@ type Props = {
 
 export default function ServiceHeader({ service, isLoading, fqsn, refetch }: Props) {
   const { trigger, isMutating } = useServiceAction();
+  const notify = useNotifications((state) => state.add);
 
   const loading = isMutating || isLoading;
 
   const sendAction = async (serviceAction: ServiceActionType) => {
-    await trigger({ fqsn, serviceAction });
-    refetch();
+    try {
+      await trigger({ fqsn, serviceAction });
+      refetch();
+    } catch (error) {
+      notify({
+        id: `service-action-${fqsn}`,
+        type: 'error',
+        header: `Could not send ${serviceAction} to ${fqsn}`,
+        content: errorMessage(error),
+        statusIconAriaLabel: 'error',
+        buttonText: 'Retry',
+        onButtonClick: () => sendAction(serviceAction),
+      });
+    }
   };
 
   return (

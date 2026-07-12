@@ -2,7 +2,7 @@ import { useDocumentTitle } from '@/hooks/use-document-title';
 import { useSplitPanel } from '@/hooks/use-split-panel';
 import { AppListItem, useAppList } from '@/pages/app-list/api/app-list';
 import { useQuickPull } from '@/pages/app-list/api/use-quick-pull';
-import { Flashbar, StatusIndicator } from '@cloudscape-design/components';
+import { StatusIndicator } from '@cloudscape-design/components';
 import Header from '@cloudscape-design/components/header';
 import SpaceBetween from '@cloudscape-design/components/space-between';
 import { useEffect, useState } from 'react';
@@ -12,9 +12,9 @@ import AppServicePanel from '@/pages/app-list/components/app-service-panel';
 
 export default function AppList() {
   useDocumentTitle('Applications');
-  const { data, isLoading } = useAppList();
+  const { data, isLoading, error, mutate } = useAppList();
   const [selected, setSelected] = useState<AppListItem[]>([]);
-  const { branch, updatedLabel, isPulling, flashItems, pull, refresh } = useQuickPull();
+  const { branch, updatedLabel, isPulling, pull, refresh } = useQuickPull();
 
   const show = useSplitPanel((state) => state.show);
   const hide = useSplitPanel((state) => state.hide);
@@ -40,8 +40,6 @@ export default function AppList() {
 
   return (
     <SpaceBetween size="m">
-      {flashItems.length > 0 && <Flashbar items={flashItems} />}
-
       <Header variant="h1">
         Applications
         {isLoading && <StatusIndicator type="loading">Fetching</StatusIndicator>}
@@ -50,6 +48,8 @@ export default function AppList() {
       <AppListTable
         apps={data?.apps ?? []}
         isLoading={isLoading}
+        error={error}
+        onRetry={() => mutate()}
         selected={selected}
         setSelected={setSelected}
         actions={

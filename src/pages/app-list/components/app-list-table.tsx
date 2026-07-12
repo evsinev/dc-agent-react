@@ -5,10 +5,11 @@ import routing from '@routing';
 import { ReactNode } from 'react';
 import { Link } from 'react-router';
 import { APP_LIST_FILTERING_PROPERTIES } from '@/pages/app-list/components/app-list-table-filters';
-import { PropertyFilter } from '@cloudscape-design/components';
+import { Box, PropertyFilter } from '@cloudscape-design/components';
 import Header from '@cloudscape-design/components/header';
 import { useQueryParams } from '@/hooks/use-query-params';
 import { parsePropertyFilterQuery, saveQueryFilter } from '@/libs/parse-property-filter';
+import LoadError from '@/components/error/components/load-error';
 import { AppStatusIndicator } from '@/pages/app-list/components/app-status-indicator';
 
 const PROPERTY_FILTERS_QUERY_PARAM_KEY = 'propertyFilter';
@@ -19,6 +20,8 @@ type AppListTableProps = {
   setSelected: (app: AppListItem[]) => void;
   isLoading: boolean;
   actions?: ReactNode;
+  error?: unknown;
+  onRetry: () => void;
 };
 
 const defaultSorting = { sorting: {} };
@@ -112,6 +115,22 @@ export default function AppListTable(props: AppListTableProps) {
       loadingText="Loading resources"
       trackBy="appName"
       loading={props.isLoading}
+      empty={
+        props.error ? (
+          <LoadError
+            error={props.error}
+            onRetry={props.onRetry}
+            resource="applications"
+          />
+        ) : (
+          <Box
+            variant="p"
+            color="inherit"
+          >
+            No applications
+          </Box>
+        )
+      }
       filter={
         <PropertyFilter
           {...propertyFilterProps}

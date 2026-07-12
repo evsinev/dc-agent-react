@@ -31,14 +31,29 @@ const getFetchData = async <T>(response: Response): Promise<T> => {
 export async function clientPost<T>(props: ClientPostProps): Promise<T> {
   const url = process.env.PUBLIC_API_BASE_URL + props.url;
 
-  const response = await fetch(url, {
-    method: 'POST',
-    cache: 'no-store',
-    headers: {
-      'content-type': 'application/json',
-    },
-    body: props.params ? JSON.stringify(props.params) : '{}',
-  });
+  let response: Response;
+  try {
+    response = await fetch(url, {
+      method: 'POST',
+      cache: 'no-store',
+      headers: {
+        'content-type': 'application/json',
+      },
+      body: props.params ? JSON.stringify(props.params) : '{}',
+    });
+  } catch (_cause) {
+    // fetch rejects (backend down, DNS, CORS, offline) with a native TypeError that carries
+    // no human-readable fields — wrap it so callers get an actionable message, not a blank error.
+    throw new RequestError({
+      title: 'Could not connect to the server',
+      type: 'NetworkError',
+      detail: {
+        path: props.url,
+        params: props.params,
+        method: 'POST',
+      },
+    });
+  }
 
   if (!response.ok) {
     const errorMessage = await getFetchData<RequestErrorModel>(response);

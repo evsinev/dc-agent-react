@@ -50,4 +50,15 @@ describe('clientPost', () => {
     expect(error).toBeInstanceOf(RequestError);
     expect((error as RequestError).status).toBe(500);
   });
+
+  test('wraps a network failure (fetch rejects) in a RequestError with a real message', async () => {
+    globalThis.fetch = (() => Promise.reject(new TypeError('Failed to fetch'))) as typeof fetch;
+    const error = await clientPost({ url: '/x' }).then(
+      () => null,
+      (e) => e,
+    );
+    expect(error).toBeInstanceOf(RequestError);
+    expect((error as RequestError).title).toBe('Could not connect to the server');
+    expect((error as RequestError).type).toBe('NetworkError');
+  });
 });

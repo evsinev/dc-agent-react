@@ -1,3 +1,4 @@
+import LoadError from '@/components/error/components/load-error';
 import { useDocumentTitle } from '@/hooks/use-document-title';
 import { useAgentList } from '@/pages/dc-agent-list/api/agent-list';
 import DcAgentDetailBody from '@/pages/dc-agent-list/components/dc-agent-detail-body';
@@ -10,7 +11,7 @@ export default function DcAgentView() {
   const { name } = useParams();
   useDocumentTitle(name ? `dc-agent: ${name}` : 'dc-agent');
 
-  const { data, isLoading } = useAgentList();
+  const { data, isLoading, error, mutate } = useAgentList();
   const agent = data?.agents.find((item) => item.name === name);
 
   return (
@@ -20,8 +21,15 @@ export default function DcAgentView() {
         {isLoading && <StatusIndicator type="loading">Fetching</StatusIndicator>}
       </Header>
 
+      {error && (
+        <LoadError
+          error={error}
+          onRetry={() => mutate()}
+          resource="agents"
+        />
+      )}
       {agent && <DcAgentDetailBody agent={agent} />}
-      {!agent && !isLoading && <Box variant="p">Agent not found</Box>}
+      {!error && !agent && !isLoading && <Box variant="p">Agent not found</Box>}
     </SpaceBetween>
   );
 }

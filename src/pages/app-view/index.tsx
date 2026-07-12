@@ -1,6 +1,8 @@
 import DefinitionList from '@/components/definition-list';
+import LoadError, { errorMessage } from '@/components/error/components/load-error';
 import InfoButton from '@/components/info/info-button';
 import { useDocumentTitle } from '@/hooks/use-document-title';
+import { useNotifications } from '@/hooks/use-notifications';
 import {
   Button,
   ColumnLayout,
@@ -27,12 +29,25 @@ export default function AppView(props: Props) {
   // split-panel instance passes undefined so it doesn't hijack it.
   useDocumentTitle(props.showAppInfo ? `App ${appName}` : undefined);
 
-  const { data: appView, isLoading, isValidating, mutate: resetApp } = useAppView({ appName });
+  const { data: appView, isLoading, isValidating, error, mutate: resetApp } = useAppView({ appName });
   const { isMutating, trigger, data: mutatingData } = useAppPush({ appName });
+  const notify = useNotifications((state) => state.add);
 
   async function makePush() {
-    await trigger();
-    await resetApp();
+    try {
+      await trigger();
+      await resetApp();
+    } catch (pushError) {
+      notify({
+        id: `app-push-${appName}`,
+        type: 'error',
+        header: `Could not push ${appName}`,
+        content: errorMessage(pushError),
+        statusIconAriaLabel: 'error',
+        buttonText: 'Retry',
+        onButtonClick: makePush,
+      });
+    }
   }
 
   return (
@@ -49,6 +64,14 @@ export default function AppView(props: Props) {
         >
           App {appName} {isLoading && <StatusIndicator type="loading">Fetching</StatusIndicator>}
         </Header>
+      )}
+
+      {error && (
+        <LoadError
+          error={error}
+          onRetry={() => resetApp()}
+          resource="application"
+        />
       )}
 
       {props.showAppInfo && isLoading && (
@@ -113,31 +136,35 @@ export default function AppView(props: Props) {
         </ColumnLayout>
       )}
 
-      <Container header={<Header actions={isValidating && <Spinner />}>Check</Header>}>
-        {appView && <CodeHighlight code={appView.taskCheckText} />}
-      </Container>
+      {!error && (
+        <Container header={<Header actions={isValidating && <Spinner />}>Check</Header>}>
+          {appView && <CodeHighlight code={appView.taskCheckText} />}
+        </Container>
+      )}
 
-      <Container
-        header={
-          <Header
-            variant="h3"
-            actions={isValidating && <StatusIndicator type="loading" />}
-          >
-            Push
-          </Header>
-        }
-      >
-        {isMutating && <StatusIndicator type="loading" />}
-
-        {mutatingData && <CodeHighlight code={mutatingData.taskCheckText} />}
-
-        <Button
-          onClick={makePush}
-          loading={isMutating}
+      {!error && (
+        <Container
+          header={
+            <Header
+              variant="h3"
+              actions={isValidating && <StatusIndicator type="loading" />}
+            >
+              Push
+            </Header>
+          }
         >
-          Push config
-        </Button>
-      </Container>
+          {isMutating && <StatusIndicator type="loading" />}
+
+          {mutatingData && <CodeHighlight code={mutatingData.taskCheckText} />}
+
+          <Button
+            onClick={makePush}
+            loading={isMutating}
+          >
+            Push config
+          </Button>
+        </Container>
+      )}
     </SpaceBetween>
   );
 }

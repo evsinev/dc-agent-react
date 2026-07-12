@@ -1,39 +1,17 @@
-import { useState, ReactNode } from 'react';
+import { ReactNode } from 'react';
 import { SWRConfig } from 'swr';
-import { RequestErrorModel } from './models/types';
-import ErrorWidget from './components/error-widget';
 
 interface ErrorProviderProps {
   children: ReactNode;
-  errors?: RequestErrorModel[];
 }
 
+/**
+ * Global SWR configuration. Load failures are surfaced in-content by each page (a
+ * `<LoadError>` with Retry), and action failures via the notifications flashbar
+ * (`use-notifications`) — so there is no global error-to-flashbar handler here.
+ * `RequestError` still logs every failure (see its constructor). Retry is manual
+ * because auto-retry is disabled.
+ */
 export default function ErrorProvider(props: ErrorProviderProps) {
-  const [errors, setErrors] = useState<RequestErrorModel[]>(props.errors || []);
-
-  const closeError = (errorId?: string): void => {
-    setErrors((prevState) => prevState.filter((err) => err.errorId !== errorId));
-  };
-
-  return (
-    <SWRConfig
-      value={{
-        shouldRetryOnError: false,
-        onError: (error: RequestErrorModel) => {
-          setErrors((prevState) => [...prevState, error]);
-        },
-      }}
-    >
-      {errors?.map((error, index) => (
-        <ErrorWidget
-          key={`${error?.errorId}-${index}`}
-          error={error}
-          onClose={() => closeError(error?.errorId)}
-          index={index}
-        />
-      ))}
-
-      {props.children}
-    </SWRConfig>
-  );
+  return <SWRConfig value={{ shouldRetryOnError: false }}>{props.children}</SWRConfig>;
 }

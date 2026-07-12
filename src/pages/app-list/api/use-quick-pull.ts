@@ -1,47 +1,29 @@
+import { errorMessage } from '@/components/error/components/load-error';
+import { useNotifications } from '@/hooks/use-notifications';
 import { useGitLog } from '@/pages/git/api/git-log';
 import { useGitPull } from '@/pages/git/api/git-pull';
-import type { FlashbarProps } from '@cloudscape-design/components';
-import { useEffect, useRef, useState } from 'react';
 import { useSWRConfig } from 'swr';
 import { formatPullFlash } from './format-pull-flash';
 
-let flashSeq = 0;
-
-// Success/info confirmations self-dismiss; error flashes stay so the user can retry.
+// Success/info confirmations self-dismiss; the error notification stays so the user can retry.
 const AUTO_DISMISS_MS = 3000;
-
-type NewFlash = Omit<FlashbarProps.MessageDefinition, 'id' | 'dismissible' | 'onDismiss'>;
+// Stable id so a repeat pull replaces its previous notification instead of stacking.
+const NOTIFICATION_ID = 'quick-pull';
 
 /**
  * Orchestrates the Applications "Pull from Git" shortcut: it reuses the Git page's
- * `useGitLog`/`useGitPull` hooks, computes the pulled-commit summary from the
- * before/after log, surfaces a flashbar, and revalidates the app list + statuses
- * so drift indicators recompute after a pull.
+ * `useGitLog`/`useGitPull` hooks, computes the pulled-commit summary from the before/after
+ * log, surfaces the result via the app-wide notifications flashbar, and revalidates the app
+ * list + statuses so drift indicators recompute after a pull.
  */
 export function useQuickPull() {
   const { data, mutate: mutateGitLog } = useGitLog();
   const { trigger, isMutating } = useGitPull();
   const { mutate } = useSWRConfig();
-  const [flashItems, setFlashItems] = useState<FlashbarProps.MessageDefinition[]>([]);
-  const timers = useRef<ReturnType<typeof setTimeout>[]>([]);
-
-  // Clear any pending auto-dismiss timers when the page unmounts.
-  useEffect(() => () => timers.current.forEach(clearTimeout), []);
+  const notify = useNotifications((state) => state.add);
 
   const branch = data?.currentBranch ?? '';
   const updatedLabel = data?.lastCommit?.ageFormatted ?? 'unknown';
-
-  function dismiss(id: string): void {
-    setFlashItems((items) => items.filter((item) => item.id !== id));
-  }
-
-  function pushFlash(flash: NewFlash, autoDismiss = false): void {
-    const id = `pull-${flashSeq++}`;
-    setFlashItems((items) => [...items, { ...flash, id, dismissible: true, onDismiss: () => dismiss(id) }]);
-    if (autoDismiss) {
-      timers.current.push(setTimeout(() => dismiss(id), AUTO_DISMISS_MS));
-    }
-  }
 
   // Revalidate the list and every per-app status (keys start with `/app/status/`).
   function revalidateApps(): Promise<unknown> {
@@ -63,13 +45,20 @@ export function useQuickPull() {
         newCount,
         latestMessage: after?.lastCommit?.shortMessage,
       });
-      pushFlash({ ...flash, statusIconAriaLabel: flash.type }, true);
+      notify({
+        id: NOTIFICATION_ID,
+        type: flash.type,
+        content: flash.content,
+        statusIconAriaLabel: flash.type,
+        autoDismissMs: AUTO_DISMISS_MS,
+      });
       await revalidateApps();
     } catch (error) {
-      pushFlash({
+      notify({
+        id: NOTIFICATION_ID,
         type: 'error',
         header: 'Pull failed',
-        content: error instanceof Error ? error.message : 'Git pull failed',
+        content: errorMessage(error),
         statusIconAriaLabel: 'error',
         buttonText: 'Retry',
         onButtonClick: () => pull(),
@@ -81,5 +70,5 @@ export function useQuickPull() {
     await revalidateApps();
   }
 
-  return { branch, updatedLabel, isPulling: isMutating, flashItems, pull, refresh, dismiss };
+  return { branch, updatedLabel, isPulling: isMutating, pull, refresh };
 }

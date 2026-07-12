@@ -10,7 +10,7 @@ import DcAgentListTable from './components/dc-agent-list-table';
 
 export default function DcAgentList() {
   useDocumentTitle('Agents');
-  const { data, isLoading } = useAgentList();
+  const { data, isLoading, error, mutate } = useAgentList();
   const [selected, setSelected] = useState<AgentInfo[]>([]);
 
   const show = useSplitPanel((state) => state.show);
@@ -38,6 +38,8 @@ export default function DcAgentList() {
       <DcAgentListTable
         agents={data?.agents ?? []}
         isLoading={isLoading}
+        error={error}
+        onRetry={() => mutate()}
         selected={selected}
         setSelected={setSelected}
       />

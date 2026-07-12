@@ -10,6 +10,7 @@ import { BrowserRouter } from 'react-router';
 import Breadcrumbs from './components/breadcrumbs';
 import HelpPanelWrapper from './components/help-panel';
 import Navigation from './components/navigation';
+import Notifications from './components/notifications';
 import SplitPanelWrapper from './components/split-panel';
 import Router from './router';
 
@@ -30,6 +31,7 @@ export default function App() {
           <AppLayout
             breadcrumbs={<Breadcrumbs />}
             navigation={<Navigation />}
+            notifications={<Notifications />}
             content={<Router />}
             splitPanel={<SplitPanelWrapper />}
             splitPanelOpen

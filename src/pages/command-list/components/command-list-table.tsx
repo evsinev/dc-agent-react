@@ -7,12 +7,13 @@ import {
 } from '@/libs/parse-property-filter';
 import { CommandInfo } from '@/pages/command-list/api/command-list';
 import { useCollection } from '@cloudscape-design/collection-hooks';
-import { CollectionPreferencesProps, Pagination, PropertyFilter } from '@cloudscape-design/components';
+import { Box, CollectionPreferencesProps, Pagination, PropertyFilter } from '@cloudscape-design/components';
 import Header from '@cloudscape-design/components/header';
 import Table, { TableProps } from '@cloudscape-design/components/table';
 import { ReactNode } from 'react';
 import { Link } from 'react-router';
 import routing from '@routing';
+import LoadError from '@/components/error/components/load-error';
 import CommandTablePreferences, {
   COMMAND_PREFERENCES_STORAGE_KEY,
   DEFAULT_COMMAND_PREFERENCES,
@@ -26,6 +27,8 @@ type Props = {
   selected: CommandInfo[];
   setSelected: (commands: CommandInfo[]) => void;
   actions?: ReactNode;
+  error?: unknown;
+  onRetry: () => void;
 };
 
 export const commandKey = (command: CommandInfo) => `${command.host}/${command.name ?? '(error)'}`;
@@ -78,6 +81,22 @@ export default function CommandListTable(props: Props) {
       trackBy={commandKey}
       loading={props.isLoading}
       loadingText="Loading commands"
+      empty={
+        props.error ? (
+          <LoadError
+            error={props.error}
+            onRetry={props.onRetry}
+            resource="commands"
+          />
+        ) : (
+          <Box
+            variant="p"
+            color="inherit"
+          >
+            No commands
+          </Box>
+        )
+      }
       wrapLines={preferences.wrapLines}
       stripedRows={preferences.stripedRows}
       contentDensity={preferences.contentDensity}

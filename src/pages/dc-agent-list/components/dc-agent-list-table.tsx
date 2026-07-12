@@ -7,12 +7,19 @@ import {
 } from '@/libs/parse-property-filter';
 import { AgentInfo } from '@/pages/dc-agent-list/api/agent-list';
 import { useCollection } from '@cloudscape-design/collection-hooks';
-import { CollectionPreferencesProps, Pagination, PropertyFilter, StatusIndicator } from '@cloudscape-design/components';
+import {
+  Box,
+  CollectionPreferencesProps,
+  Pagination,
+  PropertyFilter,
+  StatusIndicator,
+} from '@cloudscape-design/components';
 import Header from '@cloudscape-design/components/header';
 import Table, { TableProps } from '@cloudscape-design/components/table';
 import { ReactNode } from 'react';
 import { Link } from 'react-router';
 import routing from '@routing';
+import LoadError from '@/components/error/components/load-error';
 import DcAgentTablePreferences, {
   DEFAULT_AGENT_PREFERENCES,
   AGENT_PREFERENCES_STORAGE_KEY,
@@ -25,6 +32,8 @@ type Props = {
   selected: AgentInfo[];
   setSelected: (agents: AgentInfo[]) => void;
   actions?: ReactNode;
+  error?: unknown;
+  onRetry: () => void;
 };
 
 const reachableCell = (agent: AgentInfo) => (
@@ -94,6 +103,22 @@ export default function DcAgentListTable(props: Props) {
       trackBy="name"
       loading={props.isLoading}
       loadingText="Loading agents"
+      empty={
+        props.error ? (
+          <LoadError
+            error={props.error}
+            onRetry={props.onRetry}
+            resource="agents"
+          />
+        ) : (
+          <Box
+            variant="p"
+            color="inherit"
+          >
+            No agents
+          </Box>
+        )
+      }
       wrapLines={preferences.wrapLines}
       stripedRows={preferences.stripedRows}
       contentDensity={preferences.contentDensity}

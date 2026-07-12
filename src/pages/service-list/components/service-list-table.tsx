@@ -1,5 +1,5 @@
 import { useCollection } from '@cloudscape-design/collection-hooks';
-import { PropertyFilter, StatusIndicator } from '@cloudscape-design/components';
+import { Box, PropertyFilter, StatusIndicator } from '@cloudscape-design/components';
 import Table from '@cloudscape-design/components/table';
 import routing from '@routing';
 import { Link } from 'react-router';
@@ -11,12 +11,15 @@ import {
   PROPERTY_FILTERS_QUERY_PARAM_KEY,
   saveQueryFilter,
 } from '@/libs/parse-property-filter';
+import LoadError from '@/components/error/components/load-error';
 
 type Props = {
   services: ServiceListItem[];
   isLoading: boolean;
   selected: ServiceListItem[];
   setSelected: (app: ServiceListItem[]) => void;
+  error?: unknown;
+  onRetry: () => void;
 };
 
 const serviceNameLink = (item: ServiceListItem) => (
@@ -70,6 +73,22 @@ export default function ServiceListTable(props: Props) {
       loadingText="Loading services ..."
       trackBy="fqsn"
       loading={props.isLoading}
+      empty={
+        props.error ? (
+          <LoadError
+            error={props.error}
+            onRetry={props.onRetry}
+            resource="services"
+          />
+        ) : (
+          <Box
+            variant="p"
+            color="inherit"
+          >
+            No services
+          </Box>
+        )
+      }
       selectionType="single"
       onSelectionChange={(e) => props.setSelected(e.detail.selectedItems)}
       selectedItems={props.selected}

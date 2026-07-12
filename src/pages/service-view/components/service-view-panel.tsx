@@ -1,3 +1,4 @@
+import LoadError from '@/components/error/components/load-error';
 import { useServiceView } from '@/pages/service-view/api/service-view';
 import ServiceHeader from '@/pages/service-view/components/header';
 import Status from '@/pages/service-view/components/status';
@@ -13,7 +14,7 @@ type Props = {
 export default function ServiceViewPanel({ host, serviceName }: Props) {
   const fqsn = `${host}/${serviceName}`;
 
-  const { data, isLoading, mutate } = useServiceView({ fqsn });
+  const { data, isLoading, error, mutate } = useServiceView({ fqsn });
 
   return (
     <SpaceBetween size="m">
@@ -25,6 +26,14 @@ export default function ServiceViewPanel({ host, serviceName }: Props) {
       />
 
       {isLoading && <StatusIndicator type="loading">Pending ...</StatusIndicator>}
+
+      {error && (
+        <LoadError
+          error={error}
+          onRetry={() => mutate()}
+          resource="service"
+        />
+      )}
 
       {data && (
         <SpaceBetween size="l">

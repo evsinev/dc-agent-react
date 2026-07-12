@@ -1,5 +1,15 @@
-import { describe, expect, test } from '@rstest/core';
-import { APPS, GIT_LOG, SERVICES, appStatusFor, appViewFor, serviceViewFor } from './mock-data';
+import { afterEach, beforeEach, describe, expect, test } from '@rstest/core';
+import {
+  APPS,
+  GIT_LOG,
+  SERVICES,
+  __resetGitPullState,
+  appStatusFor,
+  appViewFor,
+  mockGitLog,
+  mockGitPull,
+  serviceViewFor,
+} from './mock-data';
 
 describe('mock-data fixtures', () => {
   test('ships non-empty fixtures', () => {
@@ -35,6 +45,35 @@ describe('appViewFor', () => {
     const view = appViewFor('ghost-app');
     expect(view.appName).toBe('ghost-app');
     expect(view.taskName).toBe('ghost-app-task');
+  });
+});
+
+describe('stateful git mock', () => {
+  beforeEach(() => __resetGitPullState());
+  afterEach(() => __resetGitPullState());
+
+  test('starts at the base log with no pulls', () => {
+    expect(mockGitLog().commits).toHaveLength(GIT_LOG.commits.length);
+    expect(mockGitLog().lastCommit).toEqual(GIT_LOG.commits[0]);
+  });
+
+  test('a pull adds one commit at the top of the log', () => {
+    expect(mockGitPull()).toEqual({ success: true });
+
+    const log = mockGitLog();
+    expect(log.commits).toHaveLength(GIT_LOG.commits.length + 1);
+    expect(log.lastCommit).toEqual(log.commits[0]);
+    expect(log.commits[0].shortMessage).toBe('Pulled sandbox change #1');
+  });
+
+  test('successive pulls stack newest-first', () => {
+    mockGitPull();
+    mockGitPull();
+
+    const log = mockGitLog();
+    expect(log.commits).toHaveLength(GIT_LOG.commits.length + 2);
+    expect(log.commits[0].shortMessage).toBe('Pulled sandbox change #2');
+    expect(log.commits[1].shortMessage).toBe('Pulled sandbox change #1');
   });
 });
 

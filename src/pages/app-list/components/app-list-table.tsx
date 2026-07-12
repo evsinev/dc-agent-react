@@ -2,9 +2,11 @@ import { AppListItem } from '@/pages/app-list/api/app-list';
 import { useCollection } from '@cloudscape-design/collection-hooks';
 import Table from '@cloudscape-design/components/table';
 import routing from '@routing';
+import { ReactNode } from 'react';
 import { Link } from 'react-router';
 import { APP_LIST_FILTERING_PROPERTIES } from '@/pages/app-list/components/app-list-table-filters';
 import { PropertyFilter } from '@cloudscape-design/components';
+import Header from '@cloudscape-design/components/header';
 import { useQueryParams } from '@/hooks/use-query-params';
 import { parsePropertyFilterQuery, saveQueryFilter } from '@/libs/parse-property-filter';
 import { AppStatusIndicator } from '@/pages/app-list/components/app-status-indicator';
@@ -16,6 +18,7 @@ type AppListTableProps = {
   selected: AppListItem[];
   setSelected: (app: AppListItem[]) => void;
   isLoading: boolean;
+  actions?: ReactNode;
 };
 
 const defaultSorting = { sorting: {} };
@@ -59,6 +62,14 @@ export default function AppListTable(props: AppListTableProps) {
   return (
     <Table
       {...collectionProps}
+      header={
+        <Header
+          counter={`(${props.apps.length})`}
+          actions={props.actions}
+        >
+          Apps
+        </Header>
+      }
       selectionType="single"
       onSelectionChange={(e) => props.setSelected(e.detail.selectedItems)}
       selectedItems={props.selected}

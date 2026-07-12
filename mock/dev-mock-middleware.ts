@@ -1,5 +1,5 @@
 import type { IncomingMessage, ServerResponse } from 'node:http';
-import { APPS, GIT_LOG, SERVICES, appStatusFor, appViewFor, serviceViewFor } from './mock-data';
+import { APPS, SERVICES, appStatusFor, appViewFor, mockGitLog, mockGitPull, serviceViewFor } from './mock-data';
 
 // Requests are issued as `${PUBLIC_API_BASE_URL}${path}`; PUBLIC_API_BASE_URL is `/dc-operator/api`.
 const API_PREFIX = '/dc-operator/api';
@@ -34,11 +34,11 @@ export function devMockMiddleware(req: IncomingMessage, res: ServerResponse, nex
     return;
   }
   if (endpoint === '/git/log') {
-    json(res, GIT_LOG);
+    json(res, mockGitLog());
     return;
   }
   if (endpoint === '/git/pull') {
-    json(res, { success: true });
+    json(res, mockGitPull());
     return;
   }
   if (endpoint === '/app/push') {

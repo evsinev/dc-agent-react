@@ -225,3 +225,39 @@ export const GIT_LOG: GitLog = {
   lastCommit: COMMITS[0],
   commits: COMMITS,
 };
+
+// Stateful git layer: a pull adds a commit so the App list "Pull from Git" action
+// can demonstrate its success path (real backends grow the log the same way).
+let mockPullCount = 0;
+
+/** Reset the mock pull counter — for test isolation. */
+export function __resetGitPullState(): void {
+  mockPullCount = 0;
+}
+
+function syntheticPullCommit(n: number): GitLogItem {
+  return {
+    dateFormatted: 'Jul 10, 2026, 10:00 AM',
+    shortMessage: `Pulled sandbox change #${n}`,
+    fullMessage: `Pulled sandbox change #${n}\n\nSynthetic commit added by the dev mock on git pull.`,
+    author: 'Dev Tester',
+    commiter: 'Dev Tester',
+    ageFormatted: 'just now',
+  };
+}
+
+/** Git log grown by the pulls recorded so far (newest synthetic commit first). */
+export function mockGitLog(): GitLog {
+  const pulled: GitLogItem[] = [];
+  for (let n = mockPullCount; n >= 1; n--) {
+    pulled.push(syntheticPullCommit(n));
+  }
+  const commits = [...pulled, ...COMMITS];
+  return { currentBranch: GIT_LOG.currentBranch, lastCommit: commits[0], commits };
+}
+
+/** Record a pull (adds one commit to `mockGitLog`) and acknowledge it. */
+export function mockGitPull(): { success: boolean } {
+  mockPullCount += 1;
+  return { success: true };
+}

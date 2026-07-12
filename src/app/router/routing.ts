@@ -6,6 +6,8 @@ const routing = {
   git: '/git',
   logs: '/logs',
   test: '/test',
+  agents: '/dc-agents',
+  agent: '/dc-agents/:name',
 };
 
 export default routing;

@@ -16,6 +16,11 @@ export const navigationItems = [
   },
   {
     type: 'link',
+    text: 'dc-agent list',
+    href: toHref(routing.agents),
+  },
+  {
+    type: 'link',
     text: 'Service list',
     href: toHref(routing.services),
   },

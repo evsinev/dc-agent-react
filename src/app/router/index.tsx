@@ -1,5 +1,7 @@
 import AppList from '@/pages/app-list';
 import AppView from '@/pages/app-view';
+import DcAgentList from '@/pages/dc-agent-list';
+import DcAgentView from '@/pages/dc-agent-view';
 import Git from '@/pages/git';
 import LogsPage from '@/pages/logs';
 import NotFound from '@/pages/not-found';
@@ -39,6 +41,14 @@ export default function Router() {
       <Route
         path={routing.test}
         Component={TestPage}
+      />
+      <Route
+        path={routing.agents}
+        Component={DcAgentList}
+      />
+      <Route
+        path={routing.agent}
+        Component={DcAgentView}
       />
       <Route
         path="*"

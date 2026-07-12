@@ -1,6 +1,7 @@
 // Fake, obviously-non-production fixtures for the dev mock middleware.
 // Shapes mirror the frontend API types (imported type-only, erased at build).
 import type { AppListItem } from '../src/pages/app-list/api/app-list';
+import type { AgentInfo } from '../src/pages/dc-agent-list/api/agent-list';
 import type { GitLog, GitLogItem } from '../src/pages/git/api/git-log';
 import type { ServiceListItem, ServiceStateType } from '../src/pages/service-list/api/service-list';
 import type { ServiceView } from '../src/pages/service-view/api/service-view';
@@ -64,6 +65,73 @@ export function appViewFor(appName: string): AppView {
     agentUrl: `http://sandbox-agent.local/${appName}`,
   };
 }
+
+// ── Agents ────────────────────────────────────────────────────────────────
+export const AGENTS: AgentInfo[] = [
+  {
+    name: 'sandbox-1',
+    url: 'http://sandbox-1.local:8051/dc-agent',
+    reachable: true,
+    appInstanceName: 'dc-agent',
+    appVersion: '1.0.9',
+    hostname: 'sandbox-1',
+    port: 8051,
+    uptimeMs: 936_000_000,
+    uptimeFormatted: '10d 20h 0m',
+    responseEpoch: 1_752_300_000_000,
+    responseId: 'mock-sandbox-1',
+    servicesTotal: 2,
+    servicesUp: 2,
+    services: [
+      { serviceName: 'echo-svc', statusName: 'Running', statusIndicator: 'success' },
+      { serviceName: 'demo-timer', statusName: 'Running', statusIndicator: 'success' },
+    ],
+  },
+  {
+    name: 'sandbox-2',
+    url: 'http://sandbox-2.local:8051/dc-agent',
+    reachable: true,
+    appInstanceName: 'dc-agent',
+    appVersion: '1.0.9',
+    hostname: 'sandbox-2',
+    port: 8051,
+    uptimeMs: 5_400_000,
+    uptimeFormatted: '1h 30m',
+    responseEpoch: 1_752_300_000_000,
+    responseId: 'mock-sandbox-2',
+    servicesTotal: 1,
+    servicesUp: 0,
+    services: [{ serviceName: 'sample-queue', statusName: 'Paused', statusIndicator: 'warning' }],
+  },
+  {
+    name: 'dev-box-a',
+    url: 'http://dev-box-a.local:8051/dc-agent',
+    reachable: true,
+    appInstanceName: 'dc-agent',
+    appVersion: '1.0.8',
+    hostname: 'dev-box-a',
+    port: 8051,
+    uptimeMs: 777_600_000,
+    uptimeFormatted: '9d 0h 0m',
+    responseEpoch: 1_752_300_000_000,
+    responseId: 'mock-dev-box-a',
+    servicesTotal: 1,
+    servicesUp: 1,
+    services: [{ serviceName: 'sandbox-db', statusName: 'Running', statusIndicator: 'success' }],
+  },
+  {
+    name: 'dev-box-b',
+    url: 'http://dev-box-b.local:8051/dc-agent',
+    reachable: false,
+    error: 'Cannot get app-status: Connection refused',
+    port: 0,
+    uptimeMs: 0,
+    responseEpoch: 0,
+    servicesTotal: 0,
+    servicesUp: 0,
+    servicesError: 'Connection refused',
+  },
+];
 
 // ── Services ──────────────────────────────────────────────────────────────
 type ServiceSeed = {

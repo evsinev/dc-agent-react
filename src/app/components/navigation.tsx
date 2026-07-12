@@ -1,8 +1,7 @@
 import { SideNavigation } from '@cloudscape-design/components';
 import { SideNavigationProps } from '@cloudscape-design/components/side-navigation';
 import routing from '@routing';
-import { useNavigate } from 'react-router';
-import { useState } from 'react';
+import { matchPath, useLocation, useNavigate } from 'react-router';
 
 function toHref(aRouterLink: string) {
   return process.env.PUBLIC_BASE_PATH + aRouterLink;
@@ -41,27 +40,45 @@ export const navigationItems = [
   },
 ] as ReadonlyArray<SideNavigationProps.Link>;
 
-const getActiveHref = () => {
-  const basePath = process.env.PUBLIC_BASE_PATH || '';
-
-  if (window.location.pathname === basePath) {
-    return `${basePath}/`;
+// Map the current (basename-relative) path to the routing path of its nav section, so detail
+// pages — including ones reached through in-page links or opened directly by URL — keep the
+// correct top-level item highlighted.
+function activeSection(pathname: string): string | undefined {
+  if (matchPath(routing.app, pathname) || matchPath(routing.apps, pathname)) {
+    return routing.apps;
   }
-
-  return window.location.pathname;
-};
+  if (matchPath(routing.agent, pathname) || matchPath(routing.agents, pathname)) {
+    return routing.agents;
+  }
+  if (matchPath(routing.service, pathname) || matchPath(routing.services, pathname)) {
+    return routing.services;
+  }
+  if (matchPath(routing.command, pathname) || matchPath(routing.commands, pathname)) {
+    return routing.commands;
+  }
+  if (matchPath(routing.git, pathname)) {
+    return routing.git;
+  }
+  if (matchPath(routing.logs, pathname)) {
+    return routing.logs;
+  }
+  return undefined;
+}
 
 export default function Navigation() {
   const navigate = useNavigate();
-  const [activeHref, setActiveHref] = useState(getActiveHref());
+  const location = useLocation();
+
+  const section = activeSection(location.pathname);
+  const activeHref = section ? toHref(section) : '';
 
   function onFollow(event: CustomEvent<SideNavigationProps.FollowDetail>) {
     event.preventDefault();
     const { href } = event.detail;
     if (href.startsWith('http')) {
       window.location.href = href;
+      return;
     }
-    setActiveHref(href);
     navigate(href.replace(process.env.PUBLIC_BASE_PATH || '', ''));
   }
 

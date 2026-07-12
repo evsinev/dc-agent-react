@@ -1,6 +1,7 @@
 import { AgentInfo } from '@/pages/dc-agent-list/api/agent-list';
 import { useCommandList } from '@/pages/command-list/api/command-list';
-import { Box, Header, StatusIndicator, Table } from '@cloudscape-design/components';
+import { commandNameCell } from '@/pages/command-list/components/command-name-cell';
+import { Box, Header, Table } from '@cloudscape-design/components';
 
 type Props = {
   agent: AgentInfo;
@@ -21,8 +22,7 @@ export default function DcAgentCommandsTable({ agent }: Props) {
         {
           id: 'name',
           header: 'Command',
-          cell: (command) =>
-            command.error ? <StatusIndicator type="error">{command.error}</StatusIndicator> : (command.name ?? '—'),
+          cell: commandNameCell,
           isRowHeader: true,
         },
         { id: 'type', header: 'Type', cell: (command) => command.type ?? '—' },

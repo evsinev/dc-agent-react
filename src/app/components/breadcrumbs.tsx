@@ -34,6 +34,14 @@ function buildItems(pathname: string): Crumb[] {
     return [HOME, { text: 'Services', href: routing.services }];
   }
 
+  const command = matchPath(routing.command, pathname);
+  if (command) {
+    return [
+      HOME,
+      { text: 'Commands', href: routing.commands },
+      { text: `${command.params.host}/${command.params.name}`, href: pathname },
+    ];
+  }
   if (matchPath(routing.commands, pathname)) {
     return [HOME, { text: 'Commands', href: routing.commands }];
   }

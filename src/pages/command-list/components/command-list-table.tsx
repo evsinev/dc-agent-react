@@ -7,7 +7,7 @@ import {
 } from '@/libs/parse-property-filter';
 import { CommandInfo } from '@/pages/command-list/api/command-list';
 import { useCollection } from '@cloudscape-design/collection-hooks';
-import { CollectionPreferencesProps, Pagination, PropertyFilter, StatusIndicator } from '@cloudscape-design/components';
+import { CollectionPreferencesProps, Pagination, PropertyFilter } from '@cloudscape-design/components';
 import Header from '@cloudscape-design/components/header';
 import Table, { TableProps } from '@cloudscape-design/components/table';
 import { ReactNode } from 'react';
@@ -18,6 +18,7 @@ import CommandTablePreferences, {
   DEFAULT_COMMAND_PREFERENCES,
 } from './command-list-preferences';
 import { COMMAND_FILTERING_PROPERTIES } from './command-list-table-filters';
+import { commandNameCell } from './command-name-cell';
 
 type Props = {
   commands: CommandInfo[];
@@ -29,9 +30,6 @@ type Props = {
 
 export const commandKey = (command: CommandInfo) => `${command.host}/${command.name ?? '(error)'}`;
 
-const nameCell = (command: CommandInfo) =>
-  command.error ? <StatusIndicator type="error">{command.error}</StatusIndicator> : (command.name ?? '—');
-
 const columnDefinitions: TableProps.ColumnDefinition<CommandInfo>[] = [
   {
     id: 'host',
@@ -40,7 +38,7 @@ const columnDefinitions: TableProps.ColumnDefinition<CommandInfo>[] = [
     sortingField: 'host',
     isRowHeader: true,
   },
-  { id: 'name', header: 'Command', cell: nameCell, sortingField: 'name' },
+  { id: 'name', header: 'Command', cell: commandNameCell, sortingField: 'name' },
   { id: 'type', header: 'Type', cell: (c) => c.type ?? '—', sortingField: 'type' },
 ];
 

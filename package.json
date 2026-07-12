@@ -11,7 +11,7 @@
     "preview": "rsbuild preview",
     "format": "biome format --write",
     "format:check": "biome format",
-    "lint": "biome lint && tsc --noEmit",
+    "lint": "biome format && biome lint && tsc --noEmit",
     "test": "rstest run",
     "test:watch": "rstest watch",
     "test:e2e": "playwright test"

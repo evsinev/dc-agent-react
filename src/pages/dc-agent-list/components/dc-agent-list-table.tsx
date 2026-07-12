@@ -1,6 +1,10 @@
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { useQueryParams } from '@/hooks/use-query-params';
-import { parsePropertyFilterQuery, PROPERTY_FILTERS_QUERY_PARAM_KEY, saveQueryFilter } from '@/libs/parse-property-filter';
+import {
+  parsePropertyFilterQuery,
+  PROPERTY_FILTERS_QUERY_PARAM_KEY,
+  saveQueryFilter,
+} from '@/libs/parse-property-filter';
 import { AgentInfo } from '@/pages/dc-agent-list/api/agent-list';
 import { useCollection } from '@cloudscape-design/collection-hooks';
 import { CollectionPreferencesProps, Pagination, PropertyFilter, StatusIndicator } from '@cloudscape-design/components';
@@ -9,7 +13,10 @@ import Table, { TableProps } from '@cloudscape-design/components/table';
 import { ReactNode } from 'react';
 import { Link } from 'react-router';
 import routing from '@routing';
-import DcAgentTablePreferences, { DEFAULT_AGENT_PREFERENCES, AGENT_PREFERENCES_STORAGE_KEY } from './dc-agent-list-preferences';
+import DcAgentTablePreferences, {
+  DEFAULT_AGENT_PREFERENCES,
+  AGENT_PREFERENCES_STORAGE_KEY,
+} from './dc-agent-list-preferences';
 import { AGENT_FILTERING_PROPERTIES } from './dc-agent-list-table-filters';
 
 type Props = {
@@ -21,7 +28,9 @@ type Props = {
 };
 
 const reachableCell = (agent: AgentInfo) => (
-  <StatusIndicator type={agent.reachable ? 'success' : 'error'}>{agent.reachable ? 'Online' : 'Offline'}</StatusIndicator>
+  <StatusIndicator type={agent.reachable ? 'success' : 'error'}>
+    {agent.reachable ? 'Online' : 'Offline'}
+  </StatusIndicator>
 );
 
 const servicesCell = (agent: AgentInfo) =>

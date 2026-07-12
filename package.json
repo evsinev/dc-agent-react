@@ -17,10 +17,10 @@
     "test:e2e": "playwright test"
   },
   "dependencies": {
-    "@cloudscape-design/code-view": "3.0.57",
-    "@cloudscape-design/collection-hooks": "1.0.73",
-    "@cloudscape-design/components": "3.0.979",
-    "@cloudscape-design/global-styles": "1.0.44",
+    "@cloudscape-design/code-view": "3.0.153",
+    "@cloudscape-design/collection-hooks": "1.0.100",
+    "@cloudscape-design/components": "3.0.1325",
+    "@cloudscape-design/global-styles": "1.0.62",
     "@emotion/react": "11.14.0",
     "@emotion/styled": "11.14.0",
     "pino": "8.19.0",

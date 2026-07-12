@@ -11,7 +11,7 @@ const HOME: Crumb = { text: 'Home', href: routing.apps };
 function buildItems(pathname: string): Crumb[] {
   const app = matchPath(routing.app, pathname);
   if (app) {
-    return [HOME, { text: app.params.appName ?? '', href: pathname }];
+    return [HOME, { text: 'Applications', href: routing.apps }, { text: app.params.appName ?? '', href: pathname }];
   }
 
   const agent = matchPath(routing.agent, pathname);
@@ -55,7 +55,11 @@ function buildItems(pathname: string): Crumb[] {
     return [HOME, { text: 'Test', href: routing.test }];
   }
 
-  // routing.apps ('/') is Applications, which doubles as Home.
+  // routing.apps ('/') is Applications, which doubles as Home — show it as a section too.
+  if (matchPath(routing.apps, pathname)) {
+    return [HOME, { text: 'Applications', href: routing.apps }];
+  }
+
   return [HOME];
 }
 

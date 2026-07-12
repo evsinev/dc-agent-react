@@ -1,0 +1,80 @@
+name: Release
+
+# Builds the production bundle and publishes a GitHub Release when a `v*` tag is pushed.
+#
+# IMPORTANT: the release asset name and archive layout are a contract consumed by an
+# external build downstream — DO NOT change either without coordinating that consumer:
+#   - asset:   dc-agent-react-dist-<tag>.tar.gz   (+ .sha256 checksum)
+#   - layout:  contents of dist/ at the archive root, NO wrapping directory
+#              (i.e. `index.html` and `build-info.json` sit at the archive root).
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+# Only the permission needed to create/upload the release.
+permissions:
+  contents: write
+
+jobs:
+  release:
+    name: Build & publish release
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      # Node version and yarn cache mirror the CI workflow (.github/workflows/ci.yml).
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+          cache: yarn
+
+      - name: Install dependencies
+        run: yarn install --frozen-lockfile
+
+      # Quality gates. Playwright e2e is intentionally NOT run here (heavy browser
+      # install); it stays in the regular CI workflow.
+      - name: Lint & type-check
+        run: yarn lint
+
+      - name: Test
+        run: yarn test
+
+      - name: Build
+        run: yarn build
+
+      # Stamp build metadata into the bundle, after the build and before packaging.
+      - name: Write build-info.json
+        run: |
+          cat > dist/build-info.json <<EOF
+          {
+            "version": "${GITHUB_REF_NAME}",
+            "commit": "${GITHUB_SHA}",
+            "buildTime": "$(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          }
+          EOF
+
+      - name: Sanity check the build output
+        run: test -f dist/index.html
+
+      # Archive the CONTENTS of dist/ at the root (no wrapping directory), then checksum.
+      # See the header comment: this name/layout is an external contract.
+      - name: Package dist
+        run: |
+          tar -C dist -czf "dc-agent-react-dist-${GITHUB_REF_NAME}.tar.gz" .
+          sha256sum "dc-agent-react-dist-${GITHUB_REF_NAME}.tar.gz" \
+            > "dc-agent-react-dist-${GITHUB_REF_NAME}.tar.gz.sha256"
+
+      # Publish via the preinstalled gh CLI. Idempotent so manual re-runs re-upload assets.
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if gh release view "$GITHUB_REF_NAME" >/dev/null 2>&1; then
+            gh release upload "$GITHUB_REF_NAME" dc-agent-react-dist-*.tar.gz* --clobber
+          else
+            gh release create "$GITHUB_REF_NAME" dc-agent-react-dist-*.tar.gz* --generate-notes --verify-tag
+          fi

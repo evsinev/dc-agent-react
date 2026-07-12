@@ -1,11 +1,11 @@
 import InfoButton from '@/components/info/info-button';
 import { useDocumentTitle } from '@/hooks/use-document-title';
-import Label from '@/components/label';
 import {
   Button,
   ColumnLayout,
   Container,
   Header,
+  KeyValuePairs,
   SpaceBetween,
   Spinner,
   StatusIndicator,
@@ -57,27 +57,23 @@ export default function AppView(props: Props) {
           variant="text-grid"
         >
           <Container header={<Header headingTagOverride="h3">App and Agent</Header>}>
-            <SpaceBetween size="l">
-              <Label label="App name">
-                <StatusIndicator type="loading" />
-              </Label>
-              <Label label="Agent url">
-                <StatusIndicator type="loading" />
-              </Label>
-            </SpaceBetween>
+            <KeyValuePairs
+              columns={1}
+              items={[
+                { label: 'App name', value: <StatusIndicator type="loading" /> },
+                { label: 'Agent url', value: <StatusIndicator type="loading" /> },
+              ]}
+            />
           </Container>
           <Container header={<Header headingTagOverride="h3">Task</Header>}>
-            <SpaceBetween size="l">
-              <Label label="Task name">
-                <StatusIndicator type="loading" />
-              </Label>
-              <Label label="Task type">
-                <StatusIndicator type="loading" />
-              </Label>
-              <Label label="Task host">
-                <StatusIndicator type="loading" />
-              </Label>
-            </SpaceBetween>
+            <KeyValuePairs
+              columns={1}
+              items={[
+                { label: 'Task name', value: <StatusIndicator type="loading" /> },
+                { label: 'Task type', value: <StatusIndicator type="loading" /> },
+                { label: 'Task host', value: <StatusIndicator type="loading" /> },
+              ]}
+            />
           </Container>
         </ColumnLayout>
       )}
@@ -88,17 +84,23 @@ export default function AppView(props: Props) {
           variant="text-grid"
         >
           <Container header={<Header headingTagOverride="h3">App and Agent</Header>}>
-            <SpaceBetween size="l">
-              <Label label="App name">{appView.appName}</Label>
-              <Label label="Agent url">{appView.agentUrl}</Label>
-            </SpaceBetween>
+            <KeyValuePairs
+              columns={1}
+              items={[
+                { label: 'App name', value: appView.appName },
+                { label: 'Agent url', value: appView.agentUrl },
+              ]}
+            />
           </Container>
           <Container header={<Header headingTagOverride="h3">Task</Header>}>
-            <SpaceBetween size="l">
-              <Label label="Task name">{appView.taskName}</Label>
-              <Label label="Task type">{appView.taskType}</Label>
-              <Label label="Task host">{appView.taskHost}</Label>
-            </SpaceBetween>
+            <KeyValuePairs
+              columns={1}
+              items={[
+                { label: 'Task name', value: appView.taskName },
+                { label: 'Task type', value: appView.taskType },
+                { label: 'Task host', value: appView.taskHost },
+              ]}
+            />
           </Container>
         </ColumnLayout>
       )}

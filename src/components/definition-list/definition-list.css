@@ -1,0 +1,105 @@
+/*
+ * DefinitionList — Gravity UI "horizontal" look for a Cloudscape KeyValuePairs API.
+ *
+ * Public theming knobs (set on the component via `style` / `termWidth` or on any ancestor):
+ *   --definition-list-term-width        width of the label + leader column (default 300px)
+ *   --definition-list-min-value-width   space always reserved for the value  (default 60px)
+ *   --definition-list-row-gap           vertical gap between rows            (default 16px)
+ *   --definition-list-column-gap        horizontal gap between grid columns  (default 32px)
+ *   --definition-list-term-color        label color      (default: dimmed current text color)
+ *   --definition-list-leader-color      dot leader color (default: more dimmed current text color)
+ */
+
+.definition-list {
+  --_term-width: var(--definition-list-term-width, 300px);
+  --_min-value-width: var(--definition-list-min-value-width, 60px);
+  --_row-gap: var(--definition-list-row-gap, 16px);
+  --_column-gap: var(--definition-list-column-gap, 32px);
+  --_term-color: var(--definition-list-term-color, color-mix(in srgb, currentColor 62%, transparent));
+  --_leader-color: var(--definition-list-leader-color, color-mix(in srgb, currentColor 38%, transparent));
+
+  display: grid;
+  gap: var(--_row-gap) var(--_column-gap);
+  margin: 0;
+  padding: 0;
+}
+
+/* --- single key-value row ------------------------------------------------ */
+
+.definition-list__item {
+  display: flex;
+  align-items: baseline;
+  gap: 4px;
+  min-width: 0;
+}
+
+.definition-list__term {
+  display: flex;
+  align-items: baseline;
+  flex: 0 0 auto;
+  box-sizing: border-box;
+  inline-size: var(--_term-width);
+  /* never let the label column eat the space reserved for the value */
+  max-inline-size: calc(100% - var(--_min-value-width));
+  min-inline-size: 0;
+  margin: 0;
+  overflow: hidden;
+  color: var(--_term-color);
+  font-weight: var(--definition-list-term-font-weight, 400);
+}
+
+.definition-list__label {
+  flex: 0 1 auto;
+  min-inline-size: 0;
+}
+
+.definition-list__info {
+  flex: 0 0 auto;
+  margin-inline-start: 6px;
+}
+
+/*
+ * The leader. An empty flex item has no text, so with `align-items: baseline` its baseline is
+ * its own bottom edge — the dotted border therefore sits exactly on the text baseline (at the
+ * bottom, not vertically centered). 2px side margins keep it flush against label and value.
+ */
+.definition-list__leader {
+  box-sizing: border-box;
+  flex: 1 0 auto;
+  min-inline-size: 25px;
+  margin-block: 0;
+  margin-inline: 2px;
+  border-block-end: 1px dotted var(--_leader-color);
+}
+
+.definition-list__detail {
+  flex: 0 1 auto;
+  min-inline-size: 0;
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+/* --- groups --------------------------------------------------------------- */
+
+.definition-list__group {
+  min-width: 0;
+}
+
+.definition-list__group-title {
+  margin: 0;
+  padding-block-end: var(--_row-gap);
+  font-weight: 600;
+}
+
+.definition-list__group-detail {
+  margin: 0;
+  min-width: 0;
+}
+
+.definition-list__group-list {
+  display: flex;
+  flex-direction: column;
+  row-gap: var(--_row-gap);
+  margin: 0;
+  padding: 0;
+}

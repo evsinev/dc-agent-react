@@ -1,5 +1,6 @@
+import DefinitionList from '@/components/definition-list';
 import { ServiceView } from '@/pages/service-view/api/service-view';
-import { ColumnLayout, Container, Header, KeyValuePairs, StatusIndicator } from '@cloudscape-design/components';
+import { ColumnLayout, Container, Header, StatusIndicator } from '@cloudscape-design/components';
 
 export default function Status(props: ServiceView) {
   return (
@@ -8,8 +9,10 @@ export default function Status(props: ServiceView) {
       minColumnWidth={300}
     >
       <Container header={<Header headingTagOverride="h3">Service</Header>}>
-        <KeyValuePairs
+        <DefinitionList
           columns={1}
+          ariaLabel="Service"
+          termWidth="110px"
           items={[
             { label: 'Service', value: props.service.serviceName },
             { label: 'Host', value: props.service.host },
@@ -22,8 +25,10 @@ export default function Status(props: ServiceView) {
         />
       </Container>
       <Container header={<Header headingTagOverride="h3">Supervise status</Header>}>
-        <KeyValuePairs
+        <DefinitionList
           columns={1}
+          ariaLabel="Supervise status"
+          termWidth="110px"
           items={[
             { label: 'PID', value: props.service.serviceStatus.pid },
             { label: 'Supervise', value: props.service.serviceStatus.superviseState },

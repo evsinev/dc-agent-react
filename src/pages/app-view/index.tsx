@@ -1,3 +1,4 @@
+import DefinitionList from '@/components/definition-list';
 import InfoButton from '@/components/info/info-button';
 import { useDocumentTitle } from '@/hooks/use-document-title';
 import {
@@ -5,7 +6,6 @@ import {
   ColumnLayout,
   Container,
   Header,
-  KeyValuePairs,
   SpaceBetween,
   Spinner,
   StatusIndicator,
@@ -57,8 +57,10 @@ export default function AppView(props: Props) {
           variant="text-grid"
         >
           <Container header={<Header headingTagOverride="h3">App and Agent</Header>}>
-            <KeyValuePairs
+            <DefinitionList
               columns={1}
+              ariaLabel="App and Agent"
+              termWidth="110px"
               items={[
                 { label: 'App name', value: <StatusIndicator type="loading" /> },
                 { label: 'Agent url', value: <StatusIndicator type="loading" /> },
@@ -66,8 +68,10 @@ export default function AppView(props: Props) {
             />
           </Container>
           <Container header={<Header headingTagOverride="h3">Task</Header>}>
-            <KeyValuePairs
+            <DefinitionList
               columns={1}
+              ariaLabel="Task"
+              termWidth="110px"
               items={[
                 { label: 'Task name', value: <StatusIndicator type="loading" /> },
                 { label: 'Task type', value: <StatusIndicator type="loading" /> },
@@ -84,8 +88,10 @@ export default function AppView(props: Props) {
           variant="text-grid"
         >
           <Container header={<Header headingTagOverride="h3">App and Agent</Header>}>
-            <KeyValuePairs
+            <DefinitionList
               columns={1}
+              ariaLabel="App and Agent"
+              termWidth="110px"
               items={[
                 { label: 'App name', value: appView.appName },
                 { label: 'Agent url', value: appView.agentUrl },
@@ -93,8 +99,10 @@ export default function AppView(props: Props) {
             />
           </Container>
           <Container header={<Header headingTagOverride="h3">Task</Header>}>
-            <KeyValuePairs
+            <DefinitionList
               columns={1}
+              ariaLabel="Task"
+              termWidth="110px"
               items={[
                 { label: 'Task name', value: appView.taskName },
                 { label: 'Task type', value: appView.taskType },

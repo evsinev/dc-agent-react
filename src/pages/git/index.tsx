@@ -1,5 +1,6 @@
+import DefinitionList from '@/components/definition-list';
 import { useDocumentTitle } from '@/hooks/use-document-title';
-import { Button, Container, ContentLayout, KeyValuePairs, SpaceBetween } from '@cloudscape-design/components';
+import { Button, Container, ContentLayout, SpaceBetween } from '@cloudscape-design/components';
 import { useGitLog } from './api/git-log';
 import { useGitPull } from './api/git-pull';
 import GitCommitsTable from './components/git-commits-table';
@@ -32,8 +33,10 @@ export default function Git() {
     >
       <SpaceBetween size="xl">
         <Container>
-          <KeyValuePairs
+          <DefinitionList
             columns={3}
+            ariaLabel="Git repository"
+            termWidth="140px"
             items={[
               {
                 label: 'Current Branch',

@@ -1,5 +1,6 @@
+import DefinitionList from '@/components/definition-list';
 import { AgentInfo } from '@/pages/dc-agent-list/api/agent-list';
-import { ColumnLayout, Container, Header, KeyValuePairs, StatusIndicator } from '@cloudscape-design/components';
+import { ColumnLayout, Container, Header, StatusIndicator } from '@cloudscape-design/components';
 
 type Props = {
   agent: AgentInfo;
@@ -12,8 +13,10 @@ export default function DcAgentDetailsPanel({ agent }: Props) {
       variant="text-grid"
     >
       <Container header={<Header headingTagOverride="h3">Agent</Header>}>
-        <KeyValuePairs
+        <DefinitionList
           columns={1}
+          ariaLabel="Agent details"
+          termWidth="140px"
           items={[
             { label: 'Name', value: agent.name },
             { label: 'URL', value: agent.url },
@@ -31,8 +34,10 @@ export default function DcAgentDetailsPanel({ agent }: Props) {
       </Container>
 
       <Container header={<Header headingTagOverride="h3">App status</Header>}>
-        <KeyValuePairs
+        <DefinitionList
           columns={2}
+          ariaLabel="App status"
+          termWidth="110px"
           items={[
             { label: 'Instance', value: agent.appInstanceName ?? '—' },
             { label: 'Version', value: agent.appVersion ?? '—' },

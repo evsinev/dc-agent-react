@@ -1,13 +1,6 @@
+import DefinitionList from '@/components/definition-list';
 import { CommandInfo } from '@/pages/command-list/api/command-list';
-import {
-  Box,
-  ColumnLayout,
-  Container,
-  Header,
-  KeyValuePairs,
-  SpaceBetween,
-  StatusIndicator,
-} from '@cloudscape-design/components';
+import { Box, ColumnLayout, Container, Header, SpaceBetween, StatusIndicator } from '@cloudscape-design/components';
 import routing from '@routing';
 import { Link } from 'react-router';
 
@@ -25,8 +18,10 @@ export default function CommandDetailsPanel({ command }: Props) {
         variant="text-grid"
       >
         <Container header={<Header headingTagOverride="h3">Command</Header>}>
-          <KeyValuePairs
+          <DefinitionList
             columns={1}
+            ariaLabel="Command"
+            termWidth="110px"
             items={[
               {
                 label: 'Host',
@@ -39,8 +34,10 @@ export default function CommandDetailsPanel({ command }: Props) {
         </Container>
 
         <Container header={<Header headingTagOverride="h3">Status</Header>}>
-          <KeyValuePairs
+          <DefinitionList
             columns={1}
+            ariaLabel="Status"
+            termWidth="110px"
             items={[
               {
                 label: 'State',
@@ -57,8 +54,10 @@ export default function CommandDetailsPanel({ command }: Props) {
 
       <Container header={<Header headingTagOverride="h3">Parameters</Header>}>
         {parameterItems.length > 0 ? (
-          <KeyValuePairs
+          <DefinitionList
             columns={2}
+            ariaLabel="Parameters"
+            termWidth="180px"
             items={parameterItems}
           />
         ) : (

@@ -82,7 +82,7 @@ export default function DcAgentListTable(props: Props) {
           counter={`(${props.agents.length})`}
           actions={props.actions}
         >
-          dc-agents
+          Agents
         </Header>
       }
       selectionType="single"
@@ -93,7 +93,7 @@ export default function DcAgentListTable(props: Props) {
       items={items}
       trackBy="name"
       loading={props.isLoading}
-      loadingText="Loading dc-agents"
+      loadingText="Loading agents"
       wrapLines={preferences.wrapLines}
       stripedRows={preferences.stripedRows}
       contentDensity={preferences.contentDensity}

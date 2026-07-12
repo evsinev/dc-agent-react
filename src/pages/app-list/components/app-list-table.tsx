@@ -67,7 +67,7 @@ export default function AppListTable(props: AppListTableProps) {
           counter={`(${props.apps.length})`}
           actions={props.actions}
         >
-          Apps
+          Applications
         </Header>
       }
       selectionType="single"

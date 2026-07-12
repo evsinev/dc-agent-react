@@ -13,7 +13,7 @@ const AUTO_DISMISS_MS = 3000;
 type NewFlash = Omit<FlashbarProps.MessageDefinition, 'id' | 'dismissible' | 'onDismiss'>;
 
 /**
- * Orchestrates the App list "Pull from Git" shortcut: it reuses the Git page's
+ * Orchestrates the Applications "Pull from Git" shortcut: it reuses the Git page's
  * `useGitLog`/`useGitPull` hooks, computes the pulled-commit summary from the
  * before/after log, surfaces a flashbar, and revalidates the app list + statuses
  * so drift indicators recompute after a pull.

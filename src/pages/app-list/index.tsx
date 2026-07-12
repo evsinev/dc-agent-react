@@ -11,7 +11,7 @@ import AppListTable from './components/app-list-table';
 import AppServicePanel from '@/pages/app-list/components/app-service-panel';
 
 export default function AppList() {
-  useDocumentTitle('App list');
+  useDocumentTitle('Applications');
   const { data, isLoading } = useAppList();
   const [selected, setSelected] = useState<AppListItem[]>([]);
   const { branch, updatedLabel, isPulling, flashItems, pull, refresh } = useQuickPull();
@@ -43,7 +43,7 @@ export default function AppList() {
       {flashItems.length > 0 && <Flashbar items={flashItems} />}
 
       <Header variant="h1">
-        App list
+        Applications
         {isLoading && <StatusIndicator type="loading">Fetching</StatusIndicator>}
       </Header>
 

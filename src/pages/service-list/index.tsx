@@ -9,7 +9,7 @@ import { useSplitPanel } from '@/hooks/use-split-panel';
 import ServiceViewPanel from '@/pages/service-view/components/service-view-panel';
 
 export default function ServiceList() {
-  useDocumentTitle('Service list');
+  useDocumentTitle('Services');
   const { data, isLoading } = useServiceList();
   const services = data?.services ?? [];
   const [selectedService, setSelectedServices] = useState<ServiceListItem[]>([]);
@@ -37,7 +37,7 @@ export default function ServiceList() {
   return (
     <SpaceBetween size="m">
       <Header variant="h1">
-        Service List
+        Services
         {isLoading && <StatusIndicator type="loading">Fetching</StatusIndicator>}
       </Header>
 

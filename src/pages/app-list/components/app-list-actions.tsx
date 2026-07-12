@@ -9,7 +9,7 @@ type Props = {
 };
 
 /**
- * Actions cluster for the App list table header: a muted git-status hint, a
+ * Actions cluster for the Applications table header: a muted git-status hint, a
  * plain refresh button, and the "Pull from Git" shortcut (see the design in
  * handoffs/design_handoff_git_quick_pull).
  */

@@ -9,7 +9,7 @@ import CommandDetailsPanel from './components/command-details-panel';
 import CommandListTable from './components/command-list-table';
 
 export default function CommandList() {
-  useDocumentTitle('Command list');
+  useDocumentTitle('Commands');
   const { data, isLoading } = useCommandList();
   const [selected, setSelected] = useState<CommandInfo[]>([]);
 
@@ -31,7 +31,7 @@ export default function CommandList() {
   return (
     <SpaceBetween size="m">
       <Header variant="h1">
-        Command list
+        Commands
         {isLoading && <StatusIndicator type="loading">Fetching</StatusIndicator>}
       </Header>
 

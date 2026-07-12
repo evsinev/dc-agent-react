@@ -11,22 +11,22 @@ function toHref(aRouterLink: string) {
 export const navigationItems = [
   {
     type: 'link',
-    text: 'App list',
+    text: 'Applications',
     href: toHref(routing.apps),
   },
   {
     type: 'link',
-    text: 'dc-agent list',
+    text: 'Agents',
     href: toHref(routing.agents),
   },
   {
     type: 'link',
-    text: 'Service list',
+    text: 'Services',
     href: toHref(routing.services),
   },
   {
     type: 'link',
-    text: 'Command list',
+    text: 'Commands',
     href: toHref(routing.commands),
   },
   {

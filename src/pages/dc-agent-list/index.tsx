@@ -9,7 +9,7 @@ import DcAgentDetailBody from './components/dc-agent-detail-body';
 import DcAgentListTable from './components/dc-agent-list-table';
 
 export default function DcAgentList() {
-  useDocumentTitle('dc-agent list');
+  useDocumentTitle('Agents');
   const { data, isLoading } = useAgentList();
   const [selected, setSelected] = useState<AgentInfo[]>([]);
 
@@ -31,7 +31,7 @@ export default function DcAgentList() {
   return (
     <SpaceBetween size="m">
       <Header variant="h1">
-        dc-agent list
+        Agents
         {isLoading && <StatusIndicator type="loading">Fetching</StatusIndicator>}
       </Header>
 

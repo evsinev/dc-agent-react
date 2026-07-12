@@ -37,9 +37,9 @@ export default function DcAgentTablePreferences(props: Props) {
       pageSizePreference={{
         title: 'Page size',
         options: [
-          { value: 10, label: '10 dc-agents' },
-          { value: 30, label: '30 dc-agents' },
-          { value: 50, label: '50 dc-agents' },
+          { value: 10, label: '10 agents' },
+          { value: 30, label: '30 agents' },
+          { value: 50, label: '50 agents' },
         ],
       }}
       wrapLinesPreference={{

@@ -137,12 +137,47 @@ export const AGENTS: AgentInfo[] = [
 // ── Commands ────────────────────────────────────────────────────────────────
 // Non-docker commands configured on each agent (dev-box-b is unreachable).
 export const COMMANDS: CommandInfo[] = [
-  { host: 'sandbox-1', name: 'app-config', type: 'ZIP_ARCHIVE' },
-  { host: 'sandbox-1', name: 'billing', type: 'JAR' },
-  { host: 'sandbox-1', name: 'fetch-url', type: 'FETCH_URL' },
-  { host: 'sandbox-2', name: 'frontend', type: 'NODE' },
-  { host: 'sandbox-2', name: 'artifacts', type: 'SAVE_ARTIFACT' },
-  { host: 'dev-box-a', name: 'legacy-portal', type: 'WAR' },
+  {
+    host: 'sandbox-1',
+    name: 'app-config',
+    type: 'ZIP_ARCHIVE',
+    parameters: { dir: '/opt/app-config', apiKeys: 'gitlab-ci' },
+  },
+  {
+    host: 'sandbox-1',
+    name: 'billing',
+    type: 'JAR',
+    parameters: {
+      jarFilename: 'billing.jar',
+      serviceName: 'billing',
+      waitUrl: 'http://localhost:8080/health',
+      apiKeys: 'gitlab-ci',
+    },
+  },
+  {
+    host: 'sandbox-1',
+    name: 'fetch-url',
+    type: 'FETCH_URL',
+    parameters: { apiKeys: 'gitlab-ci' },
+  },
+  {
+    host: 'sandbox-2',
+    name: 'frontend',
+    type: 'NODE',
+    parameters: { jarFilename: 'server.js', serviceName: 'frontend', apiKeys: 'ci-bot' },
+  },
+  {
+    host: 'sandbox-2',
+    name: 'artifacts',
+    type: 'SAVE_ARTIFACT',
+    parameters: { dir: '/opt/artifacts', extension: 'tgz', replaceDirChars: '_', apiKeys: 'jenkins' },
+  },
+  {
+    host: 'dev-box-a',
+    name: 'legacy-portal',
+    type: 'WAR',
+    parameters: { warFilename: 'portal.war', serviceName: 'legacy-portal', apiKeys: 'jenkins' },
+  },
   { host: 'dev-box-b', error: 'Connection refused' },
 ];
 

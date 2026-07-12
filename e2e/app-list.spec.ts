@@ -3,7 +3,7 @@ import { expect, test } from '@playwright/test';
 test('app list renders mock apps with their statuses', async ({ page }) => {
   await page.goto('/dc-operator/');
 
-  await expect(page.getByRole('heading', { name: 'App list' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Applications', level: 1 })).toBeVisible();
   await expect(page.getByRole('link', { name: 'hello-world' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'demo-clock' })).toBeVisible();
 

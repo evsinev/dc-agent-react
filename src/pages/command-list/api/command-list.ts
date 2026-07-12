@@ -6,6 +6,8 @@ export type CommandInfo = {
   name?: string;
   type?: string;
   error?: string;
+  // All config fields (secret api-key values are masked to owner labels on the server).
+  parameters?: Record<string, string>;
 };
 
 export type CommandListResponse = {

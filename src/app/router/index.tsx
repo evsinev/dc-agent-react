@@ -1,5 +1,6 @@
 import AppList from '@/pages/app-list';
 import AppView from '@/pages/app-view';
+import CommandList from '@/pages/command-list';
 import DcAgentList from '@/pages/dc-agent-list';
 import DcAgentView from '@/pages/dc-agent-view';
 import Git from '@/pages/git';
@@ -49,6 +50,10 @@ export default function Router() {
       <Route
         path={routing.agent}
         Component={DcAgentView}
+      />
+      <Route
+        path={routing.commands}
+        Component={CommandList}
       />
       <Route
         path="*"

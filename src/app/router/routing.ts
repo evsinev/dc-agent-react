@@ -8,6 +8,7 @@ const routing = {
   test: '/test',
   agents: '/dc-agents',
   agent: '/dc-agents/:name',
+  commands: '/commands',
 };
 
 export default routing;

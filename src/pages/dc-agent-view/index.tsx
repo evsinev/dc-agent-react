@@ -1,6 +1,6 @@
 import { useDocumentTitle } from '@/hooks/use-document-title';
 import { useAgentList } from '@/pages/dc-agent-list/api/agent-list';
-import DcAgentDetailsPanel from '@/pages/dc-agent-list/components/dc-agent-details-panel';
+import DcAgentDetailBody from '@/pages/dc-agent-list/components/dc-agent-detail-body';
 import { Box, StatusIndicator } from '@cloudscape-design/components';
 import Header from '@cloudscape-design/components/header';
 import SpaceBetween from '@cloudscape-design/components/space-between';
@@ -20,7 +20,7 @@ export default function DcAgentView() {
         {isLoading && <StatusIndicator type="loading">Fetching</StatusIndicator>}
       </Header>
 
-      {agent && <DcAgentDetailsPanel agent={agent} />}
+      {agent && <DcAgentDetailBody agent={agent} />}
       {!agent && !isLoading && <Box variant="p">Agent not found</Box>}
     </SpaceBetween>
   );

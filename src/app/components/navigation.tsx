@@ -26,6 +26,11 @@ export const navigationItems = [
   },
   {
     type: 'link',
+    text: 'Command list',
+    href: toHref(routing.commands),
+  },
+  {
+    type: 'link',
     text: 'Git repo',
     href: toHref(routing.git),
   },

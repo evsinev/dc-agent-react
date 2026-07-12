@@ -1,27 +1,27 @@
 import { useDocumentTitle } from '@/hooks/use-document-title';
 import { useSplitPanel } from '@/hooks/use-split-panel';
-import { AgentInfo, useAgentList } from '@/pages/dc-agent-list/api/agent-list';
+import { CommandInfo, useCommandList } from '@/pages/command-list/api/command-list';
 import { StatusIndicator } from '@cloudscape-design/components';
 import Header from '@cloudscape-design/components/header';
 import SpaceBetween from '@cloudscape-design/components/space-between';
 import { useEffect, useState } from 'react';
-import DcAgentDetailBody from './components/dc-agent-detail-body';
-import DcAgentListTable from './components/dc-agent-list-table';
+import CommandDetailsPanel from './components/command-details-panel';
+import CommandListTable from './components/command-list-table';
 
-export default function DcAgentList() {
-  useDocumentTitle('dc-agent list');
-  const { data, isLoading } = useAgentList();
-  const [selected, setSelected] = useState<AgentInfo[]>([]);
+export default function CommandList() {
+  useDocumentTitle('Command list');
+  const { data, isLoading } = useCommandList();
+  const [selected, setSelected] = useState<CommandInfo[]>([]);
 
   const show = useSplitPanel((state) => state.show);
   const hide = useSplitPanel((state) => state.hide);
 
   useEffect(() => {
     if (selected.length > 0) {
-      const agent = selected[selected.length - 1];
+      const command = selected[selected.length - 1];
       show({
-        content: <DcAgentDetailBody agent={agent} />,
-        title: agent.name,
+        content: <CommandDetailsPanel command={command} />,
+        title: command.name ?? command.host,
       });
     } else {
       hide();
@@ -31,12 +31,12 @@ export default function DcAgentList() {
   return (
     <SpaceBetween size="m">
       <Header variant="h1">
-        dc-agent list
+        Command list
         {isLoading && <StatusIndicator type="loading">Fetching</StatusIndicator>}
       </Header>
 
-      <DcAgentListTable
-        agents={data?.agents ?? []}
+      <CommandListTable
+        commands={data?.commands ?? []}
         isLoading={isLoading}
         selected={selected}
         setSelected={setSelected}

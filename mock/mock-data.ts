@@ -3,6 +3,7 @@
 import type { AppListItem } from '../src/pages/app-list/api/app-list';
 import type { AgentInfo } from '../src/pages/dc-agent-list/api/agent-list';
 import type { GitLog, GitLogItem } from '../src/pages/git/api/git-log';
+import type { CommandInfo } from '../src/pages/command-list/api/command-list';
 import type { ServiceListItem, ServiceStateType } from '../src/pages/service-list/api/service-list';
 import type { ServiceView } from '../src/pages/service-view/api/service-view';
 
@@ -131,6 +132,18 @@ export const AGENTS: AgentInfo[] = [
     servicesUp: 0,
     servicesError: 'Connection refused',
   },
+];
+
+// ── Commands ────────────────────────────────────────────────────────────────
+// Non-docker commands configured on each agent (dev-box-b is unreachable).
+export const COMMANDS: CommandInfo[] = [
+  { host: 'sandbox-1', name: 'app-config', type: 'ZIP_ARCHIVE' },
+  { host: 'sandbox-1', name: 'billing', type: 'JAR' },
+  { host: 'sandbox-1', name: 'fetch-url', type: 'FETCH_URL' },
+  { host: 'sandbox-2', name: 'frontend', type: 'NODE' },
+  { host: 'sandbox-2', name: 'artifacts', type: 'SAVE_ARTIFACT' },
+  { host: 'dev-box-a', name: 'legacy-portal', type: 'WAR' },
+  { host: 'dev-box-b', error: 'Connection refused' },
 ];
 
 // ── Services ──────────────────────────────────────────────────────────────

@@ -9,8 +9,8 @@ export const DEFAULT_COMMAND_PREFERENCES: CollectionPreferencesProps.Preferences
   contentDensity: 'comfortable',
   stickyColumns: { first: 0, last: 0 },
   contentDisplay: [
-    { id: 'host', visible: true },
     { id: 'name', visible: true },
+    { id: 'host', visible: true },
     { id: 'type', visible: true },
   ],
 };
@@ -71,8 +71,8 @@ export default function CommandTablePreferences(props: Props) {
         title: 'Column preferences',
         description: 'Customize the visibility and order of the columns.',
         options: [
-          { id: 'host', label: 'Host' },
           { id: 'name', label: 'Command' },
+          { id: 'host', label: 'Host' },
           { id: 'type', label: 'Type' },
         ],
       }}

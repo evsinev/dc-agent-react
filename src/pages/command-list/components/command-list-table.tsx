@@ -34,14 +34,13 @@ type Props = {
 export const commandKey = (command: CommandInfo) => `${command.host}/${command.name ?? '(error)'}`;
 
 const columnDefinitions: TableProps.ColumnDefinition<CommandInfo>[] = [
+  { id: 'name', header: 'Command', cell: commandNameCell, sortingField: 'name', isRowHeader: true },
   {
     id: 'host',
     header: 'Host',
     cell: (c) => <Link to={routing.agent.replace(':name', c.host)}>{c.host}</Link>,
     sortingField: 'host',
-    isRowHeader: true,
   },
-  { id: 'name', header: 'Command', cell: commandNameCell, sortingField: 'name' },
   { id: 'type', header: 'Type', cell: (c) => c.type ?? '—', sortingField: 'type' },
 ];
 

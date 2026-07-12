@@ -55,7 +55,7 @@ export default function CommandDetailsPanel({ command }: Props) {
       <Container header={<Header headingTagOverride="h3">Parameters</Header>}>
         {parameterItems.length > 0 ? (
           <DefinitionList
-            columns={2}
+            columns={1}
             ariaLabel="Parameters"
             termWidth="180px"
             items={parameterItems}

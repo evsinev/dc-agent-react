@@ -53,6 +53,20 @@
   min-inline-size: 0;
 }
 
+/*
+ * Auto term width: the label column is sized (in JS) to the widest term, so labels never wrap.
+ * Drop the shrink/clip constraints and keep each label on one line.
+ */
+.definition-list--auto-term .definition-list__term {
+  overflow: visible;
+  max-inline-size: none;
+}
+
+.definition-list--auto-term .definition-list__label {
+  flex: 0 0 auto;
+  white-space: nowrap;
+}
+
 .definition-list__info {
   flex: 0 0 auto;
   margin-inline-start: 6px;

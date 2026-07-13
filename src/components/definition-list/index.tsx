@@ -39,6 +39,12 @@ export interface DefinitionListProps {
   minColumnWidth?: number;
   /** Width of the label + leader column (any CSS length). Defaults to 300px. */
   termWidth?: string;
+  /**
+   * Measure the widest term and size the label column to fit it, so labels never wrap (values
+   * stay aligned). `termWidth` is used as the width until measurement completes. Use for lists
+   * whose labels vary in length and shouldn't break onto a second line.
+   */
+  autoTermWidth?: boolean;
   id?: string;
   className?: string;
   /** Escape hatch, e.g. to override `--definition-list-*` CSS variables. */
@@ -140,11 +146,32 @@ export default function DefinitionList({
   ariaLabelledby,
   minColumnWidth = 150,
   termWidth,
+  autoTermWidth = false,
   id,
   className,
   style,
 }: DefinitionListProps) {
   const [containerWidth, containerRef] = useContainerWidth<HTMLDListElement>();
+  const [measuredTermWidth, setMeasuredTermWidth] = React.useState<number | null>(null);
+
+  // Reserve for the dotted leader (its 25px min + 2×2px margins) plus a small buffer, so the
+  // widest label still gets a leader and doesn't butt against the value.
+  const LEADER_RESERVE = 34;
+
+  React.useLayoutEffect(() => {
+    if (!autoTermWidth) {
+      return;
+    }
+    const element = containerRef.current;
+    if (!element) {
+      return;
+    }
+    let widest = 0;
+    for (const label of element.querySelectorAll<HTMLElement>('.definition-list__label')) {
+      widest = Math.max(widest, label.scrollWidth);
+    }
+    setMeasuredTermWidth(widest > 0 ? Math.ceil(widest) + LEADER_RESERVE : null);
+  }, [autoTermWidth, items, containerWidth]);
 
   if (process.env.NODE_ENV !== 'production' && columns > MAX_COLUMNS && !columnsWarningShown) {
     columnsWarningShown = true;
@@ -152,13 +179,17 @@ export default function DefinitionList({
   }
 
   const columnCount = calculateColumnCount(Math.min(columns, MAX_COLUMNS), minColumnWidth, containerWidth);
-  const termWidthVar = termWidth ? ({ '--definition-list-term-width': termWidth } as React.CSSProperties) : undefined;
+  // In auto mode the measured width wins once available; `termWidth` is the pre-measurement width.
+  const effectiveTermWidth = autoTermWidth && measuredTermWidth != null ? `${measuredTermWidth}px` : termWidth;
+  const termWidthVar = effectiveTermWidth
+    ? ({ '--definition-list-term-width': effectiveTermWidth } as React.CSSProperties)
+    : undefined;
 
   return (
     <dl
       ref={containerRef}
       id={id}
-      className={cx('definition-list', className)}
+      className={cx('definition-list', autoTermWidth && 'definition-list--auto-term', className)}
       style={{ ...style, ...termWidthVar, gridTemplateColumns: `repeat(${columnCount}, minmax(0, 1fr))` }}
       aria-label={ariaLabel}
       aria-labelledby={ariaLabelledby}

@@ -1,3 +1,4 @@
+import VersionFooter from '@/app/components/version-footer';
 import { SideNavigation } from '@cloudscape-design/components';
 import { SideNavigationProps } from '@cloudscape-design/components/side-navigation';
 import routing from '@routing';
@@ -88,14 +89,17 @@ export default function Navigation() {
   }
 
   return (
-    <SideNavigation
-      header={{
-        href: routing.apps,
-        text: 'dc-operator',
-      }}
-      activeHref={activeHref}
-      onFollow={onFollow}
-      items={navigationItems}
-    />
+    <div style={{ display: 'flex', flexDirection: 'column', minHeight: '100%' }}>
+      <SideNavigation
+        header={{
+          href: routing.apps,
+          text: 'dc-operator',
+        }}
+        activeHref={activeHref}
+        onFollow={onFollow}
+        items={navigationItems}
+      />
+      <VersionFooter />
+    </div>
   );
 }

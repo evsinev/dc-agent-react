@@ -54,6 +54,10 @@ export function devMockMiddleware(req: IncomingMessage, res: ServerResponse, nex
   const endpoint = path.slice(API_PREFIX.length);
 
   // Static endpoints.
+  if (endpoint === '/info') {
+    json(res, { version: 'mock' });
+    return;
+  }
   if (endpoint === '/app/list') {
     json(res, { apps: APPS });
     return;

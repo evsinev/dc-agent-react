@@ -9,9 +9,62 @@ import {
   commandTypeLabel,
   isCommandType,
 } from '@/pages/command-list/api/command-types';
-import { Box, Button, Container, Header, SpaceBetween, StatusIndicator, Table } from '@cloudscape-design/components';
+import { useAgentList } from '@/pages/dc-agent-list/api/agent-list';
+import { CodeView, type CodeViewProps } from '@cloudscape-design/code-view';
+// @ts-ignore incorrect type export in the library
+import shHighlight from '@cloudscape-design/code-view/highlight/sh';
+// @ts-ignore incorrect type export in the library
+import yamlHighlight from '@cloudscape-design/code-view/highlight/yaml';
+import {
+  Box,
+  Button,
+  Container,
+  CopyToClipboard,
+  Header,
+  SpaceBetween,
+  StatusIndicator,
+  Table,
+  Tabs,
+} from '@cloudscape-design/components';
 import routing from '@routing';
 import { Link, useNavigate, useParams } from 'react-router';
+import { type UsageSnippets, buildDeployUrl, buildUsageSnippets, isUploadType } from './usage-snippets';
+
+// The four deploy-snippet tabs, each a CodeView with a copy button. Shell highlight for curl/wget,
+// YAML for the GitLab CI examples.
+function UsageTabs({ snippets }: { snippets: UsageSnippets }) {
+  const codeTab = (id: string, label: string, content: string, highlight: CodeViewProps['highlight']) => ({
+    id,
+    label,
+    content: (
+      <CodeView
+        content={content}
+        wrapLines
+        highlight={highlight}
+        actions={
+          <CopyToClipboard
+            variant="icon"
+            textToCopy={content}
+            copySuccessText="Copied"
+            copyErrorText="Failed to copy"
+            copyButtonAriaLabel={`Copy ${label} snippet`}
+          />
+        }
+      />
+    ),
+  });
+
+  return (
+    <Tabs
+      tabs={[
+        codeTab('curl', 'curl', snippets.curl, shHighlight),
+        codeTab('wget', 'wget', snippets.wget, shHighlight),
+        codeTab('gitlab-curl', 'gitlab + curl', snippets.gitlabCurl, yamlHighlight),
+        codeTab('gitlab-wget', 'gitlab + wget', snippets.gitlabWget, yamlHighlight),
+      ]}
+    />
+  );
+}
 
 export default function CommandView() {
   const { host, name } = useParams();
@@ -19,9 +72,11 @@ export default function CommandView() {
   const navigate = useNavigate();
 
   const { data: command, isLoading, error, mutate } = useCommandGet(host, name);
+  const { data: agentData } = useAgentList();
 
   const type = command?.type;
   const configFields = isCommandType(type) ? COMMAND_TYPES[type].fields : [];
+  const agentUrl = agentData?.agents.find((agent) => agent.name === host)?.url;
 
   return (
     <SpaceBetween size="m">
@@ -86,6 +141,21 @@ export default function CommandView() {
               <Box variant="p">This command type has no configurable fields.</Box>
             )}
           </Container>
+
+          {isUploadType(command.type) && (
+            <Container
+              header={
+                <Header
+                  headingTagOverride="h3"
+                  description="Replace package.zip and $DEPLOY_KEY with your artifact and deploy key."
+                >
+                  Usage
+                </Header>
+              }
+            >
+              <UsageTabs snippets={buildUsageSnippets(buildDeployUrl(agentUrl, command.type, command.name))} />
+            </Container>
+          )}
 
           <Container header={<Header counter={`(${command.apiKeys.length})`}>API keys</Header>}>
             <Table

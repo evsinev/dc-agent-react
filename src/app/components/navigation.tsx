@@ -53,7 +53,12 @@ function activeSection(pathname: string): string | undefined {
   if (matchPath(routing.service, pathname) || matchPath(routing.services, pathname)) {
     return routing.services;
   }
-  if (matchPath(routing.command, pathname) || matchPath(routing.commands, pathname)) {
+  if (
+    matchPath(routing.command, pathname) ||
+    matchPath(routing.commands, pathname) ||
+    matchPath(routing.commandCreate, pathname) ||
+    matchPath(routing.commandEdit, pathname)
+  ) {
     return routing.commands;
   }
   if (matchPath(routing.git, pathname)) {

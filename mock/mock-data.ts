@@ -4,6 +4,7 @@ import type { AppListItem } from '../src/pages/app-list/api/app-list';
 import type { AgentInfo } from '../src/pages/dc-agent-list/api/agent-list';
 import type { GitLog, GitLogItem } from '../src/pages/git/api/git-log';
 import type { CommandInfo } from '../src/pages/command-list/api/command-list';
+import type { CommandDetail, MaskedApiKey } from '../src/pages/command-list/api/command-mutations';
 import type { ServiceListItem, ServiceStateType } from '../src/pages/service-list/api/service-list';
 import type { ServiceView } from '../src/pages/service-view/api/service-view';
 
@@ -136,7 +137,7 @@ export const AGENTS: AgentInfo[] = [
 
 // ── Commands ────────────────────────────────────────────────────────────────
 // Non-docker commands configured on each agent (dev-box-b is unreachable).
-export const COMMANDS: CommandInfo[] = [
+const COMMANDS_SEED: CommandInfo[] = [
   {
     host: 'sandbox-1',
     name: 'app-config',
@@ -180,6 +181,159 @@ export const COMMANDS: CommandInfo[] = [
   },
   { host: 'dev-box-b', error: 'Connection refused' },
 ];
+
+// Working command list, mutated by create/update so `yarn dev:mock` + e2e see live changes.
+export const COMMANDS: CommandInfo[] = COMMANDS_SEED.map(cloneCommand);
+
+// Per-command masked API keys (secrets never exist in the mock — only stable ids + owners).
+const COMMAND_KEYS = new Map<string, MaskedApiKey[]>();
+
+// Backend type segment → TaskType (mirrors COMMAND_TYPES[type].path).
+const TYPE_BY_PATH: Record<string, string> = {
+  jar: 'JAR',
+  war: 'WAR',
+  node: 'NODE',
+  'save-artifact': 'SAVE_ARTIFACT',
+  'zip-archive': 'ZIP_ARCHIVE',
+  'zip-dirs': 'ZIP_DIRS',
+  'fetch-url': 'FETCH_URL',
+  docker: 'DOCKER',
+};
+
+export type CommandWriteBody = {
+  host: string;
+  name: string;
+  config?: Record<string, unknown>;
+  apiKeys?: { keep?: string[]; add?: { key: string; owner: string }[] };
+};
+
+function cloneCommand(command: CommandInfo): CommandInfo {
+  return { ...command, parameters: command.parameters ? { ...command.parameters } : undefined };
+}
+
+// Deterministic fake masked id ("****" + 8 hex) so the same seed always yields the same id.
+function fakeMaskedId(seed: string): string {
+  let hash = 0;
+  for (let i = 0; i < seed.length; i++) {
+    hash = (hash * 31 + seed.charCodeAt(i)) >>> 0;
+  }
+  return `****${hash.toString(16).padStart(8, '0').slice(0, 8)}`;
+}
+
+function commandKey(host: string, name: string): string {
+  return `${host}/${name}`;
+}
+
+// Seed one masked key per owner label found in each seeded command's `apiKeys` summary.
+function seedCommandKeys(): void {
+  COMMAND_KEYS.clear();
+  for (const command of COMMANDS) {
+    if (!command.name || !command.parameters?.apiKeys) {
+      continue;
+    }
+    const owners = command.parameters.apiKeys.split(', ').filter(Boolean);
+    COMMAND_KEYS.set(
+      commandKey(command.host, command.name),
+      owners.map((owner) => ({ maskedId: fakeMaskedId(`${command.host}/${command.name}/${owner}`), owner })),
+    );
+  }
+}
+seedCommandKeys();
+
+/** Reset the mutable command state — for test isolation. */
+export function __resetCommandState(): void {
+  COMMANDS.length = 0;
+  COMMANDS.push(...COMMANDS_SEED.map(cloneCommand));
+  seedCommandKeys();
+}
+
+function applyCommandWrite(host: string, name: string, type: string, body: CommandWriteBody): void {
+  const key = commandKey(host, name);
+  const existing = COMMAND_KEYS.get(key) ?? [];
+  const keep = body.apiKeys?.keep ?? [];
+  const kept = existing.filter((entry) => keep.includes(entry.maskedId));
+  const added = (body.apiKeys?.add ?? []).map((entry) => ({ maskedId: fakeMaskedId(entry.key), owner: entry.owner }));
+  const merged = [...kept, ...added];
+  COMMAND_KEYS.set(key, merged);
+
+  const parameters: Record<string, string> = {};
+  for (const [field, value] of Object.entries(body.config ?? {})) {
+    if (value === undefined || value === null || value === '') {
+      continue;
+    }
+    parameters[field] = typeof value === 'string' ? value : String(value);
+  }
+  if (merged.length > 0) {
+    parameters.apiKeys = merged.map((entry) => entry.owner).join(', ');
+  }
+
+  const item: CommandInfo = { host, name, type, parameters };
+  const index = COMMANDS.findIndex((command) => command.host === host && command.name === name);
+  if (index >= 0) {
+    COMMANDS[index] = item;
+  } else {
+    COMMANDS.push(item);
+  }
+}
+
+function commandDetailFor(host: string, name: string): CommandDetail | undefined {
+  const command = COMMANDS.find((item) => item.host === host && item.name === name);
+  if (!command || !command.name) {
+    return undefined;
+  }
+  const parameters: Record<string, string> = {};
+  for (const [field, value] of Object.entries(command.parameters ?? {})) {
+    if (field !== 'apiKeys') {
+      parameters[field] = value;
+    }
+  }
+  return {
+    host: command.host,
+    name: command.name,
+    type: command.type ?? '',
+    parameters,
+    apiKeys: COMMAND_KEYS.get(commandKey(host, name)) ?? [],
+  };
+}
+
+type MockResult = { status: number; body: unknown };
+
+function notFound(host: string, name: string): MockResult {
+  return {
+    status: 404,
+    body: { title: `Command ${name} was not found on ${host}.`, type: 'CommandNotFoundError', status: 404 },
+  };
+}
+
+/** GET a single command's detail (masked keys). */
+export function mockCommandGet(host: string, name: string): MockResult {
+  const detail = commandDetailFor(host, name);
+  return detail ? { status: 200, body: { command: detail } } : notFound(host, name);
+}
+
+/** CREATE a command — 409 if one with the same name already exists on that host. */
+export function mockCommandCreate(typePath: string, body: CommandWriteBody): MockResult {
+  const { host, name } = body;
+  if (COMMANDS.some((command) => command.host === host && command.name === name)) {
+    return {
+      status: 409,
+      body: { title: `A command with this name already exists on ${host}.`, type: 'CommandConflictError', status: 409 },
+    };
+  }
+  applyCommandWrite(host, name, TYPE_BY_PATH[typePath] ?? typePath.toUpperCase(), body);
+  return { status: 200, body: { command: commandDetailFor(host, name) } };
+}
+
+/** UPDATE a command — 404 if it does not exist; type is immutable (kept from the on-disk row). */
+export function mockCommandUpdate(typePath: string, body: CommandWriteBody): MockResult {
+  const { host, name } = body;
+  const existing = COMMANDS.find((command) => command.host === host && command.name === name);
+  if (!existing) {
+    return notFound(host, name);
+  }
+  applyCommandWrite(host, name, existing.type ?? TYPE_BY_PATH[typePath] ?? typePath.toUpperCase(), body);
+  return { status: 200, body: { command: commandDetailFor(host, name) } };
+}
 
 // ── Services ──────────────────────────────────────────────────────────────
 type ServiceSeed = {

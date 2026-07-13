@@ -1,15 +1,18 @@
 import { useDocumentTitle } from '@/hooks/use-document-title';
 import { useSplitPanel } from '@/hooks/use-split-panel';
 import { CommandInfo, useCommandList } from '@/pages/command-list/api/command-list';
-import { StatusIndicator } from '@cloudscape-design/components';
+import { Button, StatusIndicator } from '@cloudscape-design/components';
 import Header from '@cloudscape-design/components/header';
 import SpaceBetween from '@cloudscape-design/components/space-between';
+import routing from '@routing';
 import { useEffect, useState } from 'react';
+import { useNavigate } from 'react-router';
 import CommandDetailsPanel from './components/command-details-panel';
 import CommandListTable from './components/command-list-table';
 
 export default function CommandList() {
   useDocumentTitle('Commands');
+  const navigate = useNavigate();
   const { data, isLoading, error, mutate } = useCommandList();
   const [selected, setSelected] = useState<CommandInfo[]>([]);
 
@@ -42,6 +45,14 @@ export default function CommandList() {
         onRetry={() => mutate()}
         selected={selected}
         setSelected={setSelected}
+        actions={
+          <Button
+            variant="primary"
+            onClick={() => navigate(routing.commandCreate)}
+          >
+            Add command
+          </Button>
+        }
       />
     </SpaceBetween>
   );

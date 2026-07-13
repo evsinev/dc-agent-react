@@ -3,9 +3,13 @@ import {
   AGENTS,
   APPS,
   COMMANDS,
+  type CommandWriteBody,
   SERVICES,
   appStatusFor,
   appViewFor,
+  mockCommandCreate,
+  mockCommandGet,
+  mockCommandUpdate,
   mockGitLog,
   mockGitPull,
   serviceViewFor,
@@ -18,6 +22,21 @@ function json(res: ServerResponse, body: unknown, status = 200): void {
   res.statusCode = status;
   res.setHeader('Content-Type', 'application/json');
   res.end(JSON.stringify(body));
+}
+
+// Buffer and JSON-parse a POST body (the read endpoints ignore it; create/update need it).
+function readJsonBody(req: IncomingMessage, cb: (body: Record<string, unknown>) => void): void {
+  let data = '';
+  req.on('data', (chunk) => {
+    data += chunk;
+  });
+  req.on('end', () => {
+    try {
+      cb(data ? (JSON.parse(data) as Record<string, unknown>) : {});
+    } catch {
+      cb({});
+    }
+  });
 }
 
 /**
@@ -49,6 +68,29 @@ export function devMockMiddleware(req: IncomingMessage, res: ServerResponse, nex
   }
   if (endpoint === '/command/list') {
     json(res, { commands: COMMANDS });
+    return;
+  }
+  if (endpoint === '/command/get') {
+    readJsonBody(req, (body) => {
+      const result = mockCommandGet(String(body.host ?? ''), String(body.name ?? ''));
+      json(res, result.body, result.status);
+    });
+    return;
+  }
+  if (endpoint.startsWith('/command/create/')) {
+    const typePath = endpoint.slice('/command/create/'.length);
+    readJsonBody(req, (body) => {
+      const result = mockCommandCreate(typePath, body as CommandWriteBody);
+      json(res, result.body, result.status);
+    });
+    return;
+  }
+  if (endpoint.startsWith('/command/update/')) {
+    const typePath = endpoint.slice('/command/update/'.length);
+    readJsonBody(req, (body) => {
+      const result = mockCommandUpdate(typePath, body as CommandWriteBody);
+      json(res, result.body, result.status);
+    });
     return;
   }
   if (endpoint === '/git/log') {

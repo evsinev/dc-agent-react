@@ -1,15 +1,25 @@
+import type { CommandDetail } from '../src/pages/command-list/api/command-mutations';
 import { afterEach, beforeEach, describe, expect, test } from '@rstest/core';
 import {
   APPS,
+  COMMANDS,
   GIT_LOG,
   SERVICES,
+  __resetCommandState,
   __resetGitPullState,
   appStatusFor,
   appViewFor,
+  mockCommandCreate,
+  mockCommandGet,
+  mockCommandUpdate,
   mockGitLog,
   mockGitPull,
   serviceViewFor,
 } from './mock-data';
+
+function detailOf(body: unknown): CommandDetail {
+  return (body as { command: CommandDetail }).command;
+}
 
 describe('mock-data fixtures', () => {
   test('ships non-empty fixtures', () => {
@@ -74,6 +84,70 @@ describe('stateful git mock', () => {
     expect(log.commits).toHaveLength(GIT_LOG.commits.length + 2);
     expect(log.commits[0].shortMessage).toBe('Pulled sandbox change #2');
     expect(log.commits[1].shortMessage).toBe('Pulled sandbox change #1');
+  });
+});
+
+describe('stateful command mock', () => {
+  beforeEach(() => __resetCommandState());
+  afterEach(() => __resetCommandState());
+
+  test('get returns config + masked keys and hides the apiKeys summary', () => {
+    const result = mockCommandGet('sandbox-1', 'billing');
+    expect(result.status).toBe(200);
+    const detail = detailOf(result.body);
+    expect(detail.type).toBe('JAR');
+    expect(detail.parameters.jarFilename).toBe('billing.jar');
+    expect(detail.parameters.apiKeys).toBeUndefined();
+    expect(detail.apiKeys[0].owner).toBe('gitlab-ci');
+    expect(detail.apiKeys[0].maskedId.startsWith('****')).toBe(true);
+  });
+
+  test('get 404s for an unknown command', () => {
+    expect(mockCommandGet('sandbox-1', 'nope').status).toBe(404);
+  });
+
+  test('create adds a command visible in the list and via get', () => {
+    const before = COMMANDS.length;
+    const result = mockCommandCreate('jar', {
+      host: 'sandbox-1',
+      name: 'new-svc',
+      config: { jarFilename: '/srv/x.jar', serviceName: 'new-svc' },
+      apiKeys: { keep: [], add: [{ key: 'k'.repeat(48), owner: 'ci' }] },
+    });
+    expect(result.status).toBe(200);
+    expect(COMMANDS.length).toBe(before + 1);
+    const detail = detailOf(mockCommandGet('sandbox-1', 'new-svc').body);
+    expect(detail.parameters.jarFilename).toBe('/srv/x.jar');
+    expect(detail.apiKeys).toHaveLength(1);
+    expect(detail.apiKeys[0].owner).toBe('ci');
+  });
+
+  test('create conflicts (409) on a duplicate name for the same host', () => {
+    expect(mockCommandCreate('jar', { host: 'sandbox-1', name: 'billing', config: {}, apiKeys: {} }).status).toBe(409);
+  });
+
+  test('update merges config and keeps/adds keys (write-only)', () => {
+    const keepId = detailOf(mockCommandGet('sandbox-1', 'billing').body).apiKeys[0].maskedId;
+    const result = mockCommandUpdate('jar', {
+      host: 'sandbox-1',
+      name: 'billing',
+      config: { jarFilename: '/srv/new.jar', serviceName: 'billing' },
+      apiKeys: { keep: [keepId], add: [{ key: 'z'.repeat(48), owner: 'bot' }] },
+    });
+    expect(result.status).toBe(200);
+    const after = detailOf(mockCommandGet('sandbox-1', 'billing').body);
+    expect(after.parameters.jarFilename).toBe('/srv/new.jar');
+    expect(after.apiKeys.map((key) => key.owner).sort()).toEqual(['bot', 'gitlab-ci']);
+  });
+
+  test('update 404s for an unknown command', () => {
+    expect(mockCommandUpdate('jar', { host: 'sandbox-1', name: 'ghost', config: {}, apiKeys: {} }).status).toBe(404);
+  });
+
+  test('reset restores the seeded commands', () => {
+    mockCommandCreate('jar', { host: 'sandbox-1', name: 'temp', config: {}, apiKeys: {} });
+    __resetCommandState();
+    expect(COMMANDS.some((command) => command.name === 'temp')).toBe(false);
   });
 });
 

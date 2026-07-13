@@ -34,12 +34,27 @@ function buildItems(pathname: string): Crumb[] {
     return [HOME, { text: 'Services', href: routing.services }];
   }
 
+  if (matchPath(routing.commandCreate, pathname)) {
+    return [HOME, { text: 'Commands', href: routing.commands }, { text: 'Create command', href: pathname }];
+  }
+  const commandEdit = matchPath(routing.commandEdit, pathname);
+  if (commandEdit) {
+    const detailsHref = routing.command
+      .replace(':host', commandEdit.params.host ?? '')
+      .replace(':name', commandEdit.params.name ?? '');
+    return [
+      HOME,
+      { text: 'Commands', href: routing.commands },
+      { text: commandEdit.params.name ?? '', href: detailsHref },
+      { text: 'Edit', href: pathname },
+    ];
+  }
   const command = matchPath(routing.command, pathname);
   if (command) {
     return [
       HOME,
       { text: 'Commands', href: routing.commands },
-      { text: `${command.params.host}/${command.params.name}`, href: pathname },
+      { text: command.params.name ?? `${command.params.host}/${command.params.name}`, href: pathname },
     ];
   }
   if (matchPath(routing.commands, pathname)) {

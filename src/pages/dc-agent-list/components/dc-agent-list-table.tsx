@@ -15,9 +15,11 @@ import { AgentInfo, AgentMetrics } from '@/pages/dc-agent-list/api/agent-list';
 import { useCollection } from '@cloudscape-design/collection-hooks';
 import {
   Box,
+  Button,
   CollectionPreferencesProps,
   Pagination,
   PropertyFilter,
+  SpaceBetween,
   StatusIndicator,
 } from '@cloudscape-design/components';
 import Header from '@cloudscape-design/components/header';
@@ -199,7 +201,21 @@ export default function DcAgentListTable(props: Props) {
           <Header
             variant="awsui-h1-sticky"
             counter={`(${props.agents.length})`}
-            actions={props.actions}
+            actions={
+              <SpaceBetween
+                direction="horizontal"
+                size="xs"
+                alignItems="center"
+              >
+                <Button
+                  variant="icon"
+                  iconName="refresh"
+                  ariaLabel="Refresh list"
+                  onClick={props.onRetry}
+                />
+                {props.actions}
+              </SpaceBetween>
+            }
           >
             Agents
             {props.isLoading && <StatusIndicator type="loading">Fetching</StatusIndicator>}

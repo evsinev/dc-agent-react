@@ -1,6 +1,7 @@
 import { useCollection } from '@cloudscape-design/collection-hooks';
 import {
   Box,
+  Button,
   CollectionPreferencesProps,
   Pagination,
   PropertyFilter,
@@ -118,6 +119,14 @@ export default function ServiceListTable(props: Props) {
           <Header
             variant={variant === 'full-page' ? 'awsui-h1-sticky' : undefined}
             counter={`(${props.services.length})`}
+            actions={
+              <Button
+                variant="icon"
+                iconName="refresh"
+                ariaLabel="Refresh list"
+                onClick={props.onRetry}
+              />
+            }
           >
             {title}
             {props.isLoading && <StatusIndicator type="loading">Fetching</StatusIndicator>}

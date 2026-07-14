@@ -11,7 +11,7 @@ import {
   useFilterSetControls,
 } from '@/components/table-filter-sets/use-filter-set-controls';
 import { FilterSet } from '@/components/table-filter-sets/use-filter-sets';
-import { AgentInfo } from '@/pages/dc-agent-list/api/agent-list';
+import { AgentInfo, AgentMetrics } from '@/pages/dc-agent-list/api/agent-list';
 import { useCollection } from '@cloudscape-design/collection-hooks';
 import {
   Box,
@@ -55,6 +55,20 @@ const servicesCell = (agent: AgentInfo) =>
     `${agent.servicesUp} / ${agent.servicesTotal}`
   );
 
+// Metric columns display the human-readable *Text but sort on the raw numeric value.
+const metricRaw = (agent: AgentInfo, key: keyof AgentMetrics): number => {
+  const value = agent.metrics?.[key];
+  return typeof value === 'number' ? value : -1;
+};
+const byMetric =
+  (key: keyof AgentMetrics) =>
+  (a: AgentInfo, b: AgentInfo): number =>
+    metricRaw(a, key) - metricRaw(b, key);
+const metricText = (agent: AgentInfo, key: keyof AgentMetrics): string => {
+  const value = agent.metrics?.[key];
+  return value === undefined || value === null ? '—' : String(value);
+};
+
 const columnDefinitions: TableProps.ColumnDefinition<AgentInfo>[] = [
   {
     id: 'name',
@@ -70,6 +84,61 @@ const columnDefinitions: TableProps.ColumnDefinition<AgentInfo>[] = [
   { id: 'port', header: 'Port', cell: (a) => (a.port ? String(a.port) : '—'), sortingField: 'port' },
   { id: 'services', header: 'Services', cell: servicesCell },
   { id: 'uptime', header: 'Uptime', cell: (a) => a.uptimeFormatted ?? '—', sortingField: 'uptimeMs' },
+  // System / JVM metrics (display formatted text, sort by raw value)
+  {
+    id: 'systemCpu',
+    header: 'Sys CPU',
+    cell: (a) => a.metrics?.systemCpuLoadText ?? '—',
+    sortingComparator: byMetric('systemCpuLoad'),
+  },
+  {
+    id: 'processCpu',
+    header: 'Proc CPU',
+    cell: (a) => a.metrics?.processCpuLoadText ?? '—',
+    sortingComparator: byMetric('processCpuLoad'),
+  },
+  {
+    id: 'loadAvg',
+    header: 'Load avg',
+    cell: (a) => a.metrics?.loadAverageText ?? '—',
+    sortingComparator: byMetric('loadAverage'),
+  },
+  {
+    id: 'heapUsed',
+    header: 'Heap used',
+    cell: (a) => a.metrics?.heapUsedText ?? '—',
+    sortingComparator: byMetric('heapUsedBytes'),
+  },
+  {
+    id: 'heapPct',
+    header: 'Heap %',
+    cell: (a) => a.metrics?.heapUsedPercentText ?? '—',
+    sortingComparator: byMetric('heapUsedFraction'),
+  },
+  {
+    id: 'memUsed',
+    header: 'Mem used',
+    cell: (a) => a.metrics?.physicalUsedText ?? '—',
+    sortingComparator: byMetric('physicalUsedBytes'),
+  },
+  {
+    id: 'memPct',
+    header: 'Mem %',
+    cell: (a) => a.metrics?.physicalUsedPercentText ?? '—',
+    sortingComparator: byMetric('physicalUsedFraction'),
+  },
+  {
+    id: 'threads',
+    header: 'Threads',
+    cell: (a) => metricText(a, 'threadCount'),
+    sortingComparator: byMetric('threadCount'),
+  },
+  {
+    id: 'gcTime',
+    header: 'GC time',
+    cell: (a) => a.metrics?.gcTimeText ?? '—',
+    sortingComparator: byMetric('gcTimeMs'),
+  },
   { id: 'url', header: 'URL', cell: (a) => a.url, sortingField: 'url' },
 ];
 

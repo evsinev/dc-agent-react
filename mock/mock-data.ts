@@ -1,7 +1,7 @@
 // Fake, obviously-non-production fixtures for the dev mock middleware.
 // Shapes mirror the frontend API types (imported type-only, erased at build).
 import type { AppListItem } from '../src/pages/app-list/api/app-list';
-import type { AgentInfo } from '../src/pages/dc-agent-list/api/agent-list';
+import type { AgentInfo, AgentMetrics } from '../src/pages/dc-agent-list/api/agent-list';
 import type { GitLog, GitLogItem } from '../src/pages/git/api/git-log';
 import type { CommandInfo } from '../src/pages/command-list/api/command-list';
 import type { CommandDetail, MaskedApiKey } from '../src/pages/command-list/api/command-mutations';
@@ -69,6 +69,47 @@ export function appViewFor(appName: string): AppView {
 }
 
 // ── Agents ────────────────────────────────────────────────────────────────
+function mockMetrics(over: Partial<AgentMetrics> = {}): AgentMetrics {
+  return {
+    systemCpuLoad: 0.22,
+    systemCpuLoadText: '22%',
+    processCpuLoad: 0.04,
+    processCpuLoadText: '4%',
+    loadAverage: 1.42,
+    loadAverageText: '1.42',
+    availableProcessors: 8,
+    processCpuTimeNanos: 200_000_000_000,
+    processCpuTimeText: '3m 20s',
+    heapUsedBytes: 536_870_912,
+    heapUsedText: '512.0 MB',
+    heapCommittedBytes: 1_073_741_824,
+    heapCommittedText: '1.0 GB',
+    heapMaxBytes: 2_147_483_648,
+    heapMaxText: '2.0 GB',
+    heapUsedFraction: 0.25,
+    heapUsedPercentText: '25%',
+    nonHeapUsedBytes: 134_217_728,
+    nonHeapUsedText: '128.0 MB',
+    physicalUsedBytes: 12_884_901_888,
+    physicalUsedText: '12.0 GB',
+    physicalTotalBytes: 17_179_869_184,
+    physicalTotalText: '16.0 GB',
+    physicalFreeBytes: 4_294_967_296,
+    physicalFreeText: '4.0 GB',
+    physicalUsedFraction: 0.75,
+    physicalUsedPercentText: '75%',
+    swapTotalBytes: 2_147_483_648,
+    swapTotalText: '2.0 GB',
+    swapFreeBytes: 1_610_612_736,
+    swapFreeText: '1.5 GB',
+    threadCount: 42,
+    gcCount: 1234,
+    gcTimeMs: 1200,
+    gcTimeText: '1s',
+    ...over,
+  };
+}
+
 export const AGENTS: AgentInfo[] = [
   {
     name: 'sandbox-1',
@@ -88,6 +129,7 @@ export const AGENTS: AgentInfo[] = [
       { serviceName: 'echo-svc', statusName: 'Running', statusIndicator: 'success' },
       { serviceName: 'demo-timer', statusName: 'Running', statusIndicator: 'success' },
     ],
+    metrics: mockMetrics({ systemCpuLoad: 0.18, systemCpuLoadText: '18%', threadCount: 38 }),
   },
   {
     name: 'sandbox-2',
@@ -104,6 +146,15 @@ export const AGENTS: AgentInfo[] = [
     servicesTotal: 1,
     servicesUp: 0,
     services: [{ serviceName: 'sample-queue', statusName: 'Paused', statusIndicator: 'warning' }],
+    metrics: mockMetrics({
+      systemCpuLoad: 0.63,
+      systemCpuLoadText: '63%',
+      heapUsedBytes: 1_610_612_736,
+      heapUsedText: '1.5 GB',
+      heapUsedFraction: 0.75,
+      heapUsedPercentText: '75%',
+      threadCount: 51,
+    }),
   },
   {
     name: 'dev-box-a',
@@ -120,6 +171,7 @@ export const AGENTS: AgentInfo[] = [
     servicesTotal: 1,
     servicesUp: 1,
     services: [{ serviceName: 'sandbox-db', statusName: 'Running', statusIndicator: 'success' }],
+    metrics: mockMetrics({ loadAverage: -1, loadAverageText: 'n/a', threadCount: 27 }),
   },
   {
     name: 'dev-box-b',
@@ -132,6 +184,7 @@ export const AGENTS: AgentInfo[] = [
     servicesTotal: 0,
     servicesUp: 0,
     servicesError: 'Connection refused',
+    metricsError: 'Connection refused',
   },
 ];
 

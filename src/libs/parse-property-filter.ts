@@ -8,6 +8,7 @@ import { NonCancelableCustomEvent, PropertyFilterProps } from '@cloudscape-desig
 export const PROPERTY_FILTERS_QUERY_PARAM_KEY = 'propertyFilter';
 export const PAGE_QUERY_PARAM_KEY = 'page';
 export const SORT_QUERY_PARAM_KEY = 'sort';
+export const SELECTED_FILTER_SET_QUERY_PARAM_KEY = 'filterSet';
 
 const PropertyFilterOperation = z.enum(['and', 'or']);
 
@@ -47,14 +48,23 @@ export const parsePropertyFilterQuery = (stringifiedPropertyFilter: string): Pro
   }
 };
 
-export function saveQueryFilter(
-  event: NonCancelableCustomEvent<PropertyFilterProps.Query>,
+// Serialize a property-filter query to the URL param, or clear it when the query is empty. The
+// leading `{`→`(` swap keeps the value readable in the query string (see parsePropertyFilterQuery).
+export function writeFilterQueryParam(
+  query: PropertyFilterProps.Query,
   setQueryParam: (param: string, value: string | null) => void,
 ) {
-  const query = event.detail;
-  if (!query.tokens?.length) {
+  const hasFilters = Boolean(query.tokens?.length) || Boolean(query.tokenGroups?.length);
+  if (!hasFilters) {
     setQueryParam(PROPERTY_FILTERS_QUERY_PARAM_KEY, null);
   } else {
     setQueryParam(PROPERTY_FILTERS_QUERY_PARAM_KEY, JSON.stringify(query).replace('{', '('));
   }
+}
+
+export function saveQueryFilter(
+  event: NonCancelableCustomEvent<PropertyFilterProps.Query>,
+  setQueryParam: (param: string, value: string | null) => void,
+) {
+  writeFilterQueryParam(event.detail, setQueryParam);
 }

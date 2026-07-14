@@ -2,11 +2,15 @@ import { useLocalStorage } from '@/hooks/use-local-storage';
 import { useQueryParams } from '@/hooks/use-query-params';
 import {
   PAGE_QUERY_PARAM_KEY,
-  parsePropertyFilterQuery,
   PROPERTY_FILTERS_QUERY_PARAM_KEY,
   saveQueryFilter,
   SORT_QUERY_PARAM_KEY,
 } from '@/libs/parse-property-filter';
+import {
+  resolveDefaultFilterQuery,
+  useFilterSetControls,
+} from '@/components/table-filter-sets/use-filter-set-controls';
+import { FilterSet } from '@/components/table-filter-sets/use-filter-sets';
 import { CommandInfo } from '@/pages/command-list/api/command-list';
 import { useCollection } from '@cloudscape-design/collection-hooks';
 import {
@@ -59,98 +63,119 @@ export default function CommandListTable(props: Props) {
     DEFAULT_COMMAND_PREFERENCES,
   );
 
+  const [savedFilterSets, setSavedFilterSets] = useLocalStorage<FilterSet[]>('command-list-filter-sets', []);
+
   const defaultPage = Math.max(1, Number(getQueryParam(PAGE_QUERY_PARAM_KEY)) || 1);
   const sortParam = getQueryParam(SORT_QUERY_PARAM_KEY);
   const defaultSortingState = sortParam
     ? { sortingColumn: { sortingField: sortParam.replace(/^-/, '') }, isDescending: sortParam.startsWith('-') }
     : undefined;
 
-  const { items, collectionProps, propertyFilterProps, paginationProps } = useCollection(props.commands, {
-    sorting: { defaultState: defaultSortingState },
-    pagination: { pageSize: preferences.pageSize, defaultPage },
-    propertyFiltering: {
-      filteringProperties: COMMAND_FILTERING_PROPERTIES,
-      defaultQuery: parsePropertyFilterQuery(getQueryParam(PROPERTY_FILTERS_QUERY_PARAM_KEY)),
+  const { items, actions, collectionProps, propertyFilterProps, paginationProps, filteredItemsCount } = useCollection(
+    props.commands,
+    {
+      sorting: { defaultState: defaultSortingState },
+      pagination: { pageSize: preferences.pageSize, defaultPage },
+      propertyFiltering: {
+        filteringProperties: COMMAND_FILTERING_PROPERTIES,
+        defaultQuery: resolveDefaultFilterQuery(getQueryParam(PROPERTY_FILTERS_QUERY_PARAM_KEY), savedFilterSets),
+      },
     },
+  );
+
+  const { customControl, customFilterActions, actionModal, countText } = useFilterSetControls({
+    propertyFilterProps,
+    actions,
+    getQueryParam,
+    setQueryParam,
+    savedFilterSets,
+    setSavedFilterSets,
+    filteredItemsCount,
   });
 
   return (
-    <Table
-      {...collectionProps}
-      onSortingChange={(event) => {
-        const { sortingColumn, isDescending } = event.detail;
-        setQueryParam(
-          SORT_QUERY_PARAM_KEY,
-          sortingColumn.sortingField ? `${isDescending ? '-' : ''}${sortingColumn.sortingField}` : null,
-        );
-        collectionProps.onSortingChange?.(event);
-      }}
-      variant="full-page"
-      stickyHeader
-      header={
-        <Header
-          variant="awsui-h1-sticky"
-          counter={`(${props.commands.length})`}
-          actions={props.actions}
-        >
-          Commands
-          {props.isLoading && <StatusIndicator type="loading">Fetching</StatusIndicator>}
-        </Header>
-      }
-      selectionType="single"
-      onSelectionChange={(e) => props.setSelected(e.detail.selectedItems)}
-      selectedItems={props.selected}
-      columnDefinitions={columnDefinitions}
-      columnDisplay={preferences.contentDisplay}
-      items={items}
-      trackBy={commandKey}
-      loading={props.isLoading}
-      loadingText="Loading commands"
-      empty={
-        props.error ? (
-          <LoadError
-            error={props.error}
-            onRetry={props.onRetry}
-            resource="commands"
-          />
-        ) : (
-          <Box
-            variant="p"
-            color="inherit"
+    <>
+      {actionModal}
+      <Table
+        {...collectionProps}
+        onSortingChange={(event) => {
+          const { sortingColumn, isDescending } = event.detail;
+          setQueryParam(
+            SORT_QUERY_PARAM_KEY,
+            sortingColumn.sortingField ? `${isDescending ? '-' : ''}${sortingColumn.sortingField}` : null,
+          );
+          collectionProps.onSortingChange?.(event);
+        }}
+        variant="full-page"
+        stickyHeader
+        header={
+          <Header
+            variant="awsui-h1-sticky"
+            counter={`(${props.commands.length})`}
+            actions={props.actions}
           >
-            No commands
-          </Box>
-        )
-      }
-      wrapLines={preferences.wrapLines}
-      stripedRows={preferences.stripedRows}
-      contentDensity={preferences.contentDensity}
-      stickyColumns={preferences.stickyColumns}
-      filter={
-        <PropertyFilter
-          {...propertyFilterProps}
-          expandToViewport={true}
-          onChange={(event) => {
-            saveQueryFilter(event, setQueryParam);
-            propertyFilterProps.onChange(event);
-          }}
-        />
-      }
-      pagination={
-        <Pagination
-          {...paginationProps}
-          onChange={(event) => {
-            setQueryParam(PAGE_QUERY_PARAM_KEY, String(event.detail.currentPageIndex));
-            paginationProps.onChange(event);
-          }}
-        />
-      }
-      preferences={
-        <CommandTablePreferences
-          preferences={preferences}
-          onConfirm={setPreferences}
-        />
-      }
-    />
+            Commands
+            {props.isLoading && <StatusIndicator type="loading">Fetching</StatusIndicator>}
+          </Header>
+        }
+        selectionType="single"
+        onSelectionChange={(e) => props.setSelected(e.detail.selectedItems)}
+        selectedItems={props.selected}
+        columnDefinitions={columnDefinitions}
+        columnDisplay={preferences.contentDisplay}
+        items={items}
+        trackBy={commandKey}
+        loading={props.isLoading}
+        loadingText="Loading commands"
+        empty={
+          props.error ? (
+            <LoadError
+              error={props.error}
+              onRetry={props.onRetry}
+              resource="commands"
+            />
+          ) : (
+            <Box
+              variant="p"
+              color="inherit"
+            >
+              No commands
+            </Box>
+          )
+        }
+        wrapLines={preferences.wrapLines}
+        stripedRows={preferences.stripedRows}
+        contentDensity={preferences.contentDensity}
+        stickyColumns={preferences.stickyColumns}
+        filter={
+          <PropertyFilter
+            {...propertyFilterProps}
+            expandToViewport={true}
+            countText={countText}
+            customControl={customControl}
+            customFilterActions={customFilterActions}
+            onChange={(event) => {
+              saveQueryFilter(event, setQueryParam);
+              propertyFilterProps.onChange(event);
+            }}
+          />
+        }
+        pagination={
+          <Pagination
+            {...paginationProps}
+            onChange={(event) => {
+              setQueryParam(PAGE_QUERY_PARAM_KEY, String(event.detail.currentPageIndex));
+              paginationProps.onChange(event);
+            }}
+          />
+        }
+        preferences={
+          <CommandTablePreferences
+            preferences={preferences}
+            onConfirm={setPreferences}
+          />
+        }
+      />
+    </>
   );
 }

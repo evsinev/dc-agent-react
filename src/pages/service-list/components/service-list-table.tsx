@@ -16,7 +16,6 @@ import { useLocalStorage } from '@/hooks/use-local-storage';
 import { useQueryParams } from '@/hooks/use-query-params';
 import {
   PAGE_QUERY_PARAM_KEY,
-  parsePropertyFilterQuery,
   PROPERTY_FILTERS_QUERY_PARAM_KEY,
   saveQueryFilter,
   SORT_QUERY_PARAM_KEY,
@@ -26,6 +25,11 @@ import ServiceTablePreferences, {
   DEFAULT_SERVICE_PREFERENCES,
   SERVICE_PREFERENCES_STORAGE_KEY,
 } from './service-list-preferences';
+import {
+  resolveDefaultFilterQuery,
+  useFilterSetControls,
+} from '@/components/table-filter-sets/use-filter-set-controls';
+import { FilterSet } from '@/components/table-filter-sets/use-filter-sets';
 
 type Props = {
   services: ServiceListItem[];
@@ -51,122 +55,143 @@ export default function ServiceListTable(props: Props) {
     DEFAULT_SERVICE_PREFERENCES,
   );
 
+  const [savedFilterSets, setSavedFilterSets] = useLocalStorage<FilterSet[]>('service-list-filter-sets', []);
+
   const defaultPage = Math.max(1, Number(getQueryParam(PAGE_QUERY_PARAM_KEY)) || 1);
   const sortParam = getQueryParam(SORT_QUERY_PARAM_KEY);
   const defaultSortingState = sortParam
     ? { sortingColumn: { sortingField: sortParam.replace(/^-/, '') }, isDescending: sortParam.startsWith('-') }
     : undefined;
 
-  const { items, collectionProps, propertyFilterProps, paginationProps } = useCollection(props.services, {
-    sorting: { defaultState: defaultSortingState },
-    pagination: { pageSize: preferences.pageSize, defaultPage },
-    propertyFiltering: {
-      filteringProperties: SERVICE_LIST_FILTERING_PROPERTIES,
-      defaultQuery: parsePropertyFilterQuery(getQueryParam(PROPERTY_FILTERS_QUERY_PARAM_KEY)),
+  const { items, actions, collectionProps, propertyFilterProps, paginationProps, filteredItemsCount } = useCollection(
+    props.services,
+    {
+      sorting: { defaultState: defaultSortingState },
+      pagination: { pageSize: preferences.pageSize, defaultPage },
+      propertyFiltering: {
+        filteringProperties: SERVICE_LIST_FILTERING_PROPERTIES,
+        defaultQuery: resolveDefaultFilterQuery(getQueryParam(PROPERTY_FILTERS_QUERY_PARAM_KEY), savedFilterSets),
+      },
     },
+  );
+
+  const { customControl, customFilterActions, actionModal, countText } = useFilterSetControls({
+    propertyFilterProps,
+    actions,
+    getQueryParam,
+    setQueryParam,
+    savedFilterSets,
+    setSavedFilterSets,
+    filteredItemsCount,
   });
 
   return (
-    <Table
-      {...collectionProps}
-      onSortingChange={(event) => {
-        const { sortingColumn, isDescending } = event.detail;
-        setQueryParam(
-          SORT_QUERY_PARAM_KEY,
-          sortingColumn.sortingField ? `${isDescending ? '-' : ''}${sortingColumn.sortingField}` : null,
-        );
-        collectionProps.onSortingChange?.(event);
-      }}
-      variant="full-page"
-      stickyHeader
-      header={
-        <Header
-          variant="awsui-h1-sticky"
-          counter={`(${props.services.length})`}
-        >
-          Services
-          {props.isLoading && <StatusIndicator type="loading">Fetching</StatusIndicator>}
-        </Header>
-      }
-      columnDefinitions={[
-        {
-          id: 'serviceName',
-          header: 'Service',
-          cell: serviceNameLink,
-          sortingField: 'serviceName',
-        },
-        {
-          id: 'host',
-          header: 'Host',
-          cell: (item) => item.host,
-          sortingField: 'host',
-        },
-        {
-          id: 'statusName',
-          header: 'State',
-          cell: statusNameLink,
-          sortingField: 'statusName',
-        },
-        {
-          id: 'ageFormatted',
-          header: 'Age',
-          cell: (item) => item.ageFormatted,
-          sortingField: 'whenFormatted',
-        },
-      ]}
-      columnDisplay={preferences.contentDisplay}
-      wrapLines={preferences.wrapLines}
-      stripedRows={preferences.stripedRows}
-      contentDensity={preferences.contentDensity}
-      stickyColumns={preferences.stickyColumns}
-      items={items}
-      loadingText="Loading services ..."
-      trackBy="fqsn"
-      loading={props.isLoading}
-      empty={
-        props.error ? (
-          <LoadError
-            error={props.error}
-            onRetry={props.onRetry}
-            resource="services"
-          />
-        ) : (
-          <Box
-            variant="p"
-            color="inherit"
+    <>
+      {actionModal}
+      <Table
+        {...collectionProps}
+        onSortingChange={(event) => {
+          const { sortingColumn, isDescending } = event.detail;
+          setQueryParam(
+            SORT_QUERY_PARAM_KEY,
+            sortingColumn.sortingField ? `${isDescending ? '-' : ''}${sortingColumn.sortingField}` : null,
+          );
+          collectionProps.onSortingChange?.(event);
+        }}
+        variant="full-page"
+        stickyHeader
+        header={
+          <Header
+            variant="awsui-h1-sticky"
+            counter={`(${props.services.length})`}
           >
-            No services
-          </Box>
-        )
-      }
-      selectionType="single"
-      onSelectionChange={(e) => props.setSelected(e.detail.selectedItems)}
-      selectedItems={props.selected}
-      filter={
-        <PropertyFilter
-          {...propertyFilterProps}
-          expandToViewport={true}
-          onChange={(event) => {
-            saveQueryFilter(event, setQueryParam);
-            propertyFilterProps.onChange(event);
-          }}
-        />
-      }
-      pagination={
-        <Pagination
-          {...paginationProps}
-          onChange={(event) => {
-            setQueryParam(PAGE_QUERY_PARAM_KEY, String(event.detail.currentPageIndex));
-            paginationProps.onChange(event);
-          }}
-        />
-      }
-      preferences={
-        <ServiceTablePreferences
-          preferences={preferences}
-          onConfirm={setPreferences}
-        />
-      }
-    />
+            Services
+            {props.isLoading && <StatusIndicator type="loading">Fetching</StatusIndicator>}
+          </Header>
+        }
+        columnDefinitions={[
+          {
+            id: 'serviceName',
+            header: 'Service',
+            cell: serviceNameLink,
+            sortingField: 'serviceName',
+          },
+          {
+            id: 'host',
+            header: 'Host',
+            cell: (item) => item.host,
+            sortingField: 'host',
+          },
+          {
+            id: 'statusName',
+            header: 'State',
+            cell: statusNameLink,
+            sortingField: 'statusName',
+          },
+          {
+            id: 'ageFormatted',
+            header: 'Age',
+            cell: (item) => item.ageFormatted,
+            sortingField: 'whenFormatted',
+          },
+        ]}
+        columnDisplay={preferences.contentDisplay}
+        wrapLines={preferences.wrapLines}
+        stripedRows={preferences.stripedRows}
+        contentDensity={preferences.contentDensity}
+        stickyColumns={preferences.stickyColumns}
+        items={items}
+        loadingText="Loading services ..."
+        trackBy="fqsn"
+        loading={props.isLoading}
+        empty={
+          props.error ? (
+            <LoadError
+              error={props.error}
+              onRetry={props.onRetry}
+              resource="services"
+            />
+          ) : (
+            <Box
+              variant="p"
+              color="inherit"
+            >
+              No services
+            </Box>
+          )
+        }
+        selectionType="single"
+        onSelectionChange={(e) => props.setSelected(e.detail.selectedItems)}
+        selectedItems={props.selected}
+        filter={
+          <PropertyFilter
+            {...propertyFilterProps}
+            expandToViewport={true}
+            countText={countText}
+            customControl={customControl}
+            customFilterActions={customFilterActions}
+            onChange={(event) => {
+              saveQueryFilter(event, setQueryParam);
+              propertyFilterProps.onChange(event);
+            }}
+          />
+        }
+        pagination={
+          <Pagination
+            {...paginationProps}
+            onChange={(event) => {
+              setQueryParam(PAGE_QUERY_PARAM_KEY, String(event.detail.currentPageIndex));
+              paginationProps.onChange(event);
+            }}
+          />
+        }
+        preferences={
+          <ServiceTablePreferences
+            preferences={preferences}
+            onConfirm={setPreferences}
+          />
+        }
+      />
+    </>
   );
 }

@@ -2,9 +2,6 @@ import { useDocumentTitle } from '@/hooks/use-document-title';
 import { useSplitPanel } from '@/hooks/use-split-panel';
 import { AppListItem, useAppList } from '@/pages/app-list/api/app-list';
 import { useQuickPull } from '@/pages/app-list/api/use-quick-pull';
-import { StatusIndicator } from '@cloudscape-design/components';
-import Header from '@cloudscape-design/components/header';
-import SpaceBetween from '@cloudscape-design/components/space-between';
 import { useEffect, useState } from 'react';
 import AppListActions from './components/app-list-actions';
 import AppListTable from './components/app-list-table';
@@ -39,29 +36,22 @@ export default function AppList() {
   }, [selected]);
 
   return (
-    <SpaceBetween size="m">
-      <Header variant="h1">
-        Applications
-        {isLoading && <StatusIndicator type="loading">Fetching</StatusIndicator>}
-      </Header>
-
-      <AppListTable
-        apps={data?.apps ?? []}
-        isLoading={isLoading}
-        error={error}
-        onRetry={() => mutate()}
-        selected={selected}
-        setSelected={setSelected}
-        actions={
-          <AppListActions
-            branch={branch}
-            updatedLabel={updatedLabel}
-            isPulling={isPulling}
-            onPull={pull}
-            onRefresh={refresh}
-          />
-        }
-      />
-    </SpaceBetween>
+    <AppListTable
+      apps={data?.apps ?? []}
+      isLoading={isLoading}
+      error={error}
+      onRetry={() => mutate()}
+      selected={selected}
+      setSelected={setSelected}
+      actions={
+        <AppListActions
+          branch={branch}
+          updatedLabel={updatedLabel}
+          isPulling={isPulling}
+          onPull={pull}
+          onRefresh={refresh}
+        />
+      }
+    />
   );
 }

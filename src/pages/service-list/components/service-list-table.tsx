@@ -1,10 +1,18 @@
 import { useCollection } from '@cloudscape-design/collection-hooks';
-import { Box, PropertyFilter, StatusIndicator } from '@cloudscape-design/components';
+import {
+  Box,
+  CollectionPreferencesProps,
+  Pagination,
+  PropertyFilter,
+  StatusIndicator,
+} from '@cloudscape-design/components';
+import Header from '@cloudscape-design/components/header';
 import Table from '@cloudscape-design/components/table';
 import routing from '@routing';
 import { Link } from 'react-router';
 import { ServiceListItem } from '../api/service-list';
 import { SERVICE_LIST_FILTERING_PROPERTIES } from '@/pages/service-list/components/service-list-table-filters';
+import { useLocalStorage } from '@/hooks/use-local-storage';
 import { useQueryParams } from '@/hooks/use-query-params';
 import {
   parsePropertyFilterQuery,
@@ -12,6 +20,10 @@ import {
   saveQueryFilter,
 } from '@/libs/parse-property-filter';
 import LoadError from '@/components/error/components/load-error';
+import ServiceTablePreferences, {
+  DEFAULT_SERVICE_PREFERENCES,
+  SERVICE_PREFERENCES_STORAGE_KEY,
+} from './service-list-preferences';
 
 type Props = {
   services: ServiceListItem[];
@@ -32,8 +44,14 @@ const statusNameLink = (item: ServiceListItem) => (
 
 export default function ServiceListTable(props: Props) {
   const { getQueryParam, setQueryParam } = useQueryParams();
-  const { items, collectionProps, propertyFilterProps } = useCollection(props.services, {
+  const [preferences, setPreferences] = useLocalStorage<CollectionPreferencesProps.Preferences>(
+    SERVICE_PREFERENCES_STORAGE_KEY,
+    DEFAULT_SERVICE_PREFERENCES,
+  );
+
+  const { items, collectionProps, propertyFilterProps, paginationProps } = useCollection(props.services, {
     sorting: {},
+    pagination: { pageSize: preferences.pageSize },
     propertyFiltering: {
       filteringProperties: SERVICE_LIST_FILTERING_PROPERTIES,
       defaultQuery: parsePropertyFilterQuery(getQueryParam(PROPERTY_FILTERS_QUERY_PARAM_KEY)),
@@ -43,6 +61,17 @@ export default function ServiceListTable(props: Props) {
   return (
     <Table
       {...collectionProps}
+      variant="full-page"
+      stickyHeader
+      header={
+        <Header
+          variant="awsui-h1-sticky"
+          counter={`(${props.services.length})`}
+        >
+          Services
+          {props.isLoading && <StatusIndicator type="loading">Fetching</StatusIndicator>}
+        </Header>
+      }
       columnDefinitions={[
         {
           id: 'serviceName',
@@ -69,6 +98,11 @@ export default function ServiceListTable(props: Props) {
           sortingField: 'whenFormatted',
         },
       ]}
+      columnDisplay={preferences.contentDisplay}
+      wrapLines={preferences.wrapLines}
+      stripedRows={preferences.stripedRows}
+      contentDensity={preferences.contentDensity}
+      stickyColumns={preferences.stickyColumns}
       items={items}
       loadingText="Loading services ..."
       trackBy="fqsn"
@@ -100,6 +134,13 @@ export default function ServiceListTable(props: Props) {
             saveQueryFilter(event, setQueryParam);
             propertyFilterProps.onChange(event);
           }}
+        />
+      }
+      pagination={<Pagination {...paginationProps} />}
+      preferences={
+        <ServiceTablePreferences
+          preferences={preferences}
+          onConfirm={setPreferences}
         />
       }
     />

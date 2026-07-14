@@ -1,9 +1,7 @@
 import { useDocumentTitle } from '@/hooks/use-document-title';
 import { useSplitPanel } from '@/hooks/use-split-panel';
 import { CommandInfo, useCommandList } from '@/pages/command-list/api/command-list';
-import { Button, StatusIndicator } from '@cloudscape-design/components';
-import Header from '@cloudscape-design/components/header';
-import SpaceBetween from '@cloudscape-design/components/space-between';
+import { Button } from '@cloudscape-design/components';
 import routing from '@routing';
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router';
@@ -32,28 +30,21 @@ export default function CommandList() {
   }, [selected]);
 
   return (
-    <SpaceBetween size="m">
-      <Header variant="h1">
-        Commands
-        {isLoading && <StatusIndicator type="loading">Fetching</StatusIndicator>}
-      </Header>
-
-      <CommandListTable
-        commands={data?.commands ?? []}
-        isLoading={isLoading}
-        error={error}
-        onRetry={() => mutate()}
-        selected={selected}
-        setSelected={setSelected}
-        actions={
-          <Button
-            variant="primary"
-            onClick={() => navigate(routing.commandCreate)}
-          >
-            Add command
-          </Button>
-        }
-      />
-    </SpaceBetween>
+    <CommandListTable
+      commands={data?.commands ?? []}
+      isLoading={isLoading}
+      error={error}
+      onRetry={() => mutate()}
+      selected={selected}
+      setSelected={setSelected}
+      actions={
+        <Button
+          variant="primary"
+          onClick={() => navigate(routing.commandCreate)}
+        >
+          Add command
+        </Button>
+      }
+    />
   );
 }

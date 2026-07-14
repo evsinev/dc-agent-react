@@ -5,12 +5,20 @@ import routing from '@routing';
 import { ReactNode } from 'react';
 import { Link } from 'react-router';
 import { APP_LIST_FILTERING_PROPERTIES } from '@/pages/app-list/components/app-list-table-filters';
-import { Box, PropertyFilter } from '@cloudscape-design/components';
+import {
+  Box,
+  CollectionPreferencesProps,
+  Pagination,
+  PropertyFilter,
+  StatusIndicator,
+} from '@cloudscape-design/components';
 import Header from '@cloudscape-design/components/header';
+import { useLocalStorage } from '@/hooks/use-local-storage';
 import { useQueryParams } from '@/hooks/use-query-params';
 import { parsePropertyFilterQuery, saveQueryFilter } from '@/libs/parse-property-filter';
 import LoadError from '@/components/error/components/load-error';
 import { AppStatusIndicator } from '@/pages/app-list/components/app-status-indicator';
+import AppTablePreferences, { APP_PREFERENCES_STORAGE_KEY, DEFAULT_APP_PREFERENCES } from './app-list-preferences';
 
 const PROPERTY_FILTERS_QUERY_PARAM_KEY = 'propertyFilter';
 
@@ -26,36 +34,18 @@ type AppListTableProps = {
 
 const defaultSorting = { sorting: {} };
 
-const columns = [
-  {
-    id: 'appName',
-    visible: true,
-  },
-  {
-    id: 'appStatus',
-    visible: true,
-    sortable: false,
-  },
-  {
-    id: 'taskHost',
-    visible: true,
-  },
-  {
-    id: 'taskName',
-    visible: true,
-  },
-  {
-    id: 'taskType',
-    visible: true,
-  },
-];
-
 const itemCell = (item: AppListItem) => <Link to={routing.app.replace(':appName', item.appName)}>{item.appName}</Link>;
 
 export default function AppListTable(props: AppListTableProps) {
   const { getQueryParam, setQueryParam } = useQueryParams();
-  const { items, collectionProps, propertyFilterProps } = useCollection(props.apps, {
+  const [preferences, setPreferences] = useLocalStorage<CollectionPreferencesProps.Preferences>(
+    APP_PREFERENCES_STORAGE_KEY,
+    DEFAULT_APP_PREFERENCES,
+  );
+
+  const { items, collectionProps, propertyFilterProps, paginationProps } = useCollection(props.apps, {
     sorting: defaultSorting.sorting,
+    pagination: { pageSize: preferences.pageSize },
     propertyFiltering: {
       filteringProperties: APP_LIST_FILTERING_PROPERTIES,
       defaultQuery: parsePropertyFilterQuery(getQueryParam(PROPERTY_FILTERS_QUERY_PARAM_KEY)),
@@ -65,12 +55,16 @@ export default function AppListTable(props: AppListTableProps) {
   return (
     <Table
       {...collectionProps}
+      variant="full-page"
+      stickyHeader
       header={
         <Header
+          variant="awsui-h1-sticky"
           counter={`(${props.apps.length})`}
           actions={props.actions}
         >
           Applications
+          {props.isLoading && <StatusIndicator type="loading">Fetching</StatusIndicator>}
         </Header>
       }
       selectionType="single"
@@ -110,7 +104,11 @@ export default function AppListTable(props: AppListTableProps) {
           sortingField: 'taskType',
         },
       ]}
-      columnDisplay={columns}
+      columnDisplay={preferences.contentDisplay}
+      wrapLines={preferences.wrapLines}
+      stripedRows={preferences.stripedRows}
+      contentDensity={preferences.contentDensity}
+      stickyColumns={preferences.stickyColumns}
       items={items}
       loadingText="Loading resources"
       trackBy="appName"
@@ -139,6 +137,13 @@ export default function AppListTable(props: AppListTableProps) {
             saveQueryFilter(event, setQueryParam);
             propertyFilterProps.onChange(event);
           }}
+        />
+      }
+      pagination={<Pagination {...paginationProps} />}
+      preferences={
+        <AppTablePreferences
+          preferences={preferences}
+          onConfirm={setPreferences}
         />
       }
     />

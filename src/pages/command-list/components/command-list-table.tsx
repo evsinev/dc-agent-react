@@ -7,7 +7,13 @@ import {
 } from '@/libs/parse-property-filter';
 import { CommandInfo } from '@/pages/command-list/api/command-list';
 import { useCollection } from '@cloudscape-design/collection-hooks';
-import { Box, CollectionPreferencesProps, Pagination, PropertyFilter } from '@cloudscape-design/components';
+import {
+  Box,
+  CollectionPreferencesProps,
+  Pagination,
+  PropertyFilter,
+  StatusIndicator,
+} from '@cloudscape-design/components';
 import Header from '@cloudscape-design/components/header';
 import Table, { TableProps } from '@cloudscape-design/components/table';
 import { ReactNode } from 'react';
@@ -63,12 +69,16 @@ export default function CommandListTable(props: Props) {
   return (
     <Table
       {...collectionProps}
+      variant="full-page"
+      stickyHeader
       header={
         <Header
+          variant="awsui-h1-sticky"
           counter={`(${props.commands.length})`}
           actions={props.actions}
         >
           Commands
+          {props.isLoading && <StatusIndicator type="loading">Fetching</StatusIndicator>}
         </Header>
       }
       selectionType="single"

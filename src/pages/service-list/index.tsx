@@ -1,6 +1,3 @@
-import { StatusIndicator } from '@cloudscape-design/components';
-import Header from '@cloudscape-design/components/header';
-import SpaceBetween from '@cloudscape-design/components/space-between';
 import { ServiceListItem, useServiceList } from './api/service-list';
 import ServiceListTable from './components/service-list-table';
 import { useEffect, useState } from 'react';
@@ -35,20 +32,13 @@ export default function ServiceList() {
   }, [selectedService]);
 
   return (
-    <SpaceBetween size="m">
-      <Header variant="h1">
-        Services
-        {isLoading && <StatusIndicator type="loading">Fetching</StatusIndicator>}
-      </Header>
-
-      <ServiceListTable
-        services={services}
-        isLoading={isLoading}
-        error={error}
-        onRetry={() => mutate()}
-        selected={selectedService}
-        setSelected={setSelectedServices}
-      />
-    </SpaceBetween>
+    <ServiceListTable
+      services={services}
+      isLoading={isLoading}
+      error={error}
+      onRetry={() => mutate()}
+      selected={selectedService}
+      setSelected={setSelectedServices}
+    />
   );
 }

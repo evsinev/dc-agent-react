@@ -86,12 +86,16 @@ export default function DcAgentListTable(props: Props) {
   return (
     <Table
       {...collectionProps}
+      variant="full-page"
+      stickyHeader
       header={
         <Header
+          variant="awsui-h1-sticky"
           counter={`(${props.agents.length})`}
           actions={props.actions}
         >
           Agents
+          {props.isLoading && <StatusIndicator type="loading">Fetching</StatusIndicator>}
         </Header>
       }
       selectionType="single"

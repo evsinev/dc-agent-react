@@ -3,10 +3,11 @@ import GlobalStyles from '@/app/components/global-styles';
 import ErrorProvider from '@/components/error';
 import { useHelpPanel } from '@/hooks/use-help-panel';
 import { useSplitPanel } from '@/hooks/use-split-panel';
-import { AppLayout } from '@cloudscape-design/components';
+import { AppLayoutToolbar } from '@cloudscape-design/components';
 import { I18nProvider } from '@cloudscape-design/components/i18n';
 import messages from '@cloudscape-design/components/i18n/messages/all.en';
-import { BrowserRouter } from 'react-router';
+import routing from '@routing';
+import { BrowserRouter, useLocation } from 'react-router';
 import Breadcrumbs from './components/breadcrumbs';
 import HelpPanelWrapper from './components/help-panel';
 import Navigation from './components/navigation';
@@ -16,10 +17,33 @@ import Router from './router';
 
 const LOCALE = 'en';
 
-export default function App() {
+// Routes whose content is a single full-page table; these get contentType="table"
+// so the table spans the full content width and its sticky header aligns correctly.
+const FULL_PAGE_ROUTES: string[] = [routing.apps, routing.services, routing.commands, routing.agents];
+
+function AppShell() {
   const hideSplitPanel = useSplitPanel((state) => state.hide);
   const helpPanel = useHelpPanel((state) => state.panel);
+  const { pathname } = useLocation();
+  const contentType = FULL_PAGE_ROUTES.includes(pathname) ? 'table' : 'default';
 
+  return (
+    <AppLayoutToolbar
+      contentType={contentType}
+      breadcrumbs={<Breadcrumbs />}
+      navigation={<Navigation />}
+      notifications={<Notifications />}
+      content={<Router />}
+      splitPanel={<SplitPanelWrapper />}
+      splitPanelOpen
+      onSplitPanelToggle={hideSplitPanel}
+      tools={<HelpPanelWrapper />}
+      toolsOpen={!!helpPanel}
+    />
+  );
+}
+
+export default function App() {
   return (
     <ErrorProvider>
       <GlobalStyles />
@@ -28,17 +52,7 @@ export default function App() {
         messages={[messages]}
       >
         <BrowserRouter basename={process.env.PUBLIC_BASE_PATH}>
-          <AppLayout
-            breadcrumbs={<Breadcrumbs />}
-            navigation={<Navigation />}
-            notifications={<Notifications />}
-            content={<Router />}
-            splitPanel={<SplitPanelWrapper />}
-            splitPanelOpen
-            onSplitPanelToggle={hideSplitPanel}
-            tools={<HelpPanelWrapper />}
-            toolsOpen={!!helpPanel}
-          />
+          <AppShell />
         </BrowserRouter>
       </I18nProvider>
     </ErrorProvider>

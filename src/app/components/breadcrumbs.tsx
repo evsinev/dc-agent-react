@@ -4,7 +4,7 @@ import { matchPath, useLocation, useNavigate } from 'react-router';
 
 type Crumb = { text: string; href: string };
 
-const HOME: Crumb = { text: 'Home', href: routing.apps };
+const HOME: Crumb = { text: 'dc-operator', href: routing.apps };
 
 // Build the trail (Home → section → entity) from the current route. All hrefs are
 // basename-relative, matching location.pathname and navigate().

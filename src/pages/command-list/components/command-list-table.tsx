@@ -1,6 +1,7 @@
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { useQueryParams } from '@/hooks/use-query-params';
 import {
+  PAGE_QUERY_PARAM_KEY,
   parsePropertyFilterQuery,
   PROPERTY_FILTERS_QUERY_PARAM_KEY,
   saveQueryFilter,
@@ -57,9 +58,11 @@ export default function CommandListTable(props: Props) {
     DEFAULT_COMMAND_PREFERENCES,
   );
 
+  const defaultPage = Math.max(1, Number(getQueryParam(PAGE_QUERY_PARAM_KEY)) || 1);
+
   const { items, collectionProps, propertyFilterProps, paginationProps } = useCollection(props.commands, {
     sorting: {},
-    pagination: { pageSize: preferences.pageSize },
+    pagination: { pageSize: preferences.pageSize, defaultPage },
     propertyFiltering: {
       filteringProperties: COMMAND_FILTERING_PROPERTIES,
       defaultQuery: parsePropertyFilterQuery(getQueryParam(PROPERTY_FILTERS_QUERY_PARAM_KEY)),
@@ -120,7 +123,15 @@ export default function CommandListTable(props: Props) {
           }}
         />
       }
-      pagination={<Pagination {...paginationProps} />}
+      pagination={
+        <Pagination
+          {...paginationProps}
+          onChange={(event) => {
+            setQueryParam(PAGE_QUERY_PARAM_KEY, String(event.detail.currentPageIndex));
+            paginationProps.onChange(event);
+          }}
+        />
+      }
       preferences={
         <CommandTablePreferences
           preferences={preferences}

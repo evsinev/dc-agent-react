@@ -15,6 +15,7 @@ import { SERVICE_LIST_FILTERING_PROPERTIES } from '@/pages/service-list/componen
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { useQueryParams } from '@/hooks/use-query-params';
 import {
+  PAGE_QUERY_PARAM_KEY,
   parsePropertyFilterQuery,
   PROPERTY_FILTERS_QUERY_PARAM_KEY,
   saveQueryFilter,
@@ -49,9 +50,11 @@ export default function ServiceListTable(props: Props) {
     DEFAULT_SERVICE_PREFERENCES,
   );
 
+  const defaultPage = Math.max(1, Number(getQueryParam(PAGE_QUERY_PARAM_KEY)) || 1);
+
   const { items, collectionProps, propertyFilterProps, paginationProps } = useCollection(props.services, {
     sorting: {},
-    pagination: { pageSize: preferences.pageSize },
+    pagination: { pageSize: preferences.pageSize, defaultPage },
     propertyFiltering: {
       filteringProperties: SERVICE_LIST_FILTERING_PROPERTIES,
       defaultQuery: parsePropertyFilterQuery(getQueryParam(PROPERTY_FILTERS_QUERY_PARAM_KEY)),
@@ -136,7 +139,15 @@ export default function ServiceListTable(props: Props) {
           }}
         />
       }
-      pagination={<Pagination {...paginationProps} />}
+      pagination={
+        <Pagination
+          {...paginationProps}
+          onChange={(event) => {
+            setQueryParam(PAGE_QUERY_PARAM_KEY, String(event.detail.currentPageIndex));
+            paginationProps.onChange(event);
+          }}
+        />
+      }
       preferences={
         <ServiceTablePreferences
           preferences={preferences}

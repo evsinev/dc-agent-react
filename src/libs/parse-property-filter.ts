@@ -6,6 +6,7 @@ import { PropertyFilterQuery } from '@cloudscape-design/collection-hooks';
 import { NonCancelableCustomEvent, PropertyFilterProps } from '@cloudscape-design/components';
 
 export const PROPERTY_FILTERS_QUERY_PARAM_KEY = 'propertyFilter';
+export const PAGE_QUERY_PARAM_KEY = 'page';
 
 const PropertyFilterOperation = z.enum(['and', 'or']);
 

@@ -24,6 +24,7 @@ const FULL_PAGE_ROUTES: string[] = [routing.apps, routing.services, routing.comm
 function AppShell() {
   const hideSplitPanel = useSplitPanel((state) => state.hide);
   const helpPanel = useHelpPanel((state) => state.panel);
+  const hideHelpPanel = useHelpPanel((state) => state.hide);
   const { pathname } = useLocation();
   const contentType = FULL_PAGE_ROUTES.includes(pathname) ? 'table' : 'default';
 
@@ -39,6 +40,11 @@ function AppShell() {
       onSplitPanelToggle={hideSplitPanel}
       tools={<HelpPanelWrapper />}
       toolsOpen={!!helpPanel}
+      onToolsChange={({ detail }) => {
+        if (!detail.open) {
+          hideHelpPanel();
+        }
+      }}
     />
   );
 }

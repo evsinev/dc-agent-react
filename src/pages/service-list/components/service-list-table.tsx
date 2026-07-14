@@ -22,12 +22,31 @@ import {
   SORT_QUERY_PARAM_KEY,
 } from '@/libs/parse-property-filter';
 import LoadError from '@/components/error/components/load-error';
+import InfoHelpLink from '@/components/info/info-help-link';
 import ServiceTablePreferences, { DEFAULT_SERVICE_PREFERENCES } from './service-list-preferences';
 import {
   resolveDefaultFilterQuery,
   useFilterSetControls,
 } from '@/components/table-filter-sets/use-filter-set-controls';
 import { FilterSet } from '@/components/table-filter-sets/use-filter-sets';
+
+const SERVICE_DESCRIPTION =
+  "daemontools-supervised processes on an agent host; the State column is read live from daemontools' supervise status.";
+
+const SERVICE_HELP = (
+  <div>
+    <p>
+      A service is a long-running process supervised by daemontools on an agent host — one directory under
+      <code> /service</code>. The operator lists and controls it over the control-plane channel (up, down, hangup,
+      terminate).
+    </p>
+    <p>
+      The State column shows the raw supervise state — UP, DOWN, UP_PAUSED, UP_WANT_DOWN, DOWN_NORMALLY_UP,
+      DOWN_WANT_UP, UP_NORMALLY_DOWN, or ERROR — alongside PID and uptime. Deploy commands (jar/war/node) restart the
+      service named in their <code>serviceName</code>.
+    </p>
+  </div>
+);
 
 type Props = {
   services: ServiceListItem[];
@@ -119,6 +138,13 @@ export default function ServiceListTable(props: Props) {
           <Header
             variant={variant === 'full-page' ? 'awsui-h1-sticky' : undefined}
             counter={`(${props.services.length})`}
+            description={SERVICE_DESCRIPTION}
+            info={
+              <InfoHelpLink
+                title="Services"
+                content={SERVICE_HELP}
+              />
+            }
             actions={
               <Button
                 variant="icon"

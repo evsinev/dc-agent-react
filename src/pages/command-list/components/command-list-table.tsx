@@ -28,10 +28,29 @@ import { ReactNode } from 'react';
 import { Link } from 'react-router';
 import routing from '@routing';
 import LoadError from '@/components/error/components/load-error';
+import InfoHelpLink from '@/components/info/info-help-link';
 import CommandTablePreferences, { DEFAULT_COMMAND_PREFERENCES } from './command-list-preferences';
 import { COMMAND_FILTERING_PROPERTIES } from './command-list-table-filters';
 import { commandNameCell } from './command-name-cell';
 import { PARAM_COLUMNS, SERVICE_STATE_COLUMN, genericParamColumn } from './command-list-param-columns';
+
+const COMMAND_DESCRIPTION =
+  'Deploy endpoints on an agent — each is a config file that exposes an api-key-guarded URL that CI pushes build artifacts to.';
+
+const COMMAND_HELP = (
+  <div>
+    <p>
+      A command is a config file in an agent's <code>config/</code> directory plus the HTTP endpoint that uses it (
+      <code>/dc-agent/&lt;type&gt;/&lt;name&gt;</code>), guarded by an <code>api-key</code> header — each key mapped to
+      an owner label; without keys the endpoint is open.
+    </p>
+    <p>
+      CI pushes a build artifact to the endpoint. Deploy-type commands (jar/war/node) swap the artifact, restart the
+      linked daemontools service, and optionally poll a health URL; others store, unzip, fetch, or apply a docker
+      definition. Each command belongs to one agent; jar/war/node also target one service.
+    </p>
+  </div>
+);
 
 type Props = {
   commands: CommandInfo[];
@@ -159,6 +178,13 @@ export default function CommandListTable(props: Props) {
           <Header
             variant={variant === 'full-page' ? 'awsui-h1-sticky' : undefined}
             counter={`(${props.commands.length})`}
+            description={COMMAND_DESCRIPTION}
+            info={
+              <InfoHelpLink
+                title="Commands"
+                content={COMMAND_HELP}
+              />
+            }
             actions={
               <SpaceBetween
                 direction="horizontal"

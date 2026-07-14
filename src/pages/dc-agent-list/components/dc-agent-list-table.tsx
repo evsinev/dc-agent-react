@@ -28,11 +28,30 @@ import { ReactNode } from 'react';
 import { Link } from 'react-router';
 import routing from '@routing';
 import LoadError from '@/components/error/components/load-error';
+import InfoHelpLink from '@/components/info/info-help-link';
 import DcAgentTablePreferences, {
   DEFAULT_AGENT_PREFERENCES,
   AGENT_PREFERENCES_STORAGE_KEY,
 } from './dc-agent-list-preferences';
 import { AGENT_FILTERING_PROPERTIES } from './dc-agent-list-table-filters';
+
+const AGENT_DESCRIPTION =
+  'Managed hosts in the fleet — the lightweight dc-agent HTTP process on each host that runs deploys and supervises services. Configured statically in the operator config.';
+
+const AGENT_HELP = (
+  <div>
+    <p>
+      A dc-agent is the lightweight HTTP agent installed on each managed host (context <code>/dc-agent</code>, port
+      8051); the operator drives the whole fleet through these agents over three separately-tokened channels (deploy,
+      control-plane, app-status). Each agent hosts many commands and services on its own filesystem.
+    </p>
+    <p>
+      This screen combines every agent's <code>/app-status</code> report (reachability, instance name, version, reported
+      host, port, uptime) with a control-plane service summary (services up / total) and live system and JVM metrics
+      (CPU, load average, heap and memory, threads, GC).
+    </p>
+  </div>
+);
 
 type Props = {
   agents: AgentInfo[];
@@ -201,6 +220,13 @@ export default function DcAgentListTable(props: Props) {
           <Header
             variant="awsui-h1-sticky"
             counter={`(${props.agents.length})`}
+            description={AGENT_DESCRIPTION}
+            info={
+              <InfoHelpLink
+                title="Agents"
+                content={AGENT_HELP}
+              />
+            }
             actions={
               <SpaceBetween
                 direction="horizontal"

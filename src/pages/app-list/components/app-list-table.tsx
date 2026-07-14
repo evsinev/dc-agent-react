@@ -22,6 +22,7 @@ import {
   SORT_QUERY_PARAM_KEY,
 } from '@/libs/parse-property-filter';
 import LoadError from '@/components/error/components/load-error';
+import InfoHelpLink from '@/components/info/info-help-link';
 import { AppStatusIndicator } from '@/pages/app-list/components/app-status-indicator';
 import AppTablePreferences, { APP_PREFERENCES_STORAGE_KEY, DEFAULT_APP_PREFERENCES } from './app-list-preferences';
 import {
@@ -29,6 +30,24 @@ import {
   useFilterSetControls,
 } from '@/components/table-filter-sets/use-filter-set-controls';
 import { FilterSet } from '@/components/table-filter-sets/use-filter-sets';
+
+const APP_DESCRIPTION =
+  'Deployment bindings in the operator config repo (apps/<name>.yaml) that map a task to a host; Status shows whether the host matches the definition or has drifted.';
+
+const APP_HELP = (
+  <div>
+    <p>
+      An application is an operator-side config file (<code>apps/&lt;appName&gt;.yaml</code>) in the git-backed config
+      repo that binds one task (<code>taskName</code> / <code>taskType</code>) to one agent host (<code>taskHost</code>)
+      — unlike commands and services, which live on the agent itself. Use "Pull from Git" to refresh these definitions
+      from the repo.
+    </p>
+    <p>
+      The Status column runs a docker dry-run (<code>DOCKER_CHECK</code>) against the host and reports OK when the
+      running state matches the definition, DRIFT when it differs, or ERROR when the check fails.
+    </p>
+  </div>
+);
 
 type AppListTableProps = {
   apps: AppListItem[];
@@ -99,6 +118,13 @@ export default function AppListTable(props: AppListTableProps) {
           <Header
             variant="awsui-h1-sticky"
             counter={`(${props.apps.length})`}
+            description={APP_DESCRIPTION}
+            info={
+              <InfoHelpLink
+                title="Applications"
+                content={APP_HELP}
+              />
+            }
             actions={props.actions}
           >
             Applications

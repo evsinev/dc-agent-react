@@ -1,5 +1,5 @@
 import { useLocalStorage } from '@/hooks/use-local-storage';
-import { useQueryParams } from '@/hooks/use-query-params';
+import { useTableParams } from '@/hooks/use-table-params';
 import {
   PAGE_QUERY_PARAM_KEY,
   PROPERTY_FILTERS_QUERY_PARAM_KEY,
@@ -26,10 +26,7 @@ import { ReactNode } from 'react';
 import { Link } from 'react-router';
 import routing from '@routing';
 import LoadError from '@/components/error/components/load-error';
-import CommandTablePreferences, {
-  COMMAND_PREFERENCES_STORAGE_KEY,
-  DEFAULT_COMMAND_PREFERENCES,
-} from './command-list-preferences';
+import CommandTablePreferences, { DEFAULT_COMMAND_PREFERENCES } from './command-list-preferences';
 import { COMMAND_FILTERING_PROPERTIES } from './command-list-table-filters';
 import { commandNameCell } from './command-name-cell';
 import { PARAM_COLUMNS, SERVICE_STATE_COLUMN, genericParamColumn } from './command-list-param-columns';
@@ -37,11 +34,18 @@ import { PARAM_COLUMNS, SERVICE_STATE_COLUMN, genericParamColumn } from './comma
 type Props = {
   commands: CommandInfo[];
   isLoading: boolean;
-  selected: CommandInfo[];
-  setSelected: (commands: CommandInfo[]) => void;
+  selected?: CommandInfo[];
+  setSelected?: (commands: CommandInfo[]) => void;
   actions?: ReactNode;
   error?: unknown;
   onRetry: () => void;
+  // Embedding controls (defaults reproduce the standalone full-page Command List behavior).
+  variant?: 'full-page' | 'embedded';
+  urlState?: boolean;
+  selectable?: boolean;
+  storageKeyPrefix?: string;
+  defaultPreferences?: CollectionPreferencesProps.Preferences;
+  title?: string;
 };
 
 export const commandKey = (command: CommandInfo) => `${command.host}/${command.name ?? '(error)'}`;
@@ -87,17 +91,26 @@ const columnDefinitions: TableProps.ColumnDefinition<CommandInfo>[] = [
 ];
 
 export default function CommandListTable(props: Props) {
-  const { getQueryParam, setQueryParam } = useQueryParams();
+  const {
+    variant = 'full-page',
+    urlState = true,
+    selectable = true,
+    storageKeyPrefix = 'command-list',
+    defaultPreferences = DEFAULT_COMMAND_PREFERENCES,
+    title = 'Commands',
+  } = props;
+
+  const { getParam, setParam } = useTableParams(urlState);
 
   const [preferences, setPreferences] = useLocalStorage<CollectionPreferencesProps.Preferences>(
-    COMMAND_PREFERENCES_STORAGE_KEY,
-    DEFAULT_COMMAND_PREFERENCES,
+    `${storageKeyPrefix}-preferences`,
+    defaultPreferences,
   );
 
-  const [savedFilterSets, setSavedFilterSets] = useLocalStorage<FilterSet[]>('command-list-filter-sets', []);
+  const [savedFilterSets, setSavedFilterSets] = useLocalStorage<FilterSet[]>(`${storageKeyPrefix}-filter-sets`, []);
 
-  const defaultPage = Math.max(1, Number(getQueryParam(PAGE_QUERY_PARAM_KEY)) || 1);
-  const sortParam = getQueryParam(SORT_QUERY_PARAM_KEY);
+  const defaultPage = Math.max(1, Number(getParam(PAGE_QUERY_PARAM_KEY)) || 1);
+  const sortParam = getParam(SORT_QUERY_PARAM_KEY);
   const defaultSortingState = sortParam
     ? { sortingColumn: { sortingField: sortParam.replace(/^-/, '') }, isDescending: sortParam.startsWith('-') }
     : undefined;
@@ -109,7 +122,7 @@ export default function CommandListTable(props: Props) {
       pagination: { pageSize: preferences.pageSize, defaultPage },
       propertyFiltering: {
         filteringProperties: COMMAND_FILTERING_PROPERTIES,
-        defaultQuery: resolveDefaultFilterQuery(getQueryParam(PROPERTY_FILTERS_QUERY_PARAM_KEY), savedFilterSets),
+        defaultQuery: resolveDefaultFilterQuery(getParam(PROPERTY_FILTERS_QUERY_PARAM_KEY), savedFilterSets),
       },
     },
   );
@@ -117,8 +130,8 @@ export default function CommandListTable(props: Props) {
   const { customControl, customFilterActions, actionModal, countText } = useFilterSetControls({
     propertyFilterProps,
     actions,
-    getQueryParam,
-    setQueryParam,
+    getQueryParam: getParam,
+    setQueryParam: setParam,
     savedFilterSets,
     setSavedFilterSets,
     filteredItemsCount,
@@ -131,28 +144,28 @@ export default function CommandListTable(props: Props) {
         {...collectionProps}
         onSortingChange={(event) => {
           const { sortingColumn, isDescending } = event.detail;
-          setQueryParam(
+          setParam(
             SORT_QUERY_PARAM_KEY,
             sortingColumn.sortingField ? `${isDescending ? '-' : ''}${sortingColumn.sortingField}` : null,
           );
           collectionProps.onSortingChange?.(event);
         }}
-        variant="full-page"
-        stickyHeader
+        variant={variant}
+        stickyHeader={variant === 'full-page'}
         resizableColumns
         header={
           <Header
-            variant="awsui-h1-sticky"
+            variant={variant === 'full-page' ? 'awsui-h1-sticky' : undefined}
             counter={`(${props.commands.length})`}
             actions={props.actions}
           >
-            Commands
+            {title}
             {props.isLoading && <StatusIndicator type="loading">Fetching</StatusIndicator>}
           </Header>
         }
-        selectionType="single"
-        onSelectionChange={(e) => props.setSelected(e.detail.selectedItems)}
-        selectedItems={props.selected}
+        selectionType={selectable ? 'single' : undefined}
+        onSelectionChange={selectable ? (e) => props.setSelected?.(e.detail.selectedItems) : undefined}
+        selectedItems={selectable ? props.selected : undefined}
         columnDefinitions={columnDefinitions}
         columnDisplay={preferences.contentDisplay}
         items={items}
@@ -187,7 +200,7 @@ export default function CommandListTable(props: Props) {
             customControl={customControl}
             customFilterActions={customFilterActions}
             onChange={(event) => {
-              saveQueryFilter(event, setQueryParam);
+              saveQueryFilter(event, setParam);
               propertyFilterProps.onChange(event);
             }}
           />
@@ -196,7 +209,7 @@ export default function CommandListTable(props: Props) {
           <Pagination
             {...paginationProps}
             onChange={(event) => {
-              setQueryParam(PAGE_QUERY_PARAM_KEY, String(event.detail.currentPageIndex));
+              setParam(PAGE_QUERY_PARAM_KEY, String(event.detail.currentPageIndex));
               paginationProps.onChange(event);
             }}
           />

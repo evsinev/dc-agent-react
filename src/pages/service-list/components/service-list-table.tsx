@@ -13,7 +13,7 @@ import { Link } from 'react-router';
 import { ServiceListItem } from '../api/service-list';
 import { SERVICE_LIST_FILTERING_PROPERTIES } from '@/pages/service-list/components/service-list-table-filters';
 import { useLocalStorage } from '@/hooks/use-local-storage';
-import { useQueryParams } from '@/hooks/use-query-params';
+import { useTableParams } from '@/hooks/use-table-params';
 import {
   PAGE_QUERY_PARAM_KEY,
   PROPERTY_FILTERS_QUERY_PARAM_KEY,
@@ -21,10 +21,7 @@ import {
   SORT_QUERY_PARAM_KEY,
 } from '@/libs/parse-property-filter';
 import LoadError from '@/components/error/components/load-error';
-import ServiceTablePreferences, {
-  DEFAULT_SERVICE_PREFERENCES,
-  SERVICE_PREFERENCES_STORAGE_KEY,
-} from './service-list-preferences';
+import ServiceTablePreferences, { DEFAULT_SERVICE_PREFERENCES } from './service-list-preferences';
 import {
   resolveDefaultFilterQuery,
   useFilterSetControls,
@@ -34,10 +31,17 @@ import { FilterSet } from '@/components/table-filter-sets/use-filter-sets';
 type Props = {
   services: ServiceListItem[];
   isLoading: boolean;
-  selected: ServiceListItem[];
-  setSelected: (app: ServiceListItem[]) => void;
+  selected?: ServiceListItem[];
+  setSelected?: (app: ServiceListItem[]) => void;
   error?: unknown;
   onRetry: () => void;
+  // Embedding controls (defaults reproduce the standalone full-page Service List behavior).
+  variant?: 'full-page' | 'embedded';
+  urlState?: boolean;
+  selectable?: boolean;
+  storageKeyPrefix?: string;
+  defaultPreferences?: CollectionPreferencesProps.Preferences;
+  title?: string;
 };
 
 const serviceNameLink = (item: ServiceListItem) => (
@@ -49,16 +53,25 @@ const statusNameLink = (item: ServiceListItem) => (
 );
 
 export default function ServiceListTable(props: Props) {
-  const { getQueryParam, setQueryParam } = useQueryParams();
+  const {
+    variant = 'full-page',
+    urlState = true,
+    selectable = true,
+    storageKeyPrefix = 'service-list',
+    defaultPreferences = DEFAULT_SERVICE_PREFERENCES,
+    title = 'Services',
+  } = props;
+
+  const { getParam, setParam } = useTableParams(urlState);
   const [preferences, setPreferences] = useLocalStorage<CollectionPreferencesProps.Preferences>(
-    SERVICE_PREFERENCES_STORAGE_KEY,
-    DEFAULT_SERVICE_PREFERENCES,
+    `${storageKeyPrefix}-preferences`,
+    defaultPreferences,
   );
 
-  const [savedFilterSets, setSavedFilterSets] = useLocalStorage<FilterSet[]>('service-list-filter-sets', []);
+  const [savedFilterSets, setSavedFilterSets] = useLocalStorage<FilterSet[]>(`${storageKeyPrefix}-filter-sets`, []);
 
-  const defaultPage = Math.max(1, Number(getQueryParam(PAGE_QUERY_PARAM_KEY)) || 1);
-  const sortParam = getQueryParam(SORT_QUERY_PARAM_KEY);
+  const defaultPage = Math.max(1, Number(getParam(PAGE_QUERY_PARAM_KEY)) || 1);
+  const sortParam = getParam(SORT_QUERY_PARAM_KEY);
   const defaultSortingState = sortParam
     ? { sortingColumn: { sortingField: sortParam.replace(/^-/, '') }, isDescending: sortParam.startsWith('-') }
     : undefined;
@@ -70,7 +83,7 @@ export default function ServiceListTable(props: Props) {
       pagination: { pageSize: preferences.pageSize, defaultPage },
       propertyFiltering: {
         filteringProperties: SERVICE_LIST_FILTERING_PROPERTIES,
-        defaultQuery: resolveDefaultFilterQuery(getQueryParam(PROPERTY_FILTERS_QUERY_PARAM_KEY), savedFilterSets),
+        defaultQuery: resolveDefaultFilterQuery(getParam(PROPERTY_FILTERS_QUERY_PARAM_KEY), savedFilterSets),
       },
     },
   );
@@ -78,8 +91,8 @@ export default function ServiceListTable(props: Props) {
   const { customControl, customFilterActions, actionModal, countText } = useFilterSetControls({
     propertyFilterProps,
     actions,
-    getQueryParam,
-    setQueryParam,
+    getQueryParam: getParam,
+    setQueryParam: setParam,
     savedFilterSets,
     setSavedFilterSets,
     filteredItemsCount,
@@ -92,21 +105,21 @@ export default function ServiceListTable(props: Props) {
         {...collectionProps}
         onSortingChange={(event) => {
           const { sortingColumn, isDescending } = event.detail;
-          setQueryParam(
+          setParam(
             SORT_QUERY_PARAM_KEY,
             sortingColumn.sortingField ? `${isDescending ? '-' : ''}${sortingColumn.sortingField}` : null,
           );
           collectionProps.onSortingChange?.(event);
         }}
-        variant="full-page"
-        stickyHeader
+        variant={variant}
+        stickyHeader={variant === 'full-page'}
         resizableColumns
         header={
           <Header
-            variant="awsui-h1-sticky"
+            variant={variant === 'full-page' ? 'awsui-h1-sticky' : undefined}
             counter={`(${props.services.length})`}
           >
-            Services
+            {title}
             {props.isLoading && <StatusIndicator type="loading">Fetching</StatusIndicator>}
           </Header>
         }
@@ -161,9 +174,9 @@ export default function ServiceListTable(props: Props) {
             </Box>
           )
         }
-        selectionType="single"
-        onSelectionChange={(e) => props.setSelected(e.detail.selectedItems)}
-        selectedItems={props.selected}
+        selectionType={selectable ? 'single' : undefined}
+        onSelectionChange={selectable ? (e) => props.setSelected?.(e.detail.selectedItems) : undefined}
+        selectedItems={selectable ? props.selected : undefined}
         filter={
           <PropertyFilter
             {...propertyFilterProps}
@@ -172,7 +185,7 @@ export default function ServiceListTable(props: Props) {
             customControl={customControl}
             customFilterActions={customFilterActions}
             onChange={(event) => {
-              saveQueryFilter(event, setQueryParam);
+              saveQueryFilter(event, setParam);
               propertyFilterProps.onChange(event);
             }}
           />
@@ -181,7 +194,7 @@ export default function ServiceListTable(props: Props) {
           <Pagination
             {...paginationProps}
             onChange={(event) => {
-              setQueryParam(PAGE_QUERY_PARAM_KEY, String(event.detail.currentPageIndex));
+              setParam(PAGE_QUERY_PARAM_KEY, String(event.detail.currentPageIndex));
               paginationProps.onChange(event);
             }}
           />

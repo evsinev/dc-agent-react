@@ -32,6 +32,7 @@ import CommandTablePreferences, {
 } from './command-list-preferences';
 import { COMMAND_FILTERING_PROPERTIES } from './command-list-table-filters';
 import { commandNameCell } from './command-name-cell';
+import { PARAM_COLUMNS, SERVICE_STATE_COLUMN, genericParamColumn } from './command-list-param-columns';
 
 type Props = {
   commands: CommandInfo[];
@@ -45,6 +46,8 @@ type Props = {
 
 export const commandKey = (command: CommandInfo) => `${command.host}/${command.name ?? '(error)'}`;
 
+// The service state is resolved server-side (CommandInfo.serviceStatus*), so the columns are static —
+// no runtime join, no second request.
 const columnDefinitions: TableProps.ColumnDefinition<CommandInfo>[] = [
   { id: 'name', header: 'Command', cell: commandNameCell, sortingField: 'name', isRowHeader: true },
   {
@@ -54,10 +57,38 @@ const columnDefinitions: TableProps.ColumnDefinition<CommandInfo>[] = [
     sortingField: 'host',
   },
   { id: 'type', header: 'Type', cell: (c) => c.type ?? '—', sortingField: 'type' },
+  {
+    id: SERVICE_STATE_COLUMN.id,
+    header: SERVICE_STATE_COLUMN.label,
+    cell: (c) =>
+      c.serviceStatusIndicator ? (
+        <StatusIndicator type={c.serviceStatusIndicator}>{c.serviceStatusName}</StatusIndicator>
+      ) : (
+        ''
+      ),
+    sortingComparator: (a, b) => (a.serviceStatusName ?? '').localeCompare(b.serviceStatusName ?? ''),
+  },
+  // One column per command config parameter (blank when the command lacks it);
+  // serviceName is rendered as a link to its service.
+  ...PARAM_COLUMNS.map((col) =>
+    col.key === 'serviceName'
+      ? {
+          id: 'serviceName',
+          header: col.label,
+          cell: (c: CommandInfo) => {
+            const svc = c.parameters?.serviceName;
+            return svc ? <Link to={routing.service.replace(':host/:serviceName', `${c.host}/${svc}`)}>{svc}</Link> : '';
+          },
+          sortingComparator: (a: CommandInfo, b: CommandInfo) =>
+            (a.parameters?.serviceName ?? '').localeCompare(b.parameters?.serviceName ?? ''),
+        }
+      : genericParamColumn(col),
+  ),
 ];
 
 export default function CommandListTable(props: Props) {
   const { getQueryParam, setQueryParam } = useQueryParams();
+
   const [preferences, setPreferences] = useLocalStorage<CollectionPreferencesProps.Preferences>(
     COMMAND_PREFERENCES_STORAGE_KEY,
     DEFAULT_COMMAND_PREFERENCES,
@@ -108,6 +139,7 @@ export default function CommandListTable(props: Props) {
         }}
         variant="full-page"
         stickyHeader
+        resizableColumns
         header={
           <Header
             variant="awsui-h1-sticky"

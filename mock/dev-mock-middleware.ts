@@ -2,11 +2,11 @@ import type { IncomingMessage, ServerResponse } from 'node:http';
 import {
   AGENTS,
   APPS,
-  COMMANDS,
   type CommandWriteBody,
   SERVICES,
   appStatusFor,
   appViewFor,
+  commandListItems,
   mockCommandCreate,
   mockCommandGet,
   mockCommandUpdate,
@@ -71,7 +71,7 @@ export function devMockMiddleware(req: IncomingMessage, res: ServerResponse, nex
     return;
   }
   if (endpoint === '/command/list') {
-    json(res, { commands: COMMANDS });
+    json(res, { commands: commandListItems() });
     return;
   }
   if (endpoint === '/command/get') {

@@ -78,6 +78,10 @@ export default function CommandView() {
   const configFields = isCommandType(type) ? COMMAND_TYPES[type].fields : [];
   const agentUrl = agentData?.agents.find((agent) => agent.name === host)?.url;
 
+  // JAR/WAR/NODE commands manage a daemontools service; link to it and show its live state. The
+  // state is resolved server-side (command.serviceStatus*), so no extra /service/list request.
+  const serviceName = command?.parameters?.serviceName;
+
   return (
     <SpaceBetween size="m">
       <Header
@@ -112,12 +116,35 @@ export default function CommandView() {
             <DefinitionList
               columns={2}
               ariaLabel="Overview"
+              autoTermWidth
               termWidth="110px"
               items={[
                 {
                   label: 'Agent',
                   value: <Link to={routing.agent.replace(':name', command.host)}>{command.host}</Link>,
                 },
+                ...(serviceName
+                  ? [
+                      {
+                        label: 'Service',
+                        value: (
+                          <Link to={routing.service.replace(':host/:serviceName', `${command.host}/${serviceName}`)}>
+                            {serviceName}
+                          </Link>
+                        ),
+                      },
+                      {
+                        label: 'Service state',
+                        value: command.serviceStatusIndicator ? (
+                          <StatusIndicator type={command.serviceStatusIndicator}>
+                            {command.serviceStatusName}
+                          </StatusIndicator>
+                        ) : (
+                          '—'
+                        ),
+                      },
+                    ]
+                  : []),
                 { label: 'Type', value: commandTypeLabel(command.type) },
                 { label: 'Endpoint', value: commandEndpoint(command.type, command.name) },
                 { label: 'Config file', value: commandConfigFile(command.name) },

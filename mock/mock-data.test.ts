@@ -9,6 +9,7 @@ import {
   __resetGitPullState,
   appStatusFor,
   appViewFor,
+  commandListItems,
   mockCommandCreate,
   mockCommandGet,
   mockCommandUpdate,
@@ -100,6 +101,22 @@ describe('stateful command mock', () => {
     expect(detail.parameters.apiKeys).toBeUndefined();
     expect(detail.apiKeys[0].owner).toBe('gitlab-ci');
     expect(detail.apiKeys[0].maskedId.startsWith('****')).toBe(true);
+  });
+
+  test('get and list attach server-derived service state joined on serviceName', () => {
+    const detail = detailOf(mockCommandGet('sandbox-1', 'billing').body);
+    expect(detail.serviceStatusName).toBe('Up');
+    expect(detail.serviceStatusIndicator).toBe('success');
+
+    const commands = commandListItems();
+    const billing = commands.find((command) => command.host === 'sandbox-1' && command.name === 'billing');
+    expect(billing?.serviceStatusName).toBe('Up');
+    expect(billing?.serviceStatusIndicator).toBe('success');
+
+    // legacy-portal names a service that does not exist on its host → no state.
+    const legacy = commands.find((command) => command.name === 'legacy-portal');
+    expect(legacy?.serviceStatusName).toBeUndefined();
+    expect(legacy?.serviceStatusIndicator).toBeUndefined();
   });
 
   test('get 404s for an unknown command', () => {

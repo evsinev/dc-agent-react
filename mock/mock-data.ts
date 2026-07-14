@@ -232,6 +232,12 @@ const COMMANDS_SEED: CommandInfo[] = [
     type: 'WAR',
     parameters: { warFilename: 'portal.war', serviceName: 'legacy-portal', apiKeys: 'jenkins' },
   },
+  {
+    host: 'dev-box-a',
+    name: 'logs-mirror',
+    type: 'ZIP_DIRS',
+    parameters: { dir: '/var/log/app', delete: 'true', apiKeys: 'jenkins' },
+  },
   { host: 'dev-box-b', error: 'Connection refused' },
 ];
 
@@ -329,6 +335,21 @@ function applyCommandWrite(host: string, name: string, type: string, body: Comma
   }
 }
 
+// Mirror the operator's server-side join: a command's live service state is the state of the
+// matching service on the same host — blank when the command names no service or none matches.
+function commandServiceState(command: CommandInfo): Pick<CommandInfo, 'serviceStatusName' | 'serviceStatusIndicator'> {
+  const serviceName = command.parameters?.serviceName;
+  const service = serviceName
+    ? SERVICES.find((item) => item.host === command.host && item.serviceName === serviceName)
+    : undefined;
+  return { serviceStatusName: service?.statusName, serviceStatusIndicator: service?.statusIndicator };
+}
+
+/** The command list with server-derived service state attached, as the operator returns it. */
+export function commandListItems(): CommandInfo[] {
+  return COMMANDS.map((command) => ({ ...command, ...commandServiceState(command) }));
+}
+
 function commandDetailFor(host: string, name: string): CommandDetail | undefined {
   const command = COMMANDS.find((item) => item.host === host && item.name === name);
   if (!command || !command.name) {
@@ -346,6 +367,7 @@ function commandDetailFor(host: string, name: string): CommandDetail | undefined
     type: command.type ?? '',
     parameters,
     apiKeys: COMMAND_KEYS.get(commandKey(host, name)) ?? [],
+    ...commandServiceState(command),
   };
 }
 
@@ -438,6 +460,25 @@ const SERVICE_SEEDS: ServiceSeed[] = [
     statusIndicator: 'warning',
     statusName: 'Starting',
     ageFormatted: '30 seconds',
+  },
+  // Back the `billing` (sandbox-1) and `frontend` (sandbox-2) commands: the mock joins command →
+  // service on serviceName (as the operator now does server-side), so the command surfaces show
+  // this state; `legacy-portal` has no matching service → blank state.
+  {
+    host: 'sandbox-1',
+    serviceName: 'billing',
+    state: 'UP',
+    statusIndicator: 'success',
+    statusName: 'Up',
+    ageFormatted: '2 days',
+  },
+  {
+    host: 'sandbox-2',
+    serviceName: 'frontend',
+    state: 'DOWN',
+    statusIndicator: 'error',
+    statusName: 'Down',
+    ageFormatted: '5 minutes',
   },
 ];
 

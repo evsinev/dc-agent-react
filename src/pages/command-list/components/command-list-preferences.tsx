@@ -1,4 +1,5 @@
 import { CollectionPreferences, CollectionPreferencesProps } from '@cloudscape-design/components';
+import { PARAM_COLUMNS, SERVICE_STATE_COLUMN } from './command-list-param-columns';
 
 export const COMMAND_PREFERENCES_STORAGE_KEY = 'command-list-preferences';
 
@@ -12,6 +13,8 @@ export const DEFAULT_COMMAND_PREFERENCES: CollectionPreferencesProps.Preferences
     { id: 'name', visible: true },
     { id: 'host', visible: true },
     { id: 'type', visible: true },
+    { id: SERVICE_STATE_COLUMN.id, visible: SERVICE_STATE_COLUMN.visible },
+    ...PARAM_COLUMNS.map((col) => ({ id: col.key, visible: col.visible })),
   ],
 };
 
@@ -74,6 +77,8 @@ export default function CommandTablePreferences(props: Props) {
           { id: 'name', label: 'Command' },
           { id: 'host', label: 'Host' },
           { id: 'type', label: 'Type' },
+          { id: SERVICE_STATE_COLUMN.id, label: SERVICE_STATE_COLUMN.label },
+          ...PARAM_COLUMNS.map((col) => ({ id: col.key, label: col.label })),
         ],
       }}
     />

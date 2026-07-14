@@ -1,5 +1,6 @@
 import { RequestError } from '@/components/error/models/error-model';
 import { clientPost } from '@/libs/client-post';
+import { StatusIndicatorProps } from '@cloudscape-design/components/status-indicator';
 import useSWR, { useSWRConfig } from 'swr';
 import useSWRMutation from 'swr/mutation';
 
@@ -24,6 +25,10 @@ export type CommandDetail = {
   type: string;
   parameters: Record<string, string>;
   apiKeys: MaskedApiKey[];
+  // Live state of the daemontools service named by parameters.serviceName, resolved server-side
+  // (absent when the command has no serviceName or the service is not found on the agent).
+  serviceStatusName?: string;
+  serviceStatusIndicator?: StatusIndicatorProps.Type;
 };
 
 type CommandDetailResponse = { command: CommandDetail };

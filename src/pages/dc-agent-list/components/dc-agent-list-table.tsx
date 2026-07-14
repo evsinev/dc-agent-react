@@ -194,6 +194,7 @@ export default function DcAgentListTable(props: Props) {
         }}
         variant="full-page"
         stickyHeader
+        resizableColumns
         header={
           <Header
             variant="awsui-h1-sticky"

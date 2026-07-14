@@ -94,6 +94,7 @@ export default function AppListTable(props: AppListTableProps) {
         }}
         variant="full-page"
         stickyHeader
+        resizableColumns
         header={
           <Header
             variant="awsui-h1-sticky"

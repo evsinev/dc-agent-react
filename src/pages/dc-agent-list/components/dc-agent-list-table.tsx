@@ -5,6 +5,7 @@ import {
   parsePropertyFilterQuery,
   PROPERTY_FILTERS_QUERY_PARAM_KEY,
   saveQueryFilter,
+  SORT_QUERY_PARAM_KEY,
 } from '@/libs/parse-property-filter';
 import { AgentInfo } from '@/pages/dc-agent-list/api/agent-list';
 import { useCollection } from '@cloudscape-design/collection-hooks';
@@ -76,9 +77,13 @@ export default function DcAgentListTable(props: Props) {
   );
 
   const defaultPage = Math.max(1, Number(getQueryParam(PAGE_QUERY_PARAM_KEY)) || 1);
+  const sortParam = getQueryParam(SORT_QUERY_PARAM_KEY);
+  const defaultSortingState = sortParam
+    ? { sortingColumn: { sortingField: sortParam.replace(/^-/, '') }, isDescending: sortParam.startsWith('-') }
+    : undefined;
 
   const { items, collectionProps, propertyFilterProps, paginationProps } = useCollection(props.agents, {
-    sorting: {},
+    sorting: { defaultState: defaultSortingState },
     pagination: { pageSize: preferences.pageSize, defaultPage },
     propertyFiltering: {
       filteringProperties: AGENT_FILTERING_PROPERTIES,
@@ -89,6 +94,14 @@ export default function DcAgentListTable(props: Props) {
   return (
     <Table
       {...collectionProps}
+      onSortingChange={(event) => {
+        const { sortingColumn, isDescending } = event.detail;
+        setQueryParam(
+          SORT_QUERY_PARAM_KEY,
+          sortingColumn.sortingField ? `${isDescending ? '-' : ''}${sortingColumn.sortingField}` : null,
+        );
+        collectionProps.onSortingChange?.(event);
+      }}
       variant="full-page"
       stickyHeader
       header={

@@ -7,6 +7,7 @@ import { NonCancelableCustomEvent, PropertyFilterProps } from '@cloudscape-desig
 
 export const PROPERTY_FILTERS_QUERY_PARAM_KEY = 'propertyFilter';
 export const PAGE_QUERY_PARAM_KEY = 'page';
+export const SORT_QUERY_PARAM_KEY = 'sort';
 
 const PropertyFilterOperation = z.enum(['and', 'or']);
 

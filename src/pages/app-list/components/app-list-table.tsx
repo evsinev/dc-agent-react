@@ -15,7 +15,12 @@ import {
 import Header from '@cloudscape-design/components/header';
 import { useLocalStorage } from '@/hooks/use-local-storage';
 import { useQueryParams } from '@/hooks/use-query-params';
-import { PAGE_QUERY_PARAM_KEY, parsePropertyFilterQuery, saveQueryFilter } from '@/libs/parse-property-filter';
+import {
+  PAGE_QUERY_PARAM_KEY,
+  parsePropertyFilterQuery,
+  saveQueryFilter,
+  SORT_QUERY_PARAM_KEY,
+} from '@/libs/parse-property-filter';
 import LoadError from '@/components/error/components/load-error';
 import { AppStatusIndicator } from '@/pages/app-list/components/app-status-indicator';
 import AppTablePreferences, { APP_PREFERENCES_STORAGE_KEY, DEFAULT_APP_PREFERENCES } from './app-list-preferences';
@@ -32,8 +37,6 @@ type AppListTableProps = {
   onRetry: () => void;
 };
 
-const defaultSorting = { sorting: {} };
-
 const itemCell = (item: AppListItem) => <Link to={routing.app.replace(':appName', item.appName)}>{item.appName}</Link>;
 
 export default function AppListTable(props: AppListTableProps) {
@@ -44,9 +47,13 @@ export default function AppListTable(props: AppListTableProps) {
   );
 
   const defaultPage = Math.max(1, Number(getQueryParam(PAGE_QUERY_PARAM_KEY)) || 1);
+  const sortParam = getQueryParam(SORT_QUERY_PARAM_KEY);
+  const defaultSortingState = sortParam
+    ? { sortingColumn: { sortingField: sortParam.replace(/^-/, '') }, isDescending: sortParam.startsWith('-') }
+    : undefined;
 
   const { items, collectionProps, propertyFilterProps, paginationProps } = useCollection(props.apps, {
-    sorting: defaultSorting.sorting,
+    sorting: { defaultState: defaultSortingState },
     pagination: { pageSize: preferences.pageSize, defaultPage },
     propertyFiltering: {
       filteringProperties: APP_LIST_FILTERING_PROPERTIES,
@@ -57,6 +64,14 @@ export default function AppListTable(props: AppListTableProps) {
   return (
     <Table
       {...collectionProps}
+      onSortingChange={(event) => {
+        const { sortingColumn, isDescending } = event.detail;
+        setQueryParam(
+          SORT_QUERY_PARAM_KEY,
+          sortingColumn.sortingField ? `${isDescending ? '-' : ''}${sortingColumn.sortingField}` : null,
+        );
+        collectionProps.onSortingChange?.(event);
+      }}
       variant="full-page"
       stickyHeader
       header={

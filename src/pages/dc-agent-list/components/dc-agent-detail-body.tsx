@@ -4,7 +4,9 @@ import { Tabs } from '@cloudscape-design/components';
 import SpaceBetween from '@cloudscape-design/components/space-between';
 import DcAgentCommandsTable from './dc-agent-commands-table';
 import DcAgentDetailsPanel from './dc-agent-details-panel';
+import DcAgentGcPanel from './dc-agent-gc-panel';
 import DcAgentServicesTable from './dc-agent-services-table';
+import DcAgentSystemPanel from './dc-agent-system-panel';
 
 type Props = {
   agent: AgentInfo;
@@ -34,6 +36,16 @@ export default function DcAgentDetailBody({ agent }: Props) {
             id: 'services',
             label: 'Services',
             content: <DcAgentServicesTable agent={agent} />,
+          },
+          {
+            id: 'system',
+            label: 'System / JVM',
+            content: <DcAgentSystemPanel agent={agent} />,
+          },
+          {
+            id: 'gc',
+            label: 'Garbage collection',
+            content: <DcAgentGcPanel agent={agent} />,
           },
         ]}
       />

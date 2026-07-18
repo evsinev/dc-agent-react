@@ -20,13 +20,14 @@ const AGENT_COMMAND_PREFERENCES = {
 // carries the same property filter, saved filter sets, and column/density preferences.
 export default function DcAgentCommandsTable({ agent }: Props) {
   const navigate = useNavigate();
-  const { data, isLoading, error, mutate } = useCommandList();
+  const { data, isLoading, isValidating, error, mutate } = useCommandList();
   const commands = (data?.commands ?? []).filter((command) => command.host === agent.name);
 
   return (
     <CommandListTable
       commands={commands}
       isLoading={isLoading}
+      isValidating={isValidating}
       error={error}
       onRetry={() => mutate()}
       variant="embedded"

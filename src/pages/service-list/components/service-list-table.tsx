@@ -5,6 +5,7 @@ import {
   CollectionPreferencesProps,
   Pagination,
   PropertyFilter,
+  SpaceBetween,
   StatusIndicator,
 } from '@cloudscape-design/components';
 import Header from '@cloudscape-design/components/header';
@@ -51,6 +52,7 @@ const SERVICE_HELP = (
 type Props = {
   services: ServiceListItem[];
   isLoading: boolean;
+  isValidating?: boolean;
   selected?: ServiceListItem[];
   setSelected?: (app: ServiceListItem[]) => void;
   error?: unknown;
@@ -121,6 +123,13 @@ export default function ServiceListTable(props: Props) {
   return (
     <>
       {actionModal}
+      {props.error && items.length > 0 && (
+        <LoadError
+          error={props.error}
+          onRetry={props.onRetry}
+          resource="services"
+        />
+      )}
       <Table
         {...collectionProps}
         onSortingChange={(event) => {
@@ -146,16 +155,22 @@ export default function ServiceListTable(props: Props) {
               />
             }
             actions={
-              <Button
-                variant="icon"
-                iconName="refresh"
-                ariaLabel="Refresh list"
-                onClick={props.onRetry}
-              />
+              <SpaceBetween
+                direction="horizontal"
+                size="xs"
+                alignItems="center"
+              >
+                {props.isValidating && <StatusIndicator type="loading">Fetching</StatusIndicator>}
+                <Button
+                  variant="icon"
+                  iconName="refresh"
+                  ariaLabel="Refresh list"
+                  onClick={props.onRetry}
+                />
+              </SpaceBetween>
             }
           >
             {title}
-            {props.isLoading && <StatusIndicator type="loading">Fetching</StatusIndicator>}
           </Header>
         }
         columnDefinitions={[

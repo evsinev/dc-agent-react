@@ -26,6 +26,10 @@ export const DEFAULT_AGENT_PREFERENCES: CollectionPreferencesProps.Preferences =
     { id: 'memPct', visible: false },
     { id: 'threads', visible: true },
     { id: 'gcTime', visible: false },
+    { id: 'gcHealth', visible: true },
+    { id: 'gcMaxPause', visible: false },
+    { id: 'gcLastPause', visible: false },
+    { id: 'liveSet', visible: false },
     { id: 'url', visible: false },
   ],
 };
@@ -103,6 +107,10 @@ export default function DcAgentTablePreferences(props: Props) {
           { id: 'memPct', label: 'Memory %' },
           { id: 'threads', label: 'Threads' },
           { id: 'gcTime', label: 'GC time' },
+          { id: 'gcHealth', label: 'GC health' },
+          { id: 'gcMaxPause', label: 'GC max pause' },
+          { id: 'gcLastPause', label: 'GC last pause' },
+          { id: 'liveSet', label: 'Live set' },
           { id: 'url', label: 'URL' },
         ],
       }}

@@ -106,6 +106,23 @@ function mockMetrics(over: Partial<AgentMetrics> = {}): AgentMetrics {
     gcCount: 1234,
     gcTimeMs: 1200,
     gcTimeText: '1s',
+    gcAvgPauseMs: 18,
+    gcAvgPauseText: '18.0 ms',
+    gcMaxPauseMs: 42,
+    gcMaxPauseText: '42 ms',
+    gcLastPauseMs: 15,
+    gcLastPauseText: '15 ms',
+    gcLongPauseCount: 0,
+    gcLiveSetBytes: 268_435_456,
+    gcLiveSetText: '256.0 MB',
+    gcLastCause: 'G1 Evacuation Pause',
+    gcHealthLevel: 'OK',
+    gcHealthSummary:
+      'GC healthy: 1234 collections, avg 18.0 ms, max 42 ms, live set 256.0 MB. No leak or pressure signs.',
+    gcHealthDetail:
+      'GC healthy: 1234 collections, avg 18.0 ms, max 42 ms, live set 256.0 MB. No leak or pressure signs.',
+    gcLlmPayload:
+      'You are a JVM garbage-collection expert. Below are GC statistics and host context collected from a running Java service.\n\n## GC statistics\ncollections: 1234\nmax pause: 42 ms\nlast pause: 15 ms\nlive set after last GC: 256.0 MB\n',
     ...over,
   };
 }
@@ -154,6 +171,23 @@ export const AGENTS: AgentInfo[] = [
       heapUsedFraction: 0.75,
       heapUsedPercentText: '75%',
       threadCount: 51,
+      gcAvgPauseMs: 95,
+      gcAvgPauseText: '95.0 ms',
+      gcMaxPauseMs: 420,
+      gcMaxPauseText: '420 ms',
+      gcLastPauseMs: 180,
+      gcLastPauseText: '180 ms',
+      gcLongPauseCount: 2,
+      gcLiveSetBytes: 1_476_395_008,
+      gcLiveSetText: '1.4 GB',
+      gcLastCause: 'G1 Humongous Allocation',
+      gcHealthLevel: 'WARN',
+      gcHealthSummary:
+        'Last GC pause was 180 ms (cause: G1 Humongous Allocation) — above the comfortable range; watch for repeats.',
+      gcHealthDetail:
+        'Last GC pause was 180 ms (cause: G1 Humongous Allocation) — above the comfortable range; watch for repeats.\nAfter the last GC the heap is 69% full — getting tight, keep an eye on it.',
+      gcLlmPayload:
+        'You are a JVM garbage-collection expert. Below are GC statistics and host context collected from a running Java service.\n\n## GC statistics\ncollections: 1234\nmax pause: 420 ms\nlast pause: 180 ms\nlive set after last GC: 1.4 GB\n',
     }),
   },
   {

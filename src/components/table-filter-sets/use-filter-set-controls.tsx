@@ -87,12 +87,13 @@ export function useFilterSetControls({
   });
 
   return {
-    // Min width keeps the "Saved filter sets" inline label on one line when the selected value is short.
+    // Min width keeps the selected value / placeholder readable without the box resizing. The visible
+    // "Saved filter sets" label is dropped to declutter the row; ariaLabel keeps the accessible name.
     customControl: (
       <div style={{ minWidth: 240 }}>
         <Select
           {...selectProps}
-          inlineLabelText="Saved filter sets"
+          ariaLabel="Saved filter sets"
           ref={selectRef}
         />
       </div>

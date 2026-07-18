@@ -11,7 +11,7 @@ import {
   useFilterSetControls,
 } from '@/components/table-filter-sets/use-filter-set-controls';
 import { FilterSet } from '@/components/table-filter-sets/use-filter-sets';
-import { AgentInfo, AgentMetrics } from '@/pages/dc-agent-list/api/agent-list';
+import { AgentInfo, AgentMetrics, gcHealthIndicatorType } from '@/pages/dc-agent-list/api/agent-list';
 import { useCollection } from '@cloudscape-design/collection-hooks';
 import {
   Box,
@@ -90,6 +90,13 @@ const metricText = (agent: AgentInfo, key: keyof AgentMetrics): string => {
   return value === undefined || value === null ? '—' : String(value);
 };
 
+// GC health is a string level, not a numeric metric, so it sorts on a rank (agents without metrics
+// sink to the bottom). CRITICAL sorts highest so a descending sort surfaces the worst agents first.
+const GC_LEVEL_RANK: Record<string, number> = { OK: 0, WARN: 1, CRITICAL: 2 };
+const gcHealthRank = (agent: AgentInfo): number =>
+  agent.metrics ? (GC_LEVEL_RANK[agent.metrics.gcHealthLevel] ?? -1) : -1;
+const byGcHealth = (a: AgentInfo, b: AgentInfo): number => gcHealthRank(a) - gcHealthRank(b);
+
 const columnDefinitions: TableProps.ColumnDefinition<AgentInfo>[] = [
   {
     id: 'name',
@@ -159,6 +166,37 @@ const columnDefinitions: TableProps.ColumnDefinition<AgentInfo>[] = [
     header: 'GC time',
     cell: (a) => a.metrics?.gcTimeText ?? '—',
     sortingComparator: byMetric('gcTimeMs'),
+  },
+  {
+    id: 'gcHealth',
+    header: 'GC health',
+    cell: (a) =>
+      a.metrics ? (
+        <StatusIndicator type={gcHealthIndicatorType(a.metrics.gcHealthLevel)}>
+          {a.metrics.gcHealthLevel}
+        </StatusIndicator>
+      ) : (
+        '—'
+      ),
+    sortingComparator: byGcHealth,
+  },
+  {
+    id: 'gcMaxPause',
+    header: 'GC max pause',
+    cell: (a) => a.metrics?.gcMaxPauseText ?? '—',
+    sortingComparator: byMetric('gcMaxPauseMs'),
+  },
+  {
+    id: 'gcLastPause',
+    header: 'GC last pause',
+    cell: (a) => a.metrics?.gcLastPauseText ?? '—',
+    sortingComparator: byMetric('gcLastPauseMs'),
+  },
+  {
+    id: 'liveSet',
+    header: 'Live set',
+    cell: (a) => a.metrics?.gcLiveSetText ?? '—',
+    sortingComparator: byMetric('gcLiveSetBytes'),
   },
   { id: 'url', header: 'URL', cell: (a) => a.url, sortingField: 'url' },
 ];

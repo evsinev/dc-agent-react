@@ -1,6 +1,16 @@
 import DefinitionList from '@/components/definition-list';
-import { AgentInfo } from '@/pages/dc-agent-list/api/agent-list';
-import { Box, ColumnLayout, Container, Header, SpaceBetween, StatusIndicator } from '@cloudscape-design/components';
+import { errorMessage } from '@/components/error/components/load-error';
+import { useNotifications } from '@/hooks/use-notifications';
+import { AgentInfo, gcHealthIndicatorType } from '@/pages/dc-agent-list/api/agent-list';
+import {
+  Box,
+  Button,
+  ColumnLayout,
+  Container,
+  Header,
+  SpaceBetween,
+  StatusIndicator,
+} from '@cloudscape-design/components';
 
 type Props = {
   agent: AgentInfo;
@@ -8,6 +18,33 @@ type Props = {
 
 export default function DcAgentDetailsPanel({ agent }: Props) {
   const m = agent.metrics;
+  const notify = useNotifications((state) => state.add);
+
+  // Direct clipboard write — no browser storage. The payload is a self-contained block built by the
+  // backend (raw GC numbers + host/JVM context + an instruction) ready to paste into an LLM.
+  const copyForLlm = async () => {
+    if (!m?.gcLlmPayload) {
+      return;
+    }
+    try {
+      await navigator.clipboard.writeText(m.gcLlmPayload);
+      notify({
+        id: `gc-copy-${agent.name}`,
+        type: 'success',
+        header: `Copied GC report for ${agent.name}`,
+        autoDismissMs: 3000,
+      });
+    } catch (error) {
+      notify({
+        id: `gc-copy-${agent.name}`,
+        type: 'error',
+        header: `Could not copy GC report for ${agent.name}`,
+        content: errorMessage(error),
+        statusIconAriaLabel: 'error',
+      });
+    }
+  };
+
   return (
     <SpaceBetween size="l">
       <ColumnLayout
@@ -75,6 +112,52 @@ export default function DcAgentDetailsPanel({ agent }: Props) {
               { label: 'Process CPU time', value: m.processCpuTimeText },
             ]}
           />
+        ) : (
+          <Box color="text-status-inactive">{agent.metricsError ?? 'No metrics available'}</Box>
+        )}
+      </Container>
+
+      <Container
+        header={
+          <Header
+            headingTagOverride="h3"
+            actions={
+              <Button
+                iconName="copy"
+                disabled={!m?.gcLlmPayload}
+                onClick={copyForLlm}
+              >
+                Copy for LLM
+              </Button>
+            }
+          >
+            Garbage collection
+          </Header>
+        }
+      >
+        {m ? (
+          <SpaceBetween size="s">
+            <Box>
+              <StatusIndicator type={gcHealthIndicatorType(m.gcHealthLevel)}>{m.gcHealthLevel}</StatusIndicator>{' '}
+              {m.gcHealthSummary}
+            </Box>
+            {m.gcHealthDetail && m.gcHealthDetail !== m.gcHealthSummary && (
+              <div style={{ whiteSpace: 'pre-line' }}>{m.gcHealthDetail}</div>
+            )}
+            <DefinitionList
+              columns={2}
+              ariaLabel="Garbage collection metrics"
+              termWidth="150px"
+              items={[
+                { label: 'Avg pause', value: m.gcAvgPauseText },
+                { label: 'Max pause', value: m.gcMaxPauseText },
+                { label: 'Last pause', value: m.gcLastPauseText },
+                { label: 'Long pauses', value: String(m.gcLongPauseCount) },
+                { label: 'Live set', value: m.gcLiveSetText },
+                { label: 'Last cause', value: m.gcLastCause },
+              ]}
+            />
+          </SpaceBetween>
         ) : (
           <Box color="text-status-inactive">{agent.metricsError ?? 'No metrics available'}</Box>
         )}

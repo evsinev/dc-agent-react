@@ -58,7 +58,37 @@ export type AgentMetrics = {
   gcCount: number;
   gcTimeMs: number;
   gcTimeText: string;
+
+  // Rich per-pause GC statistics. Raw values (numbers) sort the table; *Text renders them.
+  gcAvgPauseMs: number;
+  gcAvgPauseText: string;
+  gcMaxPauseMs: number;
+  gcMaxPauseText: string;
+  gcLastPauseMs: number;
+  gcLastPauseText: string;
+  gcLongPauseCount: number;
+  gcLiveSetBytes: number;
+  gcLiveSetText: string;
+  gcLastCause: string;
+
+  // Deterministic (LLM-free) GC verdict + the ready-to-paste "copy for LLM" block.
+  gcHealthLevel: string; // OK / WARN / CRITICAL
+  gcHealthSummary: string;
+  gcHealthDetail: string;
+  gcLlmPayload: string;
 };
+
+// Map the backend GC health level to a Cloudscape StatusIndicator type. Shared by the list table
+// and the details panel so the two views can never drift.
+export function gcHealthIndicatorType(level?: string): 'error' | 'warning' | 'success' {
+  if (level === 'CRITICAL') {
+    return 'error';
+  }
+  if (level === 'WARN') {
+    return 'warning';
+  }
+  return 'success';
+}
 
 export type AgentInfo = {
   name: string;

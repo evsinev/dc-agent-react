@@ -54,6 +54,7 @@ type AppListTableProps = {
   selected: AppListItem[];
   setSelected: (app: AppListItem[]) => void;
   isLoading: boolean;
+  isValidating?: boolean;
   actions?: ReactNode;
   error?: unknown;
   onRetry: () => void;
@@ -101,6 +102,13 @@ export default function AppListTable(props: AppListTableProps) {
   return (
     <>
       {actionModal}
+      {props.error && items.length > 0 && (
+        <LoadError
+          error={props.error}
+          onRetry={props.onRetry}
+          resource="applications"
+        />
+      )}
       <Table
         {...collectionProps}
         onSortingChange={(event) => {
@@ -128,7 +136,7 @@ export default function AppListTable(props: AppListTableProps) {
             actions={props.actions}
           >
             Applications
-            {props.isLoading && <StatusIndicator type="loading">Fetching</StatusIndicator>}
+            {props.isValidating && <StatusIndicator type="loading">Fetching</StatusIndicator>}
           </Header>
         }
         selectionType="single"

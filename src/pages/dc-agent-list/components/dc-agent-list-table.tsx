@@ -56,6 +56,7 @@ const AGENT_HELP = (
 type Props = {
   agents: AgentInfo[];
   isLoading: boolean;
+  isValidating: boolean;
   selected: AgentInfo[];
   setSelected: (agents: AgentInfo[]) => void;
   actions?: ReactNode;
@@ -241,6 +242,13 @@ export default function DcAgentListTable(props: Props) {
   return (
     <>
       {actionModal}
+      {props.error && items.length > 0 && (
+        <LoadError
+          error={props.error}
+          onRetry={props.onRetry}
+          resource="agents"
+        />
+      )}
       <Table
         {...collectionProps}
         onSortingChange={(event) => {
@@ -271,6 +279,7 @@ export default function DcAgentListTable(props: Props) {
                 size="xs"
                 alignItems="center"
               >
+                {props.isValidating && <StatusIndicator type="loading">Fetching</StatusIndicator>}
                 <Button
                   variant="icon"
                   iconName="refresh"
@@ -282,7 +291,6 @@ export default function DcAgentListTable(props: Props) {
             }
           >
             Agents
-            {props.isLoading && <StatusIndicator type="loading">Fetching</StatusIndicator>}
           </Header>
         }
         selectionType="single"

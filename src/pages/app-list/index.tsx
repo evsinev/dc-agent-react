@@ -9,7 +9,7 @@ import AppServicePanel from '@/pages/app-list/components/app-service-panel';
 
 export default function AppList() {
   useDocumentTitle('Applications');
-  const { data, isLoading, error, mutate } = useAppList();
+  const { data, isLoading, isValidating, error, mutate } = useAppList();
   const [selected, setSelected] = useState<AppListItem[]>([]);
   const { branch, updatedLabel, isPulling, pull, refresh } = useQuickPull();
 
@@ -39,6 +39,7 @@ export default function AppList() {
     <AppListTable
       apps={data?.apps ?? []}
       isLoading={isLoading}
+      isValidating={isValidating}
       error={error}
       onRetry={() => mutate()}
       selected={selected}

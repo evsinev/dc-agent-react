@@ -17,13 +17,14 @@ const AGENT_SERVICE_PREFERENCES = {
 // standalone /service/list feed (SWR-cached) rather than the lightweight agent.services brief, so the
 // State/Age columns, sorting, and property filtering all work here too.
 export default function DcAgentServicesTable({ agent }: Props) {
-  const { data, isLoading, error, mutate } = useServiceList();
+  const { data, isLoading, isValidating, error, mutate } = useServiceList();
   const services = (data?.services ?? []).filter((service) => service.host === agent.name);
 
   return (
     <ServiceListTable
       services={services}
       isLoading={isLoading}
+      isValidating={isValidating}
       error={error}
       onRetry={() => mutate()}
       variant="embedded"

@@ -55,6 +55,7 @@ const COMMAND_HELP = (
 type Props = {
   commands: CommandInfo[];
   isLoading: boolean;
+  isValidating?: boolean;
   selected?: CommandInfo[];
   setSelected?: (commands: CommandInfo[]) => void;
   actions?: ReactNode;
@@ -161,6 +162,13 @@ export default function CommandListTable(props: Props) {
   return (
     <>
       {actionModal}
+      {props.error && items.length > 0 && (
+        <LoadError
+          error={props.error}
+          onRetry={props.onRetry}
+          resource="commands"
+        />
+      )}
       <Table
         {...collectionProps}
         onSortingChange={(event) => {
@@ -191,6 +199,7 @@ export default function CommandListTable(props: Props) {
                 size="xs"
                 alignItems="center"
               >
+                {props.isValidating && <StatusIndicator type="loading">Fetching</StatusIndicator>}
                 <Button
                   variant="icon"
                   iconName="refresh"
@@ -202,7 +211,6 @@ export default function CommandListTable(props: Props) {
             }
           >
             {title}
-            {props.isLoading && <StatusIndicator type="loading">Fetching</StatusIndicator>}
           </Header>
         }
         selectionType={selectable ? 'single' : undefined}

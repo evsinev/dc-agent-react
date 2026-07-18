@@ -11,7 +11,7 @@ import CommandListTable from './components/command-list-table';
 export default function CommandList() {
   useDocumentTitle('Commands');
   const navigate = useNavigate();
-  const { data, isLoading, error, mutate } = useCommandList();
+  const { data, isLoading, isValidating, error, mutate } = useCommandList();
   const [selected, setSelected] = useState<CommandInfo[]>([]);
 
   const show = useSplitPanel((state) => state.show);
@@ -33,6 +33,7 @@ export default function CommandList() {
     <CommandListTable
       commands={data?.commands ?? []}
       isLoading={isLoading}
+      isValidating={isValidating}
       error={error}
       onRetry={() => mutate()}
       selected={selected}

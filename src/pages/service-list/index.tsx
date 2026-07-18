@@ -7,7 +7,7 @@ import ServiceViewPanel from '@/pages/service-view/components/service-view-panel
 
 export default function ServiceList() {
   useDocumentTitle('Services');
-  const { data, isLoading, error, mutate } = useServiceList();
+  const { data, isLoading, isValidating, error, mutate } = useServiceList();
   const services = data?.services ?? [];
   const [selectedService, setSelectedServices] = useState<ServiceListItem[]>([]);
 
@@ -35,6 +35,7 @@ export default function ServiceList() {
     <ServiceListTable
       services={services}
       isLoading={isLoading}
+      isValidating={isValidating}
       error={error}
       onRetry={() => mutate()}
       selected={selectedService}

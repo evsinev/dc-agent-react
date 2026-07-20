@@ -52,10 +52,10 @@ export default function DcAgentDetailsPanel({ agent }: Props) {
           items={[
             { label: 'Instance', value: agent.appInstanceName ?? '—' },
             { label: 'Version', value: agent.appVersion ?? '—' },
-            { label: 'Reported host', value: agent.hostname ?? '—' },
             { label: 'Port', value: agent.port ? String(agent.port) : '—' },
             { label: 'Uptime', value: agent.uptimeFormatted ?? '—' },
-            { label: 'Response id', value: agent.responseId ?? '—' },
+            { label: 'Reported host', value: agent.hostname ?? '—', className: 'definition-list__item--full' },
+            { label: 'Response id', value: agent.responseId ?? '—', className: 'definition-list__item--full' },
           ]}
         />
       </Container>

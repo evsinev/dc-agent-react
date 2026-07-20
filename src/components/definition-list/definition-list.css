@@ -93,6 +93,11 @@
   overflow-wrap: anywhere;
 }
 
+/* Full-width row: span all grid columns (e.g. a long id that must not wrap). */
+.definition-list__item--full {
+  grid-column: 1 / -1;
+}
+
 /* --- groups --------------------------------------------------------------- */
 
 .definition-list__group {

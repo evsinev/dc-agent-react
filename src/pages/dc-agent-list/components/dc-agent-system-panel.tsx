@@ -28,9 +28,15 @@ export default function DcAgentSystemPanel({ agent }: Props) {
         { label: 'Non-heap used', value: m.nonHeapUsedText },
         { label: 'Memory used', value: `${m.physicalUsedText} (${m.physicalUsedPercentText})` },
         { label: 'Memory total', value: m.physicalTotalText },
+        // MemFree excludes page cache — MemAvailable is the real headroom figure on DB hosts.
+        { label: 'MemFree', value: m.physicalFreeText },
+        { label: 'MemAvailable', value: m.memAvailableText },
         { label: 'Swap', value: `${m.swapFreeText} free / ${m.swapTotalText}` },
+        { label: 'Swap in / out', value: `${m.swapInText} / ${m.swapOutText}` },
+        { label: 'JVM swapped out', value: m.processSwapText },
         { label: 'Threads', value: String(m.threadCount) },
         { label: 'GC', value: `${m.gcCount} (${m.gcTimeText})` },
+        { label: 'Uptime', value: m.uptimeText },
         { label: 'Process CPU time', value: m.processCpuTimeText },
       ]}
     />

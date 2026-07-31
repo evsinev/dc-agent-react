@@ -66,11 +66,19 @@ export default function DcAgentGcPanel({ agent }: Props) {
         ariaLabel="Garbage collection metrics"
         termWidth="150px"
         items={[
+          { label: 'Collectors', value: m.gcCollectorsText },
+          { label: 'Live set', value: m.gcLiveSetText },
+          { label: 'Old gen used', value: m.gcOldGenUsedText },
+          { label: 'Old gen max', value: m.gcOldGenMaxText },
+          { label: 'Allocation rate', value: m.gcAllocationRateText },
+          { label: 'Avg interval', value: m.gcAvgIntervalText },
           { label: 'Avg pause', value: m.gcAvgPauseText },
-          { label: 'Max pause', value: m.gcMaxPauseText },
+          { label: 'Max pause (all time)', value: m.gcMaxPauseText },
+          { label: 'Max pause (last hour)', value: m.gcMaxPauseRecentText },
           { label: 'Last pause', value: m.gcLastPauseText },
           { label: 'Long pauses', value: String(m.gcLongPauseCount) },
-          { label: 'Live set', value: m.gcLiveSetText },
+          { label: 'Sub-ms pauses', value: m.gcSubMsPauseCount == null ? 'n/a' : String(m.gcSubMsPauseCount) },
+          { label: 'Full GCs', value: m.gcFullGcCount == null ? 'n/a' : String(m.gcFullGcCount) },
           { label: 'Last cause', value: m.gcLastCause },
         ]}
       />

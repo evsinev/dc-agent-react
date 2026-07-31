@@ -29,6 +29,10 @@ export type AgentMetrics = {
   availableProcessors: number;
   processCpuTimeNanos: number;
   processCpuTimeText: string;
+  // Wall-clock process age. Distinct from AgentInfo.uptimeMs (app-status). Raw is optional: the
+  // backend omits it (null) for an older agent; the *Text is always present ("n/a" when unknown).
+  uptimeMs?: number;
+  uptimeText: string;
 
   heapUsedBytes: number;
   heapUsedText: string;
@@ -46,13 +50,24 @@ export type AgentMetrics = {
   physicalTotalBytes: number;
   physicalTotalText: string;
   physicalFreeBytes: number;
-  physicalFreeText: string;
+  physicalFreeText: string; // Linux MemFree (excludes page cache) — label as "MemFree"
+  // The real "free-ish" figure. Raw optional (older agent / non-Linux); *Text always present.
+  memAvailableBytes?: number;
+  memAvailableText: string;
   physicalUsedFraction: number;
   physicalUsedPercentText: string;
   swapTotalBytes: number;
   swapTotalText: string;
   swapFreeBytes: number;
   swapFreeText: string;
+  swapCachedBytes?: number;
+  swapCachedText: string;
+  swapInPagesPerSec?: number;
+  swapInText: string;
+  swapOutPagesPerSec?: number;
+  swapOutText: string;
+  processSwapBytes?: number; // how much of THIS JVM is swapped out
+  processSwapText: string;
 
   threadCount: number;
   gcCount: number;
@@ -70,6 +85,23 @@ export type AgentMetrics = {
   gcLiveSetBytes: number;
   gcLiveSetText: string;
   gcLastCause: string;
+
+  // Extended GC signals. Raw values optional (older agent / not applicable to the collector);
+  // the *Text renderings are always present ("n/a" when unknown).
+  gcCollectorNames?: string[];
+  gcCollectorsText: string;
+  gcAllocationRateBytesPerSec?: number;
+  gcAllocationRateText: string;
+  gcAvgIntervalMs?: number;
+  gcAvgIntervalText: string;
+  gcFullGcCount?: number;
+  gcOldGenUsedBytes?: number;
+  gcOldGenUsedText: string;
+  gcOldGenMaxBytes?: number;
+  gcOldGenMaxText: string;
+  gcMaxPauseRecentMs?: number;
+  gcMaxPauseRecentText: string;
+  gcSubMsPauseCount?: number;
 
   // Deterministic (LLM-free) GC verdict + the ready-to-paste "copy for LLM" block.
   gcHealthLevel: string; // OK / WARN / CRITICAL

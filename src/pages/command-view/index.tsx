@@ -1,6 +1,7 @@
 import DefinitionList from '@/components/definition-list';
 import LoadError from '@/components/error/components/load-error';
 import { useDocumentTitle } from '@/hooks/use-document-title';
+import { headerNames } from '@/pages/command-list/api/command-headers';
 import { useCommandGet } from '@/pages/command-list/api/command-mutations';
 import {
   COMMAND_TYPES,
@@ -161,7 +162,11 @@ export default function CommandView() {
                 termWidth="180px"
                 items={configFields.map((field) => ({
                   label: field.label,
-                  value: command.parameters[field.key] ?? '—',
+                  // headers: names only — the values (a service token) are never rendered
+                  value:
+                    field.kind === 'headers'
+                      ? headerNames(command.parameters[field.key])
+                      : (command.parameters[field.key] ?? '—'),
                 }))}
               />
             ) : (
@@ -180,7 +185,9 @@ export default function CommandView() {
                 </Header>
               }
             >
-              <UsageTabs snippets={buildUsageSnippets(buildDeployUrl(agentUrl, command.type, command.name))} />
+              <UsageTabs
+                snippets={buildUsageSnippets(buildDeployUrl(agentUrl, command.type, command.name), command.type)}
+              />
             </Container>
           )}
 

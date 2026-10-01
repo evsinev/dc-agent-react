@@ -9,6 +9,7 @@ const UPLOAD_TYPES: ReadonlySet<CommandTypeKey> = new Set<CommandTypeKey>([
   'SAVE_ARTIFACT',
   'ZIP_ARCHIVE',
   'ZIP_DIRS',
+  'ZIP_ARCHIVE_VERSION',
 ]);
 
 export function isUploadType(type: string | undefined): type is CommandTypeKey {
@@ -20,7 +21,8 @@ const AGENT_URL_PLACEHOLDER = '<agent-url>';
 /**
  * Build the full deploy URL for a command. The agent URL from config may or may not already include the
  * `/dc-agent` context, so it's stripped and re-added to guarantee it appears exactly once. `{name}` is
- * substituted; `{version}`/`{subdir}` (save-artifact/zip-dirs) are left as literal placeholders to fill.
+ * substituted; `{version}`/`{subdir}` (save-artifact/zip-archive-version/zip-dirs) are left as literal
+ * placeholders to fill.
  */
 export function buildDeployUrl(agentUrl: string | undefined, type: string | undefined, name: string): string {
   const base = (agentUrl ?? AGENT_URL_PLACEHOLDER).replace(/\/dc-agent\/?$/, '');
@@ -37,8 +39,25 @@ export type UsageSnippets = {
   gitlabWget: string;
 };
 
-/** The four deploy-command templates (verbatim flag sets), with the deploy URL substituted. */
-export function buildUsageSnippets(url: string): UsageSnippets {
+/**
+ * The four deploy-command templates (verbatim flag sets), with the deploy URL substituted. For
+ * zip-archive-version the failure body carries the outcome (the service's reason, where the pointer
+ * is), so curl keeps it (`--fail-with-body`) and wget prints it (`--content-on-error`).
+ */
+export function buildUsageSnippets(url: string, type?: string): UsageSnippets {
+  const snippets = templates(url);
+  if (type !== 'ZIP_ARCHIVE_VERSION') {
+    return snippets;
+  }
+  return {
+    curl: snippets.curl.replace('--fail ', '--fail-with-body '),
+    wget: snippets.wget.replace('  -O- \\\n', '  --content-on-error \\\n  -O- \\\n'),
+    gitlabCurl: snippets.gitlabCurl.replace('--fail\n', '--fail-with-body\n'),
+    gitlabWget: snippets.gitlabWget.replace('      -O-\n', '      --content-on-error\n      -O-\n'),
+  };
+}
+
+function templates(url: string): UsageSnippets {
   return {
     curl: `curl \\
   --data-binary @package.zip \\

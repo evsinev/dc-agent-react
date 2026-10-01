@@ -17,6 +17,18 @@ export function errorMessage(error: unknown): string {
   return 'Something went wrong.';
 }
 
+/**
+ * The operator's own text of a 400 — e.g. a refused command config: `config <name>: field
+ * waitTimeout: …`. `clientPost` puts the operator's `errorMessage` into `RequestError.type`
+ * (`title` is the generic "Request Error"); undefined when there is no such text.
+ */
+export function serverErrorMessage(error: unknown): string | undefined {
+  if (error instanceof RequestError && error.status === 400 && error.type && error.type !== 'Request Error') {
+    return error.type;
+  }
+  return undefined;
+}
+
 type Props = {
   error: unknown;
   onRetry: () => void;

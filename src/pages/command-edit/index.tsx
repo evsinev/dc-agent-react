@@ -1,5 +1,5 @@
 import LoadError from '@/components/error/components/load-error';
-import { errorMessage } from '@/components/error/components/load-error';
+import { errorMessage, serverErrorMessage } from '@/components/error/components/load-error';
 import { RequestError } from '@/components/error/models/error-model';
 import { useDocumentTitle } from '@/hooks/use-document-title';
 import { useNotifications } from '@/hooks/use-notifications';
@@ -10,6 +10,7 @@ import {
   useCommandUpdate,
   useRevalidateCommands,
 } from '@/pages/command-list/api/command-mutations';
+import { parseStoredHeaders } from '@/pages/command-list/api/command-headers';
 import { COMMAND_TYPES, type CommandTypeKey, isCommandType } from '@/pages/command-list/api/command-types';
 import { Alert, Box, Header, SpaceBetween, StatusIndicator } from '@cloudscape-design/components';
 import routing from '@routing';
@@ -18,16 +19,30 @@ import { useNavigate, useParams } from 'react-router';
 import CommandForm, {
   type CommandFormInitial,
   type CommandFormSubmit,
+  type HeaderRow,
   existingApiKeyRow,
+  newHeaderRow,
 } from '../command-create/command-form';
 
-// Split a command's stored parameters into text values + boolean values, per the type's field defs.
-function buildInitial(detail: CommandDetail, type: CommandTypeKey): CommandFormInitial {
+// Split a command's stored parameters into text values, boolean values and header rows, per the
+// type's field defs. Every field of the type must be here: the form posts only registry fields.
+export function buildInitial(detail: CommandDetail, type: CommandTypeKey): CommandFormInitial {
   const values: Record<string, string> = {};
   const booleans: Record<string, boolean> = {};
+  const headers: Record<string, HeaderRow[]> = {};
+  const headerWarnings: Record<string, string> = {};
   for (const field of COMMAND_TYPES[type].fields) {
     const raw = detail.parameters[field.key];
-    if (field.kind === 'boolean') {
+    if (field.kind === 'headers') {
+      const pairs = parseStoredHeaders(raw);
+      if (pairs === null) {
+        headers[field.key] = [];
+        headerWarnings[field.key] =
+          `The stored ${field.label} could not be read; saving replaces them with the rows below.`;
+      } else {
+        headers[field.key] = pairs.map((pair) => newHeaderRow(pair.name, pair.value));
+      }
+    } else if (field.kind === 'boolean') {
       booleans[field.key] = raw === 'true';
     } else if (raw !== undefined) {
       values[field.key] = raw;
@@ -40,6 +55,8 @@ function buildInitial(detail: CommandDetail, type: CommandTypeKey): CommandFormI
     values,
     booleans,
     apiKeys: detail.apiKeys.map((key) => existingApiKeyRow(key.maskedId, key.owner)),
+    headers,
+    headerWarnings,
   };
 }
 
@@ -79,7 +96,7 @@ export default function CommandEdit() {
       if (err instanceof RequestError && err.status === 404) {
         setFormError(`Command ${submit.name} no longer exists on ${submit.host}.`);
       } else {
-        setFormError(errorMessage(err));
+        setFormError(serverErrorMessage(err) ?? errorMessage(err));
       }
     }
   }

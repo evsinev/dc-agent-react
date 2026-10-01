@@ -4,7 +4,7 @@ rstest.mock('@/libs/logger', () => ({ default: () => {} }));
 
 import { RequestError } from '@/components/error/models/error-model';
 import { render, screen } from '@testing-library/react';
-import LoadError, { errorMessage } from './load-error';
+import LoadError, { errorMessage, serverErrorMessage } from './load-error';
 
 describe('errorMessage', () => {
   test('uses the RequestError title for a network error', () => {
@@ -44,5 +44,18 @@ describe('LoadError', () => {
 
     screen.getByRole('button', { name: 'Retry' }).click();
     expect(onRetry).toHaveBeenCalledTimes(1);
+  });
+});
+
+describe('serverErrorMessage', () => {
+  test("a 400 carries the operator's own text", () => {
+    const error = new RequestError({ title: 'Request Error', status: 400, type: 'config b: field waitTimeout: bad' });
+    expect(serverErrorMessage(error)).toBe('config b: field waitTimeout: bad');
+  });
+
+  test('anything else has none', () => {
+    expect(serverErrorMessage(new RequestError({ title: 'Request Error', status: 500, type: 'x' }))).toBeUndefined();
+    expect(serverErrorMessage(new RequestError({ title: 'Request Error', status: 400 }))).toBeUndefined();
+    expect(serverErrorMessage(new Error('x'))).toBeUndefined();
   });
 });

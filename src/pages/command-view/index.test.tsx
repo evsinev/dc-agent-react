@@ -47,5 +47,6 @@ describe('CommandView (zip-archive-version)', () => {
     // the Usage snippet keeps the failure body and the {version} placeholder
     expect(container.textContent).toContain('--fail-with-body');
     expect(container.textContent).toContain('/dc-agent/zip-archive-version/bundle/{version}');
+    expect(screen.getByText(/Replace package.zip, \$DEPLOY_KEY and \{version\}/)).toBeTruthy();
   });
 });

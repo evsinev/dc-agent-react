@@ -177,3 +177,50 @@ describe('serviceViewFor', () => {
     expect(view.canUp).toBe(true);
   });
 });
+
+describe('zip-archive-version in the command mock (list/get shapes and one refusal rule of the agent)', () => {
+  beforeEach(() => __resetCommandState());
+  afterEach(() => __resetCommandState());
+
+  const body = (config: Record<string, unknown>) => ({
+    host: 'sandbox-1',
+    name: 'bundle',
+    config,
+    apiKeys: { keep: [], add: [{ key: 'k'.repeat(48), owner: 'ci' }] },
+  });
+
+  test('the headers object comes back from get as JSON text, the list shows names only', () => {
+    const created = mockCommandCreate(
+      'zip-archive-version',
+      body({ dir: '/opt/b', reloadHeaders: { Authorization: 'Bearer t' } }),
+    );
+
+    expect(created.status).toBe(200);
+    expect(detailOf(created.body).type).toBe('ZIP_ARCHIVE_VERSION');
+    expect(detailOf(mockCommandGet('sandbox-1', 'bundle').body).parameters.reloadHeaders).toBe(
+      '{"Authorization":"Bearer t"}',
+    );
+    const listed = commandListItems().find((command) => command.name === 'bundle');
+    expect(listed?.parameters?.reloadHeaders).toBe('Authorization');
+    expect(JSON.stringify(commandListItems())).not.toContain('mock-service-token');
+  });
+
+  test('a waitTimeout in hours is refused like the agent: 400 with the field, nothing written', () => {
+    const refused = mockCommandCreate('zip-archive-version', body({ dir: '/opt/b', waitTimeout: '1h' }));
+
+    expect(refused.status).toBe(400);
+    expect((refused.body as { errorMessage: string }).errorMessage).toMatch(/^config bundle: field waitTimeout:/);
+    expect(COMMANDS.some((command) => command.name === 'bundle')).toBe(false);
+
+    const updated = mockCommandUpdate('zip-archive-version', {
+      ...body({ waitTimeout: '2h' }),
+      name: 'mail-templates',
+    });
+    expect(updated.status).toBe(400);
+    expect(detailOf(mockCommandGet('sandbox-1', 'mail-templates').body).parameters.waitTimeout).toBe('6m');
+    // as the agent: the config is checked before the command is looked up
+    expect(mockCommandUpdate('zip-archive-version', { ...body({ waitTimeout: '1h' }), name: 'no-such' }).status).toBe(
+      400,
+    );
+  });
+});

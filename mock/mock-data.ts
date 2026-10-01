@@ -298,6 +298,20 @@ const COMMANDS_SEED: CommandInfo[] = [
     type: 'ZIP_DIRS',
     parameters: { dir: '/var/log/app', delete: 'true', apiKeys: 'jenkins' },
   },
+  {
+    host: 'sandbox-1',
+    name: 'mail-templates',
+    type: 'ZIP_ARCHIVE_VERSION',
+    // stored as the agent's command/get returns it: the headers object as JSON text
+    parameters: {
+      dir: '/opt/mail/bundles',
+      versionFile: '/opt/mail/bundles/current',
+      reloadUrl: 'http://127.0.0.1:8080/bundle/reload?version=${version}',
+      reloadHeaders: '{"Authorization":"Bearer mock-service-token"}',
+      waitTimeout: '6m',
+      apiKeys: 'gitlab-ci',
+    },
+  },
   { host: 'dev-box-b', error: 'Connection refused' },
 ];
 
@@ -315,6 +329,7 @@ const TYPE_BY_PATH: Record<string, string> = {
   'save-artifact': 'SAVE_ARTIFACT',
   'zip-archive': 'ZIP_ARCHIVE',
   'zip-dirs': 'ZIP_DIRS',
+  'zip-archive-version': 'ZIP_ARCHIVE_VERSION',
   'fetch-url': 'FETCH_URL',
   docker: 'DOCKER',
 };
@@ -380,7 +395,9 @@ function applyCommandWrite(host: string, name: string, type: string, body: Comma
     if (value === undefined || value === null || value === '') {
       continue;
     }
-    parameters[field] = typeof value === 'string' ? value : String(value);
+    // an object (zip-archive-version reloadHeaders) is kept as JSON text, as the agent's get returns it
+    parameters[field] =
+      typeof value === 'string' ? value : typeof value === 'object' ? JSON.stringify(value) : String(value);
   }
   if (merged.length > 0) {
     parameters.apiKeys = merged.map((entry) => entry.owner).join(', ');
@@ -407,7 +424,42 @@ function commandServiceState(command: CommandInfo): Pick<CommandInfo, 'serviceSt
 
 /** The command list with server-derived service state attached, as the operator returns it. */
 export function commandListItems(): CommandInfo[] {
-  return COMMANDS.map((command) => ({ ...command, ...commandServiceState(command) }));
+  return COMMANDS.map((command) => ({ ...maskListHeaders(command), ...commandServiceState(command) }));
+}
+
+// The agent's list shows reloadHeaders as names only (CommandListService); the detail keeps the object.
+function maskListHeaders(command: CommandInfo): CommandInfo {
+  const raw = command.parameters?.reloadHeaders;
+  if (raw === undefined) {
+    return command;
+  }
+  let names = '';
+  try {
+    names = Object.keys(JSON.parse(raw) as object).join(', ');
+  } catch {
+    names = '';
+  }
+  return { ...command, parameters: { ...command.parameters, reloadHeaders: names } };
+}
+
+/**
+ * The agent refuses a config it would not run (CommandSaveStatus.INVALID → operator 400 with its
+ * text). The mock models one rule deterministically: a waitTimeout in hours does not fit the
+ * default 10m idle timeout.
+ */
+function zipArchiveVersionRefusal(name: string, typePath: string, body: CommandWriteBody): MockResult | undefined {
+  const waitTimeout = body.config?.waitTimeout;
+  if (typePath !== 'zip-archive-version' || typeof waitTimeout !== 'string' || !/h/i.test(waitTimeout)) {
+    return undefined;
+  }
+  return {
+    status: 400,
+    body: {
+      errorCorrelationId: 'mock-invalid',
+      errorMessage: `config ${name}: field waitTimeout: plus the 1m lock wait must be below the agent's WEB_SERVER_IDLE_TIMEOUT (PT10M); lower it or raise the parameter`,
+      httpReasonCode: 400,
+    },
+  };
 }
 
 function commandDetailFor(host: string, name: string): CommandDetail | undefined {
@@ -449,6 +501,10 @@ export function mockCommandGet(host: string, name: string): MockResult {
 /** CREATE a command — 409 if one with the same name already exists on that host. */
 export function mockCommandCreate(typePath: string, body: CommandWriteBody): MockResult {
   const { host, name } = body;
+  const refusal = zipArchiveVersionRefusal(name, typePath, body);
+  if (refusal) {
+    return refusal;
+  }
   if (COMMANDS.some((command) => command.host === host && command.name === name)) {
     return {
       status: 409,
@@ -462,6 +518,11 @@ export function mockCommandCreate(typePath: string, body: CommandWriteBody): Moc
 /** UPDATE a command — 404 if it does not exist; type is immutable (kept from the on-disk row). */
 export function mockCommandUpdate(typePath: string, body: CommandWriteBody): MockResult {
   const { host, name } = body;
+  // the agent checks the config before it looks for the file: INVALID wins over 404
+  const refusal = zipArchiveVersionRefusal(name, typePath, body);
+  if (refusal) {
+    return refusal;
+  }
   const existing = COMMANDS.find((command) => command.host === host && command.name === name);
   if (!existing) {
     return notFound(host, name);

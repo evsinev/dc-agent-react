@@ -49,7 +49,7 @@ export async function clientPost<T>(props: ClientPostProps): Promise<T> {
       type: 'NetworkError',
       detail: {
         path: props.url,
-        params: props.params,
+        params: redactSecrets(props.params),
         method: 'POST',
       },
     });
@@ -66,11 +66,42 @@ export async function clientPost<T>(props: ClientPostProps): Promise<T> {
       type: errorMessage.type || (errorMessage as any).errorMessage,
       detail: {
         path: props.url,
-        params: props.params,
+        params: redactSecrets(props.params),
         method: 'POST',
       },
     });
   }
 
   return getFetchData<T>(response);
+}
+
+const REDACTED = '***';
+
+/**
+ * A copy of request params safe for `RequestError.detail` — which is logged as soon as the error is
+ * created: new api keys (`apiKeys.add[].key`) and header values of a command config
+ * (`config.reloadHeaders`, a service token) are replaced. The request itself is sent unchanged.
+ */
+export function redactSecrets(params: unknown): unknown {
+  if (params === null || typeof params !== 'object' || Array.isArray(params)) {
+    return params;
+  }
+  const copy: Record<string, unknown> = { ...(params as Record<string, unknown>) };
+  const apiKeys = copy.apiKeys as { add?: unknown } | undefined;
+  if (apiKeys && typeof apiKeys === 'object' && Array.isArray(apiKeys.add)) {
+    copy.apiKeys = {
+      ...apiKeys,
+      add: apiKeys.add.map((entry) =>
+        entry && typeof entry === 'object' ? { ...(entry as object), key: REDACTED } : REDACTED,
+      ),
+    };
+  }
+  const config = copy.config as { reloadHeaders?: unknown } | undefined;
+  if (config && typeof config === 'object' && config.reloadHeaders && typeof config.reloadHeaders === 'object') {
+    copy.config = {
+      ...config,
+      reloadHeaders: Object.fromEntries(Object.keys(config.reloadHeaders as object).map((name) => [name, REDACTED])),
+    };
+  }
+  return copy;
 }

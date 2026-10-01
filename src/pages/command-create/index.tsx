@@ -1,4 +1,4 @@
-import { errorMessage } from '@/components/error/components/load-error';
+import { errorMessage, serverErrorMessage } from '@/components/error/components/load-error';
 import { RequestError } from '@/components/error/models/error-model';
 import { useDocumentTitle } from '@/hooks/use-document-title';
 import { useNotifications } from '@/hooks/use-notifications';
@@ -65,7 +65,7 @@ export default function CommandCreate() {
       if (error instanceof RequestError && error.status === 409) {
         setNameServerError(`A command named "${submit.name}" already exists on ${submit.host}.`);
       } else {
-        setFormError(errorMessage(error));
+        setFormError(serverErrorMessage(error) ?? errorMessage(error));
       }
     }
   }

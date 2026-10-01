@@ -21,11 +21,22 @@ import {
   Input,
   Select,
   SpaceBetween,
+  Textarea,
   Tiles,
 } from '@cloudscape-design/components';
 import type { SelectProps } from '@cloudscape-design/components/select';
 import { useMemo, useRef, useState } from 'react';
-import { validateApiKeySecret, validateField, validateName, validateOwner } from './validation';
+import {
+  type HeaderRow,
+  validateApiKeySecret,
+  validateField,
+  validateHeaders,
+  validateName,
+  validateOwner,
+  validateVersionFileInDir,
+} from './validation';
+
+export type { HeaderRow } from './validation';
 
 export type ApiKeyRow = {
   rowId: string;
@@ -43,13 +54,20 @@ export type CommandFormInitial = {
   values: Record<string, string>;
   booleans: Record<string, boolean>;
   apiKeys: ApiKeyRow[];
+  /** Rows of each `headers` field (zip-archive-version `reloadHeaders`). */
+  headers?: Record<string, HeaderRow[]>;
+  /** A `headers` field whose stored value could not be read (edit): shown as a warning. */
+  headerWarnings?: Record<string, string>;
 };
+
+/** A config value: text, a checkbox, or a `headers` object. */
+export type ConfigValue = string | boolean | Record<string, string>;
 
 export type CommandFormSubmit = {
   host: string;
   name: string;
   type: CommandTypeKey;
-  config: Record<string, string | boolean>;
+  config: Record<string, ConfigValue>;
   apiKeys: ApiKeyOps;
 };
 
@@ -77,6 +95,11 @@ export function newApiKeyRow(owner = 'gitlab-ci'): ApiKeyRow {
   return { rowId: nextRowId(), owner, secret: generateApiKey() };
 }
 
+/** An empty header row. */
+export function newHeaderRow(name = '', value = ''): HeaderRow {
+  return { rowId: nextRowId(), name, value };
+}
+
 /** A row representing a key already stored on the server. */
 export function existingApiKeyRow(maskedId: string, owner: string): ApiKeyRow {
   return { rowId: nextRowId(), owner, maskedId };
@@ -91,6 +114,7 @@ export default function CommandForm(props: Props) {
   const [values, setValues] = useState<Record<string, string>>(initial.values);
   const [booleans, setBooleans] = useState<Record<string, boolean>>(initial.booleans);
   const [keys, setKeys] = useState<ApiKeyRow[]>(initial.apiKeys);
+  const [headers, setHeaders] = useState<Record<string, HeaderRow[]>>(initial.headers ?? {});
   const [touched, setTouched] = useState<Set<string>>(new Set());
   const [submitAttempted, setSubmitAttempted] = useState(false);
   // Auto-fill serviceName from Name until the user edits it (or when editing an existing command).
@@ -113,9 +137,21 @@ export default function CommandForm(props: Props) {
       }
     }
     for (const field of typeDef.fields) {
+      if (field.kind === 'headers') {
+        for (const [id, error] of Object.entries(validateHeaders(headers[field.key] ?? []))) {
+          map[`header-${field.key}-${id}`] = error;
+        }
+        continue;
+      }
       const error = validateField(field, field.kind === 'boolean' ? booleans[field.key] : values[field.key]);
       if (error) {
         map[`field-${field.key}`] = error;
+      }
+    }
+    if (type === 'ZIP_ARCHIVE_VERSION' && !map['field-dir'] && !map['field-versionFile']) {
+      const error = validateVersionFileInDir(values.dir ?? '', values.versionFile ?? '');
+      if (error) {
+        map['field-versionFile'] = error;
       }
     }
     for (const row of keys) {
@@ -131,7 +167,7 @@ export default function CommandForm(props: Props) {
       }
     }
     return map;
-  }, [fixedName, name, typeDef, values, booleans, keys]);
+  }, [fixedName, name, type, typeDef, values, booleans, keys, headers]);
 
   const nameError = props.nameServerError ?? errors.name;
 
@@ -178,9 +214,22 @@ export default function CommandForm(props: Props) {
     setKeys((prev) => prev.map((row, i) => (i === index ? { ...row, ...patch } : row)));
   }
 
+  function updateHeaders(field: string, change: (rows: HeaderRow[]) => HeaderRow[]): void {
+    setHeaders((prev) => ({ ...prev, [field]: change(prev[field] ?? []) }));
+  }
+
   // ── Submit ──────────────────────────────────────────────────────────────
   function focusOrder(): string[] {
-    const order = ['name', ...typeDef.fields.filter((f) => f.kind !== 'boolean').map((f) => `field-${f.key}`)];
+    const order = ['name'];
+    for (const field of typeDef.fields) {
+      if (field.kind === 'headers') {
+        for (const row of headers[field.key] ?? []) {
+          order.push(`header-${field.key}-name-${row.rowId}`, `header-${field.key}-value-${row.rowId}`);
+        }
+      } else if (field.kind !== 'boolean') {
+        order.push(`field-${field.key}`);
+      }
+    }
     for (const row of keys) {
       order.push(`secret-${row.rowId}`, `owner-${row.rowId}`);
     }
@@ -198,12 +247,19 @@ export default function CommandForm(props: Props) {
       return;
     }
 
-    const config: Record<string, string | boolean> = {};
+    const config: Record<string, ConfigValue> = {};
     for (const field of typeDef.fields) {
       if (field.kind === 'boolean') {
         config[field.key] = booleans[field.key] ?? false;
+      } else if (field.kind === 'headers') {
+        const rows = headers[field.key] ?? [];
+        if (rows.length > 0) {
+          // values as typed: whitespace inside a header value is the user's
+          config[field.key] = Object.fromEntries(rows.map((row) => [row.name, row.value]));
+        }
       } else {
-        const value = (values[field.key] ?? '').trim();
+        const typed = values[field.key] ?? '';
+        const value = field.raw ? typed : typed.trim();
         if (value) {
           config[field.key] = value;
         }
@@ -368,6 +424,21 @@ export default function CommandForm(props: Props) {
                     </SpaceBetween>
                   );
                 }
+                if (field.kind === 'headers') {
+                  return (
+                    <HeadersField
+                      key={field.key}
+                      field={field}
+                      rows={headers[field.key] ?? []}
+                      warning={initial.headerWarnings?.[field.key]}
+                      errors={errors}
+                      shown={shown}
+                      markTouched={markTouched}
+                      refs={refs.current}
+                      onChange={(change) => updateHeaders(field.key, change)}
+                    />
+                  );
+                }
                 return (
                   <FormField
                     key={field.key}
@@ -376,15 +447,28 @@ export default function CommandForm(props: Props) {
                     constraintText={field.constraintText}
                     errorText={shown(id) ? errors[id] : undefined}
                   >
-                    <Input
-                      ref={(el) => {
-                        refs.current[id] = el;
-                      }}
-                      value={values[field.key] ?? ''}
-                      placeholder={field.placeholder}
-                      onChange={({ detail }) => onFieldChange(field, detail.value)}
-                      onBlur={() => markTouched(id)}
-                    />
+                    {field.kind === 'multiline' ? (
+                      <Textarea
+                        ref={(el) => {
+                          refs.current[id] = el;
+                        }}
+                        value={values[field.key] ?? ''}
+                        placeholder={field.placeholder}
+                        rows={4}
+                        onChange={({ detail }) => onFieldChange(field, detail.value)}
+                        onBlur={() => markTouched(id)}
+                      />
+                    ) : (
+                      <Input
+                        ref={(el) => {
+                          refs.current[id] = el;
+                        }}
+                        value={values[field.key] ?? ''}
+                        placeholder={field.placeholder}
+                        onChange={({ detail }) => onFieldChange(field, detail.value)}
+                        onBlur={() => markTouched(id)}
+                      />
+                    )}
                   </FormField>
                 );
               })}
@@ -456,5 +540,78 @@ export default function CommandForm(props: Props) {
         </Container>
       </SpaceBetween>
     </Form>
+  );
+}
+
+type HeadersFieldProps = {
+  field: FieldDef;
+  rows: HeaderRow[];
+  warning?: string;
+  errors: Record<string, string>;
+  shown: (id: string) => boolean;
+  markTouched: (id: string) => void;
+  refs: Record<string, { focus: () => void } | null>;
+  onChange: (change: (rows: HeaderRow[]) => HeaderRow[]) => void;
+};
+
+/**
+ * Name → value rows of a `headers` field. Values are password inputs so they do not show over a
+ * shoulder — not a protection: the value is in the browser (the simple variant, see the plan).
+ */
+function HeadersField(props: HeadersFieldProps) {
+  const { field, rows, errors, shown } = props;
+  const id = (part: 'name' | 'value', row: HeaderRow) => `header-${field.key}-${part}-${row.rowId}`;
+  const update = (index: number, patch: Partial<HeaderRow>) =>
+    props.onChange((prev) => prev.map((row, i) => (i === index ? { ...row, ...patch } : row)));
+  return (
+    <FormField
+      label={field.required ? field.label : `${field.label} - optional`}
+      description={field.description}
+      constraintText={field.constraintText}
+    >
+      <SpaceBetween size="xs">
+        {props.warning && <Alert type="warning">{props.warning}</Alert>}
+        <AttributeEditor
+          items={rows}
+          addButtonText="Add header"
+          removeButtonText="Remove"
+          empty="No headers."
+          onAddButtonClick={() => props.onChange((prev) => [...prev, newHeaderRow()])}
+          onRemoveButtonClick={({ detail }) => props.onChange((prev) => prev.filter((_, i) => i !== detail.itemIndex))}
+          definition={[
+            {
+              label: 'Header name',
+              control: (row: HeaderRow, index) => (
+                <Input
+                  ref={(el) => {
+                    props.refs[id('name', row)] = el;
+                  }}
+                  value={row.name}
+                  placeholder="Authorization"
+                  onChange={({ detail }) => update(index, { name: detail.value })}
+                  onBlur={() => props.markTouched(id('name', row))}
+                />
+              ),
+              errorText: (row: HeaderRow) => (shown(id('name', row)) ? errors[id('name', row)] : undefined),
+            },
+            {
+              label: 'Value',
+              control: (row: HeaderRow, index) => (
+                <Input
+                  ref={(el) => {
+                    props.refs[id('value', row)] = el;
+                  }}
+                  type="password"
+                  value={row.value}
+                  onChange={({ detail }) => update(index, { value: detail.value })}
+                  onBlur={() => props.markTouched(id('value', row))}
+                />
+              ),
+              errorText: (row: HeaderRow) => (shown(id('value', row)) ? errors[id('value', row)] : undefined),
+            },
+          ]}
+        />
+      </SpaceBetween>
+    </FormField>
   );
 }

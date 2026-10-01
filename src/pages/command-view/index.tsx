@@ -1,6 +1,7 @@
 import DefinitionList from '@/components/definition-list';
 import LoadError from '@/components/error/components/load-error';
 import { useDocumentTitle } from '@/hooks/use-document-title';
+import { headerNames } from '@/pages/command-list/api/command-headers';
 import { useCommandGet } from '@/pages/command-list/api/command-mutations';
 import {
   COMMAND_TYPES,
@@ -161,7 +162,11 @@ export default function CommandView() {
                 termWidth="180px"
                 items={configFields.map((field) => ({
                   label: field.label,
-                  value: command.parameters[field.key] ?? '—',
+                  // headers: names only — the values (a service token) are never rendered
+                  value:
+                    field.kind === 'headers'
+                      ? headerNames(command.parameters[field.key])
+                      : (command.parameters[field.key] ?? '—'),
                 }))}
               />
             ) : (
@@ -174,13 +179,19 @@ export default function CommandView() {
               header={
                 <Header
                   headingTagOverride="h3"
-                  description="Replace package.zip and $DEPLOY_KEY with your artifact and deploy key."
+                  description={
+                    command.type === 'ZIP_ARCHIVE_VERSION'
+                      ? 'Replace package.zip, $DEPLOY_KEY and {version} with your bundle, deploy key and tag. The status code is the outcome; the body says where the pointer is.'
+                      : 'Replace package.zip and $DEPLOY_KEY with your artifact and deploy key.'
+                  }
                 >
                   Usage
                 </Header>
               }
             >
-              <UsageTabs snippets={buildUsageSnippets(buildDeployUrl(agentUrl, command.type, command.name))} />
+              <UsageTabs
+                snippets={buildUsageSnippets(buildDeployUrl(agentUrl, command.type, command.name), command.type)}
+              />
             </Container>
           )}
 

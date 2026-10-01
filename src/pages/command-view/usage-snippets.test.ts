@@ -58,3 +58,28 @@ describe('buildUsageSnippets', () => {
     expect(snippets.gitlabWget).toContain('wget');
   });
 });
+
+describe('zip-archive-version snippets', () => {
+  const url = 'http://h/dc-agent/zip-archive-version/bundle/{version}';
+
+  test('the deploy URL keeps {version} to fill', () => {
+    expect(isUploadType('ZIP_ARCHIVE_VERSION')).toBe(true);
+    expect(buildDeployUrl('http://h/dc-agent', 'ZIP_ARCHIVE_VERSION', 'bundle')).toBe(url);
+  });
+
+  test('the failure body is kept: it carries the outcome', () => {
+    const snippets = buildUsageSnippets(url, 'ZIP_ARCHIVE_VERSION');
+    expect(snippets.curl).toContain('--fail-with-body ');
+    expect(snippets.gitlabCurl).toContain('--fail-with-body\n');
+    expect(snippets.wget).toContain('--content-on-error');
+    expect(snippets.gitlabWget).toContain('--content-on-error');
+    for (const snippet of Object.values(snippets)) {
+      expect(snippet).toContain(url);
+    }
+  });
+
+  test('other types are unchanged', () => {
+    expect(buildUsageSnippets(url, 'ZIP_DIRS')).toEqual(buildUsageSnippets(url));
+    expect(buildUsageSnippets(url).curl).not.toContain('--fail-with-body');
+  });
+});

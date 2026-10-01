@@ -1,4 +1,4 @@
-// Single source of truth for the eight command types. Drives the create-form type tiles,
+// Single source of truth for the nine command types. Drives the create-form type tiles,
 // the per-type Configuration fields, the command details view, the endpoint badge, and the
 // create/update request URL. Keep this in sync with the backend `TaskType` enum and the
 // per-type request DTOs (dc-agent `.../remote/agent/controlplane/messages/Command*Request`).
@@ -11,9 +11,14 @@ export type CommandTypeKey =
   | 'ZIP_ARCHIVE'
   | 'ZIP_DIRS'
   | 'FETCH_URL'
-  | 'DOCKER';
+  | 'DOCKER'
+  | 'ZIP_ARCHIVE_VERSION';
 
-export type FieldKind = 'path' | 'text' | 'url' | 'boolean';
+/**
+ * `size` (`50mb`), `count` (`10k`) and `duration` (`5m`) are strings checked like the agent's
+ * `Units`; `headers` is a name → value object; `multiline` is free text edited in a textarea.
+ */
+export type FieldKind = 'path' | 'text' | 'url' | 'boolean' | 'size' | 'count' | 'duration' | 'headers' | 'multiline';
 
 export type FieldDef = {
   /** Config key written to the file and posted in `config` (matches the backend model field). */
@@ -24,6 +29,11 @@ export type FieldDef = {
   description?: string;
   constraintText?: string;
   placeholder?: string;
+  /**
+   * Sent exactly as typed — no trim; only an empty string is left out. For values where
+   * whitespace is content (a request body, a regex). Off for every other field.
+   */
+  raw?: boolean;
 };
 
 export type CommandTypeDef = {
@@ -211,6 +221,109 @@ export const COMMAND_TYPES: Record<CommandTypeKey, CommandTypeDef> = {
     fixedName: 'fetch-url',
     fields: [],
   },
+  ZIP_ARCHIVE_VERSION: {
+    key: 'ZIP_ARCHIVE_VERSION',
+    label: 'zip-archive-version',
+    description: 'Publish a version dir, switch the pointer, wait for the service',
+    endpoint: 'POST /dc-agent/zip-archive-version/{name}/{version}',
+    path: 'zip-archive-version',
+    fields: [
+      {
+        key: 'dir',
+        label: 'dir',
+        required: true,
+        kind: 'path',
+        description: 'Directory holding the published versions; created if missing (its parent must exist).',
+        constraintText: 'Absolute path, starts with /.',
+        placeholder: '/opt/app/bundles',
+      },
+      {
+        key: 'versionFile',
+        label: 'versionFile',
+        required: true,
+        kind: 'path',
+        description: 'Pointer file: one line with the name of the active version.',
+        constraintText:
+          'Must lie directly in dir · File name: 1–64 of A–Z a–z 0–9 . _ -, starting with a letter or digit.',
+        placeholder: '/opt/app/bundles/current',
+      },
+      {
+        key: 'reloadUrl',
+        label: 'reloadUrl',
+        required: true,
+        kind: 'url',
+        description:
+          "The service's synchronous reload endpoint, called with POST after the switch; ${version} is substituted.",
+        constraintText: 'http:// or https:// · The service answers 2xx when the version is active, an error otherwise.',
+        placeholder: 'http://127.0.0.1:8080/bundle/reload?version=${version}',
+      },
+      {
+        key: 'reloadHeaders',
+        label: 'reloadHeaders',
+        required: false,
+        kind: 'headers',
+        description: 'Headers added to the reload call, e.g. the service token.',
+        constraintText:
+          'Stored in the agent config and readable by operators; not for agent api keys. Host, Connection, Content-Length, Expect, Upgrade are not allowed.',
+      },
+      {
+        key: 'waitTimeout',
+        label: 'waitTimeout',
+        required: false,
+        kind: 'duration',
+        description: 'How long the reload call may take; past it the call is 504 and the pointer goes back.',
+        constraintText: 'Like 30s, 5m · Default 5m · Plus 1 minute must be below the agent WEB_SERVER_IDLE_TIMEOUT.',
+        placeholder: '5m',
+      },
+      {
+        key: 'versionPattern',
+        label: 'versionPattern',
+        required: false,
+        // a Java regex may span lines ((?x) with comments): a one-line input would join them
+        kind: 'multiline',
+        raw: true,
+        description: 'Regular expression a version must match (whole name), on top of the built-in name rule.',
+        constraintText: 'Java regex.',
+        placeholder: '^v[0-9]+\\.[0-9]+\\.[0-9]+$',
+      },
+      {
+        key: 'maxUploadBytes',
+        label: 'maxUploadBytes',
+        required: false,
+        kind: 'size',
+        description: 'Largest request body accepted; larger is 413.',
+        constraintText: 'Like 50mb, 512k, 10 (bytes) · Default 100mb.',
+        placeholder: '100mb',
+      },
+      {
+        key: 'maxBytes',
+        label: 'maxBytes',
+        required: false,
+        kind: 'size',
+        description: 'Largest unpacked contents, counted from the bytes actually read.',
+        constraintText: 'Like 200mb · Default 500mb.',
+        placeholder: '500mb',
+      },
+      {
+        key: 'maxEntries',
+        label: 'maxEntries',
+        required: false,
+        kind: 'count',
+        description: 'Most ZIP entries accepted, directory entries included.',
+        constraintText: 'Like 10k, 500 · Default 10k.',
+        placeholder: '10k',
+      },
+      {
+        key: 'reloadBody',
+        label: 'reloadBody',
+        required: false,
+        kind: 'multiline',
+        raw: true,
+        description: 'Body of the reload POST; ${version} is substituted. Empty: no body.',
+        constraintText: 'Sent as is; set its Content-Type in reloadHeaders.',
+      },
+    ],
+  },
   DOCKER: {
     key: 'DOCKER',
     label: 'docker push / check',
@@ -222,7 +335,7 @@ export const COMMAND_TYPES: Record<CommandTypeKey, CommandTypeDef> = {
   },
 };
 
-// Tile display order (4 columns × 2 rows), matching the design.
+// Tile display order (4 columns; the ninth type starts a third row).
 export const COMMAND_TYPE_ORDER: CommandTypeKey[] = [
   'WAR',
   'JAR',
@@ -230,6 +343,7 @@ export const COMMAND_TYPE_ORDER: CommandTypeKey[] = [
   'SAVE_ARTIFACT',
   'ZIP_ARCHIVE',
   'ZIP_DIRS',
+  'ZIP_ARCHIVE_VERSION',
   'FETCH_URL',
   'DOCKER',
 ];
